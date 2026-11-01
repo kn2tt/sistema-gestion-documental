@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Asignaciones | Gestión Documental</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/asignaciones.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div>
+                <strong>Gestión Documental</strong>
+                <span>Plataforma empresarial</span>
+            </div>
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">
+                PRINCIPAL
+            </div>
+
+            <a href="dashboard.html" class="nav-item">
+                <i class="bi bi-grid-1x2"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="asignaciones.html" class="nav-item active">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Asignaciones</span>
+            </a>
+
+            <a href="documentos.html" class="nav-item">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Documentos</span>
+            </a>
+
+            <a href="evidencias.html" class="nav-item">
+                <i class="bi bi-images"></i>
+                <span>Evidencias</span>
+            </a>
+
+            <a href="seguimiento.html" class="nav-item">
+                <i class="bi bi-clock-history"></i>
+                <span>Seguimiento</span>
+            </a>
+
+
+            <div class="nav-section-title nav-section-space">
+                ADMINISTRACIÓN
+            </div>
+
+            <a href="administracion.html" class="nav-item">
+                <i class="bi bi-gear"></i>
+                <span>Configuración</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <div class="sidebar-user">
+
+                <div class="user-avatar">
+                    AS
+                </div>
+
+                <div class="user-info">
+                    <strong>Administrador</strong>
+                    <span>admin@empresa.com</span>
+                </div>
+
+                <button
+                    type="button"
+                    class="sidebar-user-menu"
+                    title="Opciones"
+                >
+                    <i class="bi bi-three-dots"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="Abrir menú"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="breadcrumb-area">
+                    <span class="breadcrumb-section">Principal</span>
+                    <i class="bi bi-chevron-right"></i>
+                    <strong>Asignaciones</strong>
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    class="topbar-button notification-button"
+                    title="Notificaciones"
+                >
+                    <i class="bi bi-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-user">
+
+                    <div class="topbar-avatar">
+                        AS
+                    </div>
+
+                    <div class="topbar-user-info">
+                        <strong>Administrador</strong>
+                        <span>Administrador del sistema</span>
+                    </div>
+
+                    <i class="bi bi-chevron-down topbar-chevron"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+        <!-- PAGE -->
+        <section class="assignments-page">
+
+            <!-- HEADER -->
+
+            <div class="page-header">
+
+                <div>
+                    <h1>Asignaciones</h1>
+
+                    <p>
+                        Gestiona los responsables y el flujo documental de cada proyecto.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-primary new-assignment-button"
+                    id="newAssignmentButton"
+                >
+                    <i class="bi bi-plus-lg"></i>
+                    Nueva asignación
+                </button>
+
+            </div>
+
+
+            <!-- SUMMARY -->
+
+            <div class="assignment-summary">
+
+                <div class="summary-card">
+
+                    <div class="summary-icon total">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+
+                    <div>
+                        <span>Total asignaciones</span>
+                        <strong>12</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-icon process">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </div>
+
+                    <div>
+                        <span>En proceso</span>
+                        <strong>4</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-icon complete">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+
+                    <div>
+                        <span>Completadas</span>
+                        <strong>6</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-icon pending">
+                        <i class="bi bi-clock"></i>
+                    </div>
+
+                    <div>
+                        <span>Pendientes</span>
+                        <strong>2</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CLIENTE SELECCIONADO -->
+            <div class="assignment-client-card" id="assignmentClientCard">
+
+                <div class="assignment-client-icon">
+                    <i class="bi bi-building"></i>
+                </div>
+
+                <div class="assignment-client-info">
+                    <h2 id="clienteAsignacionesNombre">Seleccionar cliente</h2>
+                    <p id="clienteAsignacionesEstado">Cliente actual</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="assignment-client-toggle"
+                    id="btnCambiarCliente"
+                    aria-label="Mostrar clientes"
+                    aria-expanded="false"
+                    aria-controls="selectorClientesPanel"
+                >
+                    <i class="bi bi-chevron-down" id="iconoCambiarCliente"></i>
+                </button>
+
+            </div>
+
+
+            <!-- SELECTOR DESPLEGABLE DE CLIENTES -->
+            <div
+                class="assignment-client-dropdown"
+                id="selectorClientesPanel"
+                hidden
+            >
+                <div class="assignment-client-dropdown-header">
+
+                    <div>
+                        <h3>Selecciona un cliente</h3>
+                        <p>Elige el cliente cuyas asignaciones deseas consultar.</p>
+                    </div>
+
+                </div>
+
+                <div
+                    class="assignment-client-options"
+                    id="listaClientesAsignaciones"
+                >
+                    <!-- Las opciones se cargarán con los clientes del sistema. -->
+                </div>
+
+                <p class="assignment-client-empty" id="mensajeClientesVacios" hidden>
+                    No hay clientes disponibles.
+                </p>
+
+            </div>
+
+            <!-- Se conserva el select para mantener la compatibilidad con el JS actual. -->
+            <select
+                id="clienteAsignacionesSelect"
+                class="visually-hidden"
+                tabindex="-1"
+                aria-hidden="true"
+            >
+                <option value="">Cargando clientes...</option>
+            </select>
+
+
+
+            <!-- VISTAS POR ESTADO -->
+            <div class="assignment-status-views">
+
+                <button
+                    type="button"
+                    class="assignment-view-card active"
+                    data-assignment-view="activas"
+                    aria-pressed="true"
+                >
+                    <span class="assignment-view-icon active-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </span>
+
+                    <span class="assignment-view-content">
+                        <strong>Activas</strong>
+                        <small>Pendientes y en proceso</small>
+                    </span>
+
+                    <i class="bi bi-chevron-right assignment-view-arrow"></i>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="assignment-view-card"
+                    data-assignment-view="observadas"
+                    aria-pressed="false"
+                >
+                    <span class="assignment-view-icon observed-icon">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </span>
+
+                    <span class="assignment-view-content">
+                        <strong>Observadas</strong>
+                        <small>Requieren atención</small>
+                    </span>
+
+                    <i class="bi bi-chevron-right assignment-view-arrow"></i>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="assignment-view-card"
+                    data-assignment-view="completadas"
+                    aria-pressed="false"
+                >
+                    <span class="assignment-view-icon completed-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </span>
+
+                    <span class="assignment-view-content">
+                        <strong>Completadas</strong>
+                        <small>Trabajo finalizado</small>
+                    </span>
+
+                    <i class="bi bi-chevron-right assignment-view-arrow"></i>
+                </button>
+
+            </div>
+
+
+            <!-- BUSCADOR Y BOTÓN DE FILTROS -->
+            <div class="assignment-list-toolbar">
+
+                <div class="assignment-search">
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="searchInput"
+                        placeholder="Buscar asignaciones..."
+                        aria-label="Buscar asignaciones"
+                    >
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-light assignment-filter-button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#filtrosAsignaciones"
+                    aria-expanded="false"
+                    aria-controls="filtrosAsignaciones"
+                    id="btnFiltrosAsignaciones"
+                >
+                    <i class="bi bi-sliders"></i>
+                    Filtros
+                    <i class="bi bi-chevron-down assignment-filter-chevron"></i>
+                </button>
+
+            </div>
+
+
+            <!-- PANEL DESPLEGABLE DE FILTROS -->
+            <div class="collapse" id="filtrosAsignaciones">
+
+                <div class="assignment-filters">
+
+                    <div>
+                        <label for="documentFilter" class="form-label">
+                            Tipo de documento
+                        </label>
+
+                        <select class="form-select" id="documentFilter">
+                            <option value="">Todos los documentos</option>
+                        </select>
+                    </div>
+
+
+                    <div>
+                        <label for="technicianFilter" class="form-label">
+                            Técnico
+                        </label>
+
+                        <select class="form-select" id="technicianFilter">
+                            <option value="">Todos los técnicos</option>
+                        </select>
+                    </div>
+
+
+                    <div>
+                        <label for="filtroFechaDesde" class="form-label">
+                            Fecha límite desde
+                        </label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="filtroFechaDesde"
+                        >
+                    </div>
+
+
+                    <div>
+                        <label for="filtroFechaHasta" class="form-label">
+                            Fecha límite hasta
+                        </label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="filtroFechaHasta"
+                        >
+                    </div>
+
+
+                    <div class="assignment-filter-actions">
+                        <button
+                            type="button"
+                            class="btn btn-light"
+                            id="btnLimpiarFiltrosAsignaciones"
+                        >
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            Limpiar filtros
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TABLE -->
+
+            <div class="assignments-card">
+
+                <div class="table-header">
+
+                    <div>
+                        <h2>Asignaciones registradas</h2>
+                        <span>12 asignaciones encontradas</span>
+                    </div>
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table class="assignments-table">
+                        <thead>
+                            <tr>
+                                <th>Asignación</th>
+                                <th>Site</th>
+                                <th>Subproyecto</th>
+                                <th>Documento</th>
+                                <th>Técnicos</th>
+                                <th>Documentador</th>
+                                <th>Fecha límite</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="assignmentTableBody"></tbody>
+                    </table>
+
+                </div>
+
+
+                <!-- PAGINATION -->
+                <div class="table-footer">
+
+                    <span id="contadorAsignaciones">
+                        Cargando asignaciones...
+                    </span>
+
+                    <div
+                        class="pagination"
+                        id="paginacionAsignaciones"
+                        aria-label="Paginación de asignaciones"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- MODAL NUEVA ASIGNACIÓN -->
+<div
+    class="modal fade"
+    id="assignmentModal"
+    tabindex="-1"
+    aria-labelledby="assignmentModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="assignmentModalLabel">
+                        Nueva asignación
+                    </h5>
+                    <p>Asigna un proyecto, sus documentos y el personal responsable.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label for="assignmentClient" class="form-label">
+                            Cliente
+                        </label>
+                        <select class="form-select" id="assignmentClient" required>
+                            <option value="">Seleccionar cliente</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="assignmentProject" class="form-label">
+                            Proyecto
+                        </label>
+                        <select class="form-select" id="assignmentProject" required disabled>
+                            <option value="">Seleccionar proyecto</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="assignmentSite" class="form-label">
+                            Site
+                        </label>
+                        <select class="form-select" id="assignmentSite" required disabled>
+                            <option value="">Seleccionar site</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="assignmentSubproject" class="form-label">
+                            Subproyecto
+                        </label>
+                        <select class="form-select" id="assignmentSubproject" disabled>
+                            <option value="">Sin subproyecto</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="assignmentDocumentType" class="form-label">
+                            Tipo de documento
+                        </label>
+                        <select class="form-select" id="assignmentDocumentType" required>
+                            <option value="">Seleccionar tipo de documento</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="assignmentTemplate" class="form-label">
+                            Plantilla
+                        </label>
+                        <select class="form-select" id="assignmentTemplate" disabled>
+                            <option value="">Seleccionar plantilla (opcional)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="technicianSearch">
+                            Técnicos asignados
+                        </label>
+
+                        <div class="border rounded p-3">
+                            <div
+                                id="selectedTechnicians"
+                                class="d-flex flex-wrap gap-2 mb-3"
+                            ></div>
+
+                            <input
+                                type="search"
+                                class="form-control"
+                                id="technicianSearch"
+                                placeholder="Buscar técnico..."
+                                autocomplete="off"
+                            >
+
+                            <div
+                                id="technicianOptions"
+                                class="d-flex flex-column gap-2 mt-2"
+                                style="max-height: 180px; overflow-y: auto;"
+                            ></div>
+
+                            <div
+                                id="technicianEmpty"
+                                class="text-muted small mt-2"
+                                hidden
+                            >
+                                No se encontraron técnicos.
+                            </div>
+
+                            <div class="text-muted small mt-2">
+                                Técnicos seleccionados:
+                                <span id="technicianCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="assignmentDocumenter" class="form-label">
+                            Documentador
+                        </label>
+                        <select class="form-select" id="assignmentDocumenter">
+                            <option value="">Seleccionar documentador (opcional)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="assignmentStartDate" class="form-label">
+                            Fecha de inicio
+                        </label>
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="assignmentStartDate"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="assignmentDueDate" class="form-label">
+                            Fecha límite
+                        </label>
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="assignmentDueDate"
+                        >
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="saveAssignment"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Crear asignación
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL EDITAR ASIGNACIÓN -->
+<div
+    class="modal fade"
+    id="editarAsignacionModal"
+    tabindex="-1"
+    aria-labelledby="editarAsignacionModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div>
+                    <h5
+                        class="modal-title"
+                        id="editarAsignacionModalLabel"
+                    >
+                        Editar asignación
+                    </h5>
+
+                    <p>
+                        Actualiza los datos y responsables de la asignación seleccionada.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="editarAsignacionId">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label for="editarAssignmentClient" class="form-label">
+                            Cliente
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarAssignmentClient"
+                            required
+                        >
+                            <option value="">Seleccionar cliente</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editarAssignmentProject" class="form-label">
+                            Proyecto
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarAssignmentProject"
+                            required
+                            disabled
+                        >
+                            <option value="">Seleccionar proyecto</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editarAssignmentSite" class="form-label">
+                            Site
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarAssignmentSite"
+                            required
+                            disabled
+                        >
+                            <option value="">Seleccionar site</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editarAssignmentSubproject" class="form-label">
+                            Subproyecto
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarAssignmentSubproject"
+                            disabled
+                        >
+                            <option value="">Sin subproyecto</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editarAssignmentDocumentType" class="form-label">
+                            Tipo de documento
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarAssignmentDocumentType"
+                            required
+                        >
+                            <option value="">Seleccionar tipo de documento</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editarAssignmentTemplate" class="form-label">
+                            Plantilla
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarAssignmentTemplate"
+                            disabled
+                        >
+                            <option value="">Seleccionar plantilla</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="editarTechnicianSearch">
+                            Técnicos asignados
+                        </label>
+
+                        <div class="border rounded p-3">
+                            <div
+                                id="editarSelectedTechnicians"
+                                class="d-flex flex-wrap gap-2 mb-3"
+                            ></div>
+
+                            <input
+                                type="search"
+                                class="form-control"
+                                id="editarTechnicianSearch"
+                                placeholder="Buscar técnico..."
+                                autocomplete="off"
+                            >
+
+                            <div
+                                id="editarTechnicianOptions"
+                                class="d-flex flex-column gap-2 mt-2"
+                                style="max-height: 180px; overflow-y: auto;"
+                            ></div>
+
+                            <div
+                                id="editarTechnicianEmpty"
+                                class="text-muted small mt-2"
+                                hidden
+                            >
+                                No se encontraron técnicos.
+                            </div>
+
+                            <div class="text-muted small mt-2">
+                                Técnicos seleccionados:
+                                <span id="editarTechnicianCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editarAssignmentDocumenter" class="form-label">
+                            Documentador
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarAssignmentDocumenter"
+                        >
+                            <option value="">
+                                Seleccionar documentador (opcional)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editarAssignmentStartDate" class="form-label">
+                            Fecha de inicio
+                        </label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="editarAssignmentStartDate"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editarAssignmentDueDate" class="form-label">
+                            Fecha límite
+                        </label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="editarAssignmentDueDate"
+                        >
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="actualizarAsignacion"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar cambios
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL ELIMINAR ASIGNACIÓN -->
+<div
+    class="modal fade"
+    id="eliminarAsignacionModal"
+    tabindex="-1"
+    aria-labelledby="eliminarAsignacionModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="eliminarAsignacionModalLabel"
+                >
+                    Eliminar asignación
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar esta asignación?
+                    </p>
+
+                    <p
+                        id="eliminarAsignacionMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el registro de la asignación.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarAsignacion"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar asignación
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="js/asignaciones.js"></script>
+
+</body>
+</html>

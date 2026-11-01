@@ -1,0 +1,1161 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Detalle de asignación | Gestión Documental</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/detalle-asignacion.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div>
+                <strong>Gestión Documental</strong>
+                <span>Plataforma empresarial</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">PRINCIPAL</div>
+
+            <a href="dashboard.html" class="nav-item">
+                <i class="bi bi-grid-1x2"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="asignaciones.html" class="nav-item active">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Asignaciones</span>
+            </a>
+
+            <a href="documentos.html" class="nav-item">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Documentos</span>
+            </a>
+
+            <a href="evidencias.html" class="nav-item">
+                <i class="bi bi-images"></i>
+                <span>Evidencias</span>
+            </a>
+
+            <a href="seguimiento.html" class="nav-item">
+                <i class="bi bi-clock-history"></i>
+                <span>Seguimiento</span>
+            </a>
+
+            <div class="nav-section-title nav-section-space">
+                ADMINISTRACIÓN
+            </div>
+
+            <a href="administracion.html" class="nav-item">
+                <i class="bi bi-gear"></i>
+                <span>Configuración</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+
+                <div class="user-avatar">AS</div>
+
+                <div class="user-info">
+                    <strong>Administrador</strong>
+                    <span>admin@empresa.com</span>
+                </div>
+
+                <button
+                    type="button"
+                    class="sidebar-user-menu"
+                    title="Opciones"
+                >
+                    <i class="bi bi-three-dots"></i>
+                </button>
+
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- OVERLAY MOBILE -->
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="Abrir menú"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="breadcrumb-area">
+                    <span class="breadcrumb-section">Asignaciones</span>
+                    <i class="bi bi-chevron-right"></i>
+                    <strong>Detalle de asignación</strong>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    class="topbar-button notification-button"
+                    title="Notificaciones"
+                >
+                    <i class="bi bi-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-user">
+                    <div class="topbar-avatar">AS</div>
+
+                    <div class="topbar-user-info">
+                        <strong>Administrador</strong>
+                        <span>Administrador del sistema</span>
+                    </div>
+
+                    <i class="bi bi-chevron-down topbar-chevron"></i>
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- CONTENIDO -->
+
+        <div class="page-content">
+
+            <!-- ENCABEZADO DINÁMICO -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <a href="asignaciones.html" class="back-link">
+                        <i class="bi bi-arrow-left"></i>
+                        Volver a asignaciones
+                    </a>
+
+                    <div class="title-row">
+
+                        <div>
+                            <h1 id="tituloAsignacion"></h1>
+                            <p id="subtituloAsignacion"></p>
+                        </div>
+
+                        <span
+                            class="status-badge"
+                            id="estadoAsignacion"
+                            hidden
+                        >
+                            <span></span>
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="header-actions">
+
+                    <button
+                        type="button"
+                        class="btn-secondary-custom"
+                        id="documentBtn"
+                    >
+                        <i class="bi bi-file-earmark-text"></i>
+                        Ver documento
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-secondary-custom"
+                        id="manageChecklistTemplatesBtn"
+                    >
+                        <i class="bi bi-gear"></i>
+                        Administrar plantillas
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-primary-custom"
+                        id="trackingBtn"
+                    >
+                        <i class="bi bi-clock-history"></i>
+                        Seguimiento
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- INFORMACIÓN GENERAL DINÁMICA -->
+
+            <section class="info-grid">
+
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="bi bi-building"></i>
+                    </div>
+
+                    <div>
+                        <span class="info-label">Cliente</span>
+                        <strong id="clienteAsignacion"></strong>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+
+                    <div>
+                        <span class="info-label">Site</span>
+                        <strong id="siteAsignacion"></strong>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+
+                    <div>
+                        <span class="info-label">Tipo de documento</span>
+                        <strong id="tipoDocumentoAsignacion"></strong>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="bi bi-list-check"></i>
+                    </div>
+
+                    <div class="info-card-content">
+                        <span class="info-label">Alcances</span>
+                        <div id="alcanceAsignacion" class="scope-list"></div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- RESPONSABLES Y FECHAS -->
+
+            <section class="content-grid">
+
+                <!-- RESPONSABLES -->
+
+                <div class="panel-card">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2>Responsables</h2>
+                            <p>Personal asignado a la ejecución documental</p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="responsible-action"
+                            id="manageTechniciansBtn"
+                        >
+                            <i class="bi bi-pencil"></i>
+                            Gestionar
+                        </button>
+
+                    </div>
+
+                    <div class="responsible-section">
+
+                        <div class="responsible-section-header">
+
+                            <div>
+                                <span class="responsible-section-title">
+                                    Técnicos responsables
+                                </span>
+
+                                <span class="responsible-section-description">
+                                    Personal encargado de registrar las evidencias
+                                </span>
+                            </div>
+
+                            <span class="responsible-count"></span>
+
+                        </div>
+
+                        <div class="responsible-list"></div>
+
+                    </div>
+
+                    <div class="responsible-divider"></div>
+
+                    <div class="responsible-section">
+
+                        <div class="responsible-section-header">
+
+                            <div>
+                                <span class="responsible-section-title">
+                                    Documentador
+                                </span>
+
+                                <span class="responsible-section-description">
+                                    Responsable de elaborar y completar el documento
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="documenter-assignment"></div>
+
+                    </div>
+
+                </div>
+
+                <!-- FECHAS -->
+
+                <div class="panel-card">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2>Información de la asignación</h2>
+                            <p>Fechas y estado actual</p>
+                        </div>
+                    </div>
+
+                    <div class="date-list">
+
+                        <div class="date-row">
+                            <div class="date-icon">
+                                <i class="bi bi-calendar-plus"></i>
+                            </div>
+
+                            <div>
+                                <span>Fecha de asignación</span>
+                                <strong id="fechaAsignacion"></strong>
+                            </div>
+                        </div>
+
+                        <div class="date-row">
+                            <div class="date-icon">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+
+                            <div>
+                                <span>Fecha límite</span>
+                                <strong id="fechaLimiteAsignacion"></strong>
+                            </div>
+                        </div>
+
+                        <div class="date-row">
+                            <div class="date-icon">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+
+                            <div>
+                                <span>Días restantes</span>
+                                <strong id="diasRestantesAsignacion"></strong>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- FLUJO DE ESTADOS -->
+
+                <div class="panel-card workflow-card">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2>Flujo de estados</h2>
+                            <p>Etapas del proceso de la asignación</p>
+                        </div>
+
+                        <i class="bi bi-diagram-3 workflow-header-icon"></i>
+
+                    </div>
+
+                    <div class="workflow-timeline">
+
+                        <div class="workflow-step" data-status="pendiente">
+                            <div class="workflow-marker">
+                                <i class="bi bi-clipboard-check"></i>
+                            </div>
+                            <div class="workflow-content">
+                                <strong>Pendiente</strong>
+                                <span>Asignación registrada</span>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step" data-status="en_proceso">
+                            <div class="workflow-marker">
+                                <i class="bi bi-tools"></i>
+                            </div>
+                            <div class="workflow-content">
+                                <strong>En proceso</strong>
+                                <span>Ejecución técnica y evidencias</span>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step" data-status="pendiente_documentacion">
+                            <div class="workflow-marker">
+                                <i class="bi bi-file-earmark"></i>
+                            </div>
+                            <div class="workflow-content">
+                                <strong>Pendiente de documentación</strong>
+                                <span>Preparación del documento</span>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step" data-status="en_documentacion">
+                            <div class="workflow-marker">
+                                <i class="bi bi-pencil-square"></i>
+                            </div>
+                            <div class="workflow-content">
+                                <strong>En documentación</strong>
+                                <span>Elaboración o corrección</span>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step" data-status="en_revision">
+                            <div class="workflow-marker">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <div class="workflow-content">
+                                <strong>En revisión</strong>
+                                <span>Revisión del documento</span>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step" data-status="observado">
+                            <div class="workflow-marker">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="workflow-content">
+                                <strong>Observado</strong>
+                                <span>Corrección documental o nuevas evidencias</span>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step" data-status="completado">
+                            <div class="workflow-marker">
+                                <i class="bi bi-flag"></i>
+                            </div>
+                            <div class="workflow-content">
+                                <strong>Completado</strong>
+                                <span>Asignación finalizada</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- CHECKLIST -->
+            <section class="panel-card checklist-panel" id="checklistPanel">
+
+                <div class="panel-header checklist-header">
+                    <div>
+                        <h2>Checklist de evidencias</h2>
+                        <p id="checklistSubtitle">
+                            Requisitos fotográficos para completar la asignación
+                        </p>
+                    </div>
+
+                    <div class="checklist-management-actions" id="checklistActions" hidden>
+                        <button type="button" class="btn-secondary-custom" id="updateChecklistBtn">
+                            <i class="bi bi-arrow-repeat"></i>
+                            Actualizar
+                        </button>
+
+                        <button type="button" class="btn-secondary-custom" id="deleteChecklistBtn">
+                            <i class="bi bi-trash3"></i>
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    id="checklistMessage"
+                    class="checklist-template-message"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                ></div>
+
+                <div class="checklist-empty-state" id="checklistEmptyState">
+                    <div class="checklist-empty-icon">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+
+                    <h3>Aún no se ha generado el checklist</h3>
+
+                    <p>
+                        Genera el checklist a partir de la plantilla configurada
+                        para este tipo de documento.
+                    </p>
+
+                    <button type="button" class="btn-primary-custom" id="generateChecklistBtn">
+                        <i class="bi bi-plus-lg"></i>
+                        Generar checklist
+                    </button>
+                </div>
+
+                <div id="checklistContent" hidden>
+                    <div class="progress-container">
+                        <div class="progress-info">
+                            <span>Progreso de evidencias</span>
+                            <strong id="checklistProgressText">0 %</strong>
+                        </div>
+
+                        <div
+                            class="progress"
+                            id="checklistProgress"
+                            role="progressbar"
+                            aria-label="Progreso del checklist"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            aria-valuenow="0"
+                        >
+                            <div
+                                class="progress-bar"
+                                id="checklistProgressBar"
+                                style="width: 0%;"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="checklist" id="checklistItems"></div>
+                </div>
+
+            </section>
+
+            <!-- ACCIONES INFERIORES -->
+
+            <section class="bottom-actions">
+
+                <div>
+                    <h3>Seguimiento de la asignación</h3>
+                    <p>
+                        Consulta los documentos, las evidencias y los movimientos registrados.
+                    </p>
+                </div>
+
+                <div class="bottom-buttons">
+
+                    <button
+                        type="button"
+                        class="btn-secondary-custom"
+                        id="evidencesBtn"
+                    >
+                        <i class="bi bi-images"></i>
+                        Ver evidencias
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-primary-custom"
+                        id="trackingBtnBottom"
+                    >
+                        <i class="bi bi-clock-history"></i>
+                        Ver trazabilidad
+                    </button>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- MODAL SUBIR EVIDENCIA: INTERFAZ TEMPORAL -->
+
+<div class="modal-overlay" id="uploadModal">
+
+    <div class="custom-modal">
+
+        <div class="modal-header-custom">
+
+            <div>
+                <h3>Subir evidencia</h3>
+                <p>Selecciona una fotografía</p>
+            </div>
+
+            <button
+                type="button"
+                class="modal-close"
+                id="closeModal"
+            >
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+        </div>
+
+        <div class="upload-area">
+
+            <div class="upload-icon">
+                <i class="bi bi-cloud-arrow-up"></i>
+            </div>
+
+            <strong>Selecciona una fotografía</strong>
+            <span>JPG, JPEG o PNG · Máximo 10 MB</span>
+
+            <input
+                type="file"
+                id="evidenceFile"
+                accept="image/png,image/jpeg"
+            >
+
+            <label for="evidenceFile" class="file-label">
+                Seleccionar archivo
+            </label>
+
+            <p id="selectedFile">Ningún archivo seleccionado</p>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                class="btn-secondary-custom"
+                id="cancelUpload"
+            >
+                Cancelar
+            </button>
+
+            <button
+                type="button"
+                class="btn-primary-custom"
+                id="confirmUpload"
+            >
+                <i class="bi bi-cloud-arrow-up"></i>
+                Subir evidencia
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL ASIGNAR / CAMBIAR DOCUMENTADOR -->
+
+<div class="modal-overlay" id="documenterModal">
+    <div class="custom-modal documenter-modal">
+
+        <div class="modal-header-custom">
+            <div class="documenter-modal-heading">
+                <span class="documenter-modal-icon">
+                    <i class="bi bi-person-badge"></i>
+                </span>
+
+                <div>
+                    <h3 id="documenterModalTitle">Asignar documentador</h3>
+                    <p>Selecciona al responsable de este documento.</p>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="modal-close"
+                id="closeDocumenterModal"
+                aria-label="Cerrar"
+            >
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="documenter-modal-body">
+            <label class="documenter-field-label" for="documenterSearch">
+                Buscar documentador
+            </label>
+
+            <div class="documenter-search">
+                <i class="bi bi-search"></i>
+
+                <input
+                    type="text"
+                    id="documenterSearch"
+                    placeholder="Buscar por nombre o apellido..."
+                    autocomplete="off"
+                >
+
+                <button
+                    type="button"
+                    id="clearDocumenterSearch"
+                    aria-label="Limpiar búsqueda"
+                    title="Limpiar búsqueda"
+                    hidden
+                >
+                    <i class="bi bi-x-circle"></i>
+                </button>
+            </div>
+
+            <div class="documenter-list-label">
+                <span>Documentadores disponibles</span>
+                <span id="documenterCount">0</span>
+            </div>
+
+            <div
+                class="documenter-options"
+                id="documenterOptions"
+                role="listbox"
+                aria-label="Documentadores disponibles"
+            >
+                <div class="documenter-empty">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span>Cargando documentadores...</span>
+                </div>
+            </div>
+
+            <p
+                class="documenter-modal-message"
+                id="documenterModalMessage"
+                role="status"
+                aria-live="polite"
+            ></p>
+        </div>
+
+        <div class="modal-actions documenter-modal-actions">
+            <button
+                type="button"
+                class="btn-secondary-custom"
+                id="cancelDocumenterModal"
+            >
+                Cancelar
+            </button>
+
+            <button
+                type="button"
+                class="btn-primary-custom"
+                id="saveDocumenterBtn"
+                disabled
+            >
+                <i class="bi bi-check-lg"></i>
+                Guardar cambios
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL GESTIONAR TÉCNICOS -->
+<div class="modal-overlay" id="techniciansModal">
+    <div class="custom-modal documenter-modal">
+
+        <div class="modal-header-custom">
+            <div class="documenter-modal-heading">
+                <span class="documenter-modal-icon">
+                    <i class="bi bi-people"></i>
+                </span>
+
+                <div>
+                    <h3>Gestionar responsables</h3>
+                    <p>Selecciona los técnicos responsables de las evidencias.</p>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="modal-close"
+                id="closeTechniciansModal"
+                aria-label="Cerrar"
+            >
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="documenter-modal-body">
+            <label class="documenter-field-label" for="technicianSearch">
+                Buscar técnico
+            </label>
+
+            <div class="documenter-search">
+                <i class="bi bi-search"></i>
+
+                <input
+                    type="text"
+                    id="technicianSearch"
+                    placeholder="Buscar por nombre o apellido..."
+                    autocomplete="off"
+                >
+
+                <button
+                    type="button"
+                    id="clearTechnicianSearch"
+                    aria-label="Limpiar búsqueda"
+                    title="Limpiar búsqueda"
+                    hidden
+                >
+                    <i class="bi bi-x-circle"></i>
+                </button>
+            </div>
+
+            <div class="documenter-list-label">
+                <span>Técnicos disponibles</span>
+                <span id="technicianCount">0</span>
+            </div>
+
+            <div
+                class="documenter-options"
+                id="technicianOptions"
+                role="listbox"
+                aria-label="Técnicos disponibles"
+                aria-multiselectable="true"
+            >
+                <div class="documenter-empty">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span>Cargando técnicos...</span>
+                </div>
+            </div>
+
+            <p
+                class="documenter-modal-message"
+                id="techniciansModalMessage"
+                role="status"
+                aria-live="polite"
+            ></p>
+        </div>
+
+        <div class="modal-actions documenter-modal-actions">
+            <button
+                type="button"
+                class="btn-secondary-custom"
+                id="cancelTechniciansModal"
+            >
+                Cancelar
+            </button>
+
+            <button
+                type="button"
+                class="btn-primary-custom"
+                id="saveTechniciansBtn"
+                disabled
+            >
+                <i class="bi bi-check-lg"></i>
+                Guardar cambios
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+
+<!-- MODAL ADMINISTRAR PLANTILLAS DE CHECKLIST -->
+<div class="modal-overlay" id="manageChecklistTemplatesModal">
+    <div class="custom-modal checklist-template-modal">
+
+        <div class="modal-header-custom checklist-template-header">
+            <div>
+                <h3 id="manageChecklistTemplatesTitle">
+                    Plantillas de checklist
+                </h3>
+                <p id="manageChecklistTemplatesSubtitle">
+                    Administra los requisitos por tipo de documento.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="modal-close"
+                id="closeManageChecklistTemplatesModal"
+                aria-label="Cerrar"
+            >
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <!-- LISTADO DE PLANTILLAS -->
+        <div class="checklist-template-body" id="checklistTemplatesListView">
+
+            <div
+                id="manageChecklistTemplatesMessage"
+                class="checklist-template-message"
+                role="status"
+                aria-live="polite"
+                hidden
+            ></div>
+
+            <div
+                id="manageChecklistTemplatesList"
+                class="checklist-template-list"
+            ></div>
+
+            <div class="modal-actions checklist-template-actions">
+                <button
+                    type="button"
+                    class="btn-secondary-custom"
+                    id="cancelManageChecklistTemplates"
+                >
+                    Cerrar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-primary-custom"
+                    id="newChecklistTemplateBtn"
+                >
+                    <i class="bi bi-plus-lg"></i>
+                    Nueva plantilla
+                </button>
+            </div>
+        </div>
+
+        <!-- FORMULARIO DE CREACIÓN / EDICIÓN -->
+        <div
+            class="checklist-template-body"
+            id="checklistTemplateFormView"
+            hidden
+        >
+            <input
+                type="hidden"
+                id="checklistTemplateId"
+            >
+
+            <div class="mb-3">
+                <label
+                    for="checklistTemplateDocumentType"
+                    class="form-label"
+                >
+                    Tipo de documento
+                </label>
+
+                <select
+                    id="checklistTemplateDocumentType"
+                    class="form-select"
+                    required
+                >
+                    <option value="">
+                        Seleccionar tipo de documento
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label
+                    for="checklistTemplateName"
+                    class="form-label"
+                >
+                    Nombre de la plantilla
+                </label>
+
+                <input
+                    type="text"
+                    id="checklistTemplateName"
+                    class="form-control"
+                    maxlength="200"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label
+                    for="checklistTemplateFormDescription"
+                    class="form-label"
+                >
+                    Descripción
+                </label>
+
+                <textarea
+                    id="checklistTemplateFormDescription"
+                    class="form-control"
+                    rows="2"
+                ></textarea>
+            </div>
+
+            <div class="checklist-template-items-heading">
+                <div>
+                    <h4>Requerimientos e ítems específicos</h4>
+                    <p>
+                        Cada requerimiento agrupa los ítems que deben verificarse
+                        para completar las evidencias fotográficas.
+                    </p>
+                </div>
+            </div>
+
+            <div id="checklistTemplateFormItems"></div>
+
+            <div class="checklist-template-items-heading">
+                <div>
+                    <h4>Ítems de la plantilla</h4>
+                    <p>
+                        Selecciona los requisitos fotográficos que
+                        formarán parte del checklist.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-secondary-custom"
+                    id="addChecklistTemplateItemBtn"
+                >
+                    <i class="bi bi-plus-lg"></i>
+                    Agregar ítem
+                </button>
+            </div>
+
+            <div id="checklistTemplateFormItems"></div>
+
+            <div
+                id="checklistTemplateFormMessage"
+                class="checklist-template-message"
+                role="status"
+                aria-live="polite"
+                hidden
+            ></div>
+
+            <div class="modal-actions checklist-template-actions">
+                <button
+                    type="button"
+                    class="btn-secondary-custom"
+                    id="backChecklistTemplateListBtn"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-primary-custom"
+                    id="saveChecklistTemplateBtn"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar plantilla
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL ELIMINAR CHECKLIST -->
+<div
+    class="modal fade"
+    id="eliminarChecklistModal"
+    tabindex="-1"
+    aria-labelledby="eliminarChecklistModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5
+                    class="modal-title"
+                    id="eliminarChecklistModalLabel"
+                >
+                    Eliminar checklist
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar este checklist?
+                    </p>
+
+                    <p
+                        id="eliminarChecklistMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará todos los ítems generados para esta asignación.
+                    </p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarChecklist"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar checklist
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="js/detalle-asignacion.js"></script>
+
+</body>
+</html>

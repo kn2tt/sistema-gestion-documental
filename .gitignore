@@ -1,0 +1,40 @@
+# =========================================
+# Python & Entornos Virtuales
+# =========================================
+# Ignora __pycache__ en cualquier subcarpeta (controllers, models, schemas, etc.)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+venv/
+.venv/
+backend/venv/
+backend/.venv/
+
+# =========================================
+# Archivos de Datos y Almacenamiento
+# =========================================
+# Ignora toda la carpeta storage (plantillas de excel, uploads, etc.)
+backend/storage/
+
+# Base de datos SQLite (si usas localmente)
+*.sqlite3
+*.db
+
+# Archivos de registro / logs
+*.log
+
+# =========================================
+# Variables de Entorno y Credenciales
+# =========================================
+.env
+.env.*
+
+# =========================================
+# Configuración del Editor y Sistema Operativo
+# =========================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

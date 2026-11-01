@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Gestión Documental</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div>
+                <strong>Gestión Documental</strong>
+                <span>Plataforma empresarial</span>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">
+                PRINCIPAL
+            </div>
+
+            <a href="dashboard.html" class="nav-item active">
+                <i class="bi bi-grid-1x2"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="asignaciones.html" class="nav-item">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Asignaciones</span>
+            </a>
+
+            <a href="documentos.html" class="nav-item">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Documentos</span>
+            </a>
+
+            <a href="evidencias.html" class="nav-item">
+                <i class="bi bi-images"></i>
+                <span>Evidencias</span>
+            </a>
+
+            <a href="seguimiento.html" class="nav-item">
+                <i class="bi bi-clock-history"></i>
+                <span>Seguimiento</span>
+            </a>
+
+
+            <div class="nav-section-title nav-section-space">
+                ADMINISTRACIÓN
+            </div>
+
+            <a href="administracion.html" class="nav-item">
+                <i class="bi bi-gear"></i>
+                <span>Configuración</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <div class="sidebar-user">
+
+                <div class="user-avatar">
+                    AS
+                </div>
+
+                <div class="user-info">
+                    <strong>Administrador</strong>
+                    <span>admin@empresa.com</span>
+                </div>
+
+                <button
+                    type="button"
+                    class="sidebar-user-menu"
+                    title="Opciones"
+                >
+                    <i class="bi bi-three-dots"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+         ===================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="Abrir menú"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="breadcrumb-area">
+
+                    <span class="breadcrumb-section">
+                        Principal
+                    </span>
+
+                    <i class="bi bi-chevron-right"></i>
+
+                    <strong>Dashboard</strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    class="topbar-button notification-button"
+                    title="Notificaciones"
+                >
+                    <i class="bi bi-bell"></i>
+
+                    <span class="notification-dot"></span>
+                </button>
+
+
+                <div class="topbar-divider"></div>
+
+
+                <div class="topbar-user">
+
+                    <div class="topbar-avatar">
+                        AS
+                    </div>
+
+                    <div class="topbar-user-info">
+
+                        <strong>Administrador</strong>
+
+                        <span>
+                            Administrador del sistema
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-chevron-down topbar-chevron"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             CONTENIDO
+             ================================================= -->
+
+        <div class="page-content">
+
+
+            <!-- ENCABEZADO -->
+
+            <div class="page-heading">
+
+                <div>
+
+                    <span class="page-eyebrow">
+                        RESUMEN GENERAL
+                    </span>
+
+                    <h1>Dashboard</h1>
+
+                    <p>
+                        Consulta el estado general de la gestión documental.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="newAssignmentButton"
+                >
+                    <i class="bi bi-plus-lg"></i>
+                    Nueva asignación
+                </button>
+
+            </div>
+
+
+            <!-- =================================================
+                 TARJETAS DE RESUMEN
+                 ================================================= -->
+
+            <section class="stats-grid">
+
+
+                <!-- Asignaciones -->
+
+                <article class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <div class="stat-icon blue">
+                            <i class="bi bi-clipboard-check"></i>
+                        </div>
+
+                        <span class="stat-period">
+                            Total
+                        </span>
+
+                    </div>
+
+                    <div class="stat-value">
+                        12
+                    </div>
+
+                    <div class="stat-label">
+                        Asignaciones
+                    </div>
+
+                    <div class="stat-footer positive">
+                        <i class="bi bi-arrow-up"></i>
+                        <span>3 nuevas este mes</span>
+                    </div>
+
+                </article>
+
+
+                <!-- En proceso -->
+
+                <article class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <div class="stat-icon orange">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+
+                        <span class="stat-period">
+                            Actual
+                        </span>
+
+                    </div>
+
+                    <div class="stat-value">
+                        4
+                    </div>
+
+                    <div class="stat-label">
+                        En proceso
+                    </div>
+
+                    <div class="stat-footer neutral">
+                        <i class="bi bi-arrow-right"></i>
+                        <span>Requieren seguimiento</span>
+                    </div>
+
+                </article>
+
+
+                <!-- Completadas -->
+
+                <article class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <div class="stat-icon green">
+                            <i class="bi bi-check2-circle"></i>
+                        </div>
+
+                        <span class="stat-period">
+                            Total
+                        </span>
+
+                    </div>
+
+                    <div class="stat-value">
+                        6
+                    </div>
+
+                    <div class="stat-label">
+                        Completadas
+                    </div>
+
+                    <div class="stat-footer positive">
+                        <i class="bi bi-check-lg"></i>
+                        <span>Documentación finalizada</span>
+                    </div>
+
+                </article>
+
+
+                <!-- Pendientes -->
+
+                <article class="stat-card">
+
+                    <div class="stat-card-top">
+
+                        <div class="stat-icon red">
+                            <i class="bi bi-exclamation-circle"></i>
+                        </div>
+
+                        <span class="stat-period">
+                            Atención
+                        </span>
+
+                    </div>
+
+                    <div class="stat-value">
+                        2
+                    </div>
+
+                    <div class="stat-label">
+                        Pendientes
+                    </div>
+
+                    <div class="stat-footer warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>Requieren atención</span>
+                    </div>
+
+                </article>
+
+            </section>
+
+
+            <!-- =================================================
+                 CONTENIDO INFERIOR
+                 ================================================= -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- =================================================
+                     ASIGNACIONES RECIENTES
+                     ================================================= -->
+
+                <section class="content-card assignments-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h2>
+                                Asignaciones recientes
+                            </h2>
+
+                            <p>
+                                Últimas actividades registradas
+                            </p>
+
+                        </div>
+
+                        <a
+                            href="asignaciones.html"
+                            class="view-all"
+                        >
+                            Ver todas
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+
+                    </div>
+
+
+                    <div class="table-responsive">
+
+                        <table class="data-table">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Proyecto</th>
+                                    <th>Site</th>
+                                    <th>Documento</th>
+                                    <th>Responsables</th>
+                                    <th>Estado</th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                                <!-- Registro 1 -->
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="project-cell">
+
+                                            <div class="project-icon">
+                                                <i class="bi bi-diagram-3"></i>
+                                            </div>
+
+                                            <div>
+                                                <strong>
+                                                    Implementación DWDM
+                                                </strong>
+
+                                                <span>
+                                                    Cliente Telecomunicaciones S.A.C.
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+                                        <span class="site-name">
+                                            Site Lima Centro
+                                        </span>
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="document-cell">
+
+                                            <i class="bi bi-file-earmark-text"></i>
+
+                                            <span>
+                                                Reporte de instalación
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="responsible-cell">
+
+                                            <div class="mini-avatar technician">
+                                                TC
+                                            </div>
+
+                                            <div class="mini-avatar documenter">
+                                                DC
+                                            </div>
+
+                                            <span>
+                                                Técnico / Documentador
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="status-badge in-progress">
+                                            <span></span>
+                                            En proceso
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+
+                                <!-- Registro 2 -->
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="project-cell">
+
+                                            <div class="project-icon">
+                                                <i class="bi bi-diagram-3"></i>
+                                            </div>
+
+                                            <div>
+                                                <strong>
+                                                    Ampliación de red
+                                                </strong>
+
+                                                <span>
+                                                    Cliente Telecomunicaciones S.A.C.
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+                                        <span class="site-name">
+                                            Site Miraflores
+                                        </span>
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="document-cell">
+
+                                            <i class="bi bi-file-earmark-text"></i>
+
+                                            <span>
+                                                TSS
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="responsible-cell">
+
+                                            <div class="mini-avatar technician">
+                                                JP
+                                            </div>
+
+                                            <div class="mini-avatar documenter">
+                                                MR
+                                            </div>
+
+                                            <span>
+                                                Técnico / Documentador
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="status-badge completed">
+                                            <span></span>
+                                            Completado
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+
+                                <!-- Registro 3 -->
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="project-cell">
+
+                                            <div class="project-icon">
+                                                <i class="bi bi-diagram-3"></i>
+                                            </div>
+
+                                            <div>
+                                                <strong>
+                                                    Instalación óptica
+                                                </strong>
+
+                                                <span>
+                                                    Cliente Telecomunicaciones S.A.C.
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+                                        <span class="site-name">
+                                            Site San Isidro
+                                        </span>
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="document-cell">
+
+                                            <i class="bi bi-file-earmark-text"></i>
+
+                                            <span>
+                                                Pre Power On
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="responsible-cell">
+
+                                            <div class="mini-avatar technician">
+                                                AC
+                                            </div>
+
+                                            <div class="mini-avatar documenter">
+                                                LR
+                                            </div>
+
+                                            <span>
+                                                Técnico / Documentador
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="status-badge pending">
+                                            <span></span>
+                                            Pendiente
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     SEGUIMIENTO
+                     ================================================= -->
+
+                <section class="content-card tracking-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h2>
+                                Seguimiento
+                            </h2>
+
+                            <p>
+                                Estado del flujo documental
+                            </p>
+
+                        </div>
+
+                        <a
+                            href="seguimiento.html"
+                            class="icon-link"
+                            title="Ver seguimiento"
+                        >
+                            <i class="bi bi-arrow-up-right"></i>
+                        </a>
+
+                    </div>
+
+
+                    <div class="tracking-list">
+
+
+                        <!-- Paso 1 -->
+
+                        <div class="tracking-item completed-step">
+
+                            <div class="tracking-icon">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+
+                            <div class="tracking-content">
+
+                                <strong>
+                                    Asignaciones creadas
+                                </strong>
+
+                                <span>
+                                    12 asignaciones registradas
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Paso 2 -->
+
+                        <div class="tracking-item completed-step">
+
+                            <div class="tracking-icon">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+
+                            <div class="tracking-content">
+
+                                <strong>
+                                    Evidencias recopiladas
+                                </strong>
+
+                                <span>
+                                    28 evidencias completas
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Paso 3 -->
+
+                        <div class="tracking-item active-step">
+
+                            <div class="tracking-icon">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </div>
+
+                            <div class="tracking-content">
+
+                                <strong>
+                                    Documentos en elaboración
+                                </strong>
+
+                                <span>
+                                    4 documentos en proceso
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Paso 4 -->
+
+                        <div class="tracking-item">
+
+                            <div class="tracking-icon">
+                                <i class="bi bi-check2-all"></i>
+                            </div>
+
+                            <div class="tracking-content">
+
+                                <strong>
+                                    Documentos completados
+                                </strong>
+
+                                <span>
+                                    6 documentos finalizados
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tracking-progress">
+
+                        <div class="progress-label">
+
+                            <span>
+                                Progreso general
+                            </span>
+
+                            <strong>
+                                67%
+                            </strong>
+
+                        </div>
+
+                        <div class="progress-bar-container">
+
+                            <div
+                                class="progress-bar-fill"
+                                style="width: 67%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- =================================================
+                 ACCESOS RÁPIDOS
+                 ================================================= -->
+
+            <section class="quick-actions">
+
+                <div class="quick-actions-header">
+
+                    <div>
+
+                        <h2>
+                            Accesos rápidos
+                        </h2>
+
+                        <p>
+                            Acciones frecuentes del sistema
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="quick-actions-grid">
+
+
+                    <a
+                        href="asignaciones.html"
+                        class="quick-action"
+                    >
+
+                        <div class="quick-action-icon blue">
+                            <i class="bi bi-plus-circle"></i>
+                        </div>
+
+                        <div>
+                            <strong>
+                                Nueva asignación
+                            </strong>
+
+                            <span>
+                                Asignar técnico y documentador
+                            </span>
+                        </div>
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+
+                    <a
+                        href="documentos.html"
+                        class="quick-action"
+                    >
+
+                        <div class="quick-action-icon purple">
+                            <i class="bi bi-file-earmark-plus"></i>
+                        </div>
+
+                        <div>
+                            <strong>
+                                Gestionar documentos
+                            </strong>
+
+                            <span>
+                                Consultar y administrar documentos
+                            </span>
+                        </div>
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+
+                    <a
+                        href="evidencias.html"
+                        class="quick-action"
+                    >
+
+                        <div class="quick-action-icon green">
+                            <i class="bi bi-camera"></i>
+                        </div>
+
+                        <div>
+                            <strong>
+                                Revisar evidencias
+                            </strong>
+
+                            <span>
+                                Ver fotografías pendientes
+                            </span>
+                        </div>
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+
+                    <a
+                        href="seguimiento.html"
+                        class="quick-action"
+                    >
+
+                        <div class="quick-action-icon orange">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+
+                        <div>
+                            <strong>
+                                Ver seguimiento
+                            </strong>
+
+                            <span>
+                                Consultar trazabilidad documental
+                            </span>
+                        </div>
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     OVERLAY MOBILE
+     ========================================================= -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+></div>
+
+
+<script>
+
+    const sidebar =
+        document.getElementById("sidebar");
+
+    const mobileMenuButton =
+        document.getElementById("mobileMenuButton");
+
+    const sidebarOverlay =
+        document.getElementById("sidebarOverlay");
+
+
+    function openSidebar() {
+
+        sidebar.classList.add("show");
+
+        sidebarOverlay.classList.add("show");
+
+    }
+
+
+    function closeSidebar() {
+
+        sidebar.classList.remove("show");
+
+        sidebarOverlay.classList.remove("show");
+
+    }
+
+
+    mobileMenuButton.addEventListener(
+        "click",
+        openSidebar
+    );
+
+
+    sidebarOverlay.addEventListener(
+        "click",
+        closeSidebar
+    );
+
+
+    /*
+     * Botón de nueva asignación.
+     *
+     * Más adelante lo conectaremos con
+     * asignaciones.html y el backend.
+     */
+
+    document
+        .getElementById("newAssignmentButton")
+        .addEventListener("click", function () {
+
+            window.location.href =
+                "asignaciones.html";
+
+        });
+
+
+    /*
+     * Cerrar menú móvil al seleccionar una opción.
+     */
+
+    document
+        .querySelectorAll(".sidebar .nav-item")
+        .forEach(function (item) {
+
+            item.addEventListener(
+                "click",
+                closeSidebar
+            );
+
+        });
+
+</script>
+
+</body>
+</html>

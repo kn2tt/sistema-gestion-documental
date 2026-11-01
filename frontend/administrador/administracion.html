@@ -1,0 +1,4774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración | Gestión Documental</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/administracion.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <div id="notificationContainer"
+        class="notification-container"
+        aria-live="polite"
+        aria-relevant="additions">
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div>
+                <strong>Gestión Documental</strong>
+                <span>Plataforma empresarial</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">PRINCIPAL</div>
+
+            <a href="dashboard.html" class="nav-item">
+                <i class="bi bi-grid-1x2"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="asignaciones.html" class="nav-item">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Asignaciones</span>
+            </a>
+
+            <a href="documentos.html" class="nav-item">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Documentos</span>
+            </a>
+
+            <a href="evidencias.html" class="nav-item">
+                <i class="bi bi-images"></i>
+                <span>Evidencias</span>
+            </a>
+
+            <a href="seguimiento.html" class="nav-item">
+                <i class="bi bi-clock-history"></i>
+                <span>Seguimiento</span>
+            </a>
+
+            <div class="nav-section-title nav-section-space">
+                ADMINISTRACIÓN
+            </div>
+
+            <a href="administracion.html" class="nav-item active">
+                <i class="bi bi-gear"></i>
+                <span>Configuración</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+
+            <div class="sidebar-user">
+
+                <div class="user-avatar">
+                    AS
+                </div>
+
+                <div class="user-info">
+                    <strong>Administrador</strong>
+                    <span>admin@empresa.com</span>
+                </div>
+
+                <button
+                    type="button"
+                    class="sidebar-user-menu"
+                    title="Opciones"
+                >
+                    <i class="bi bi-three-dots"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="Abrir menú"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="breadcrumb-area">
+                    <span class="breadcrumb-section">Administración</span>
+                    <i class="bi bi-chevron-right"></i>
+                    <strong>Configuración</strong>
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    class="topbar-button notification-button"
+                    title="Notificaciones"
+                >
+                    <i class="bi bi-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-user">
+
+                    <div class="topbar-avatar">
+                        AS
+                    </div>
+
+                    <div class="topbar-user-info">
+                        <strong>Administrador</strong>
+                        <span>Administrador del sistema</span>
+                    </div>
+
+                    <i class="bi bi-chevron-down topbar-chevron"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- OVERLAY MOBILE -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+        <!-- PAGE -->
+        <section class="admin-page">
+
+            <div class="page-header">
+
+                <div>
+                    <h1>Configuración</h1>
+                    <p>
+                        Administra los parámetros principales del sistema de gestión documental.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- RESUMEN -->
+
+            <div class="admin-summary">
+
+                <div class="admin-summary-card">
+                    <div class="admin-summary-icon users">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <div>
+                        <span>Usuarios</span>
+                        <strong id="totalUsuarios">0</strong>
+                    </div>
+                </div>
+
+                <div class="admin-summary-card">
+                    <div class="admin-summary-icon clients">
+                        <i class="bi bi-building"></i>
+                    </div>
+
+                    <div>
+                        <span>Clientes</span>
+                        <strong id="totalClientes">0</strong>
+                    </div>
+                </div>
+
+                <div class="admin-summary-card">
+                    <div class="admin-summary-icon documents">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+
+                    <div>
+                        <span>Tipos de documento</span>
+                        <strong id="totalTiposDocumento">0</strong>
+                    </div>
+                </div>
+
+                <div class="admin-summary-card">
+                    <div class="admin-summary-icon requirements">
+                        <i class="bi bi-camera"></i>
+                    </div>
+
+                    <div>
+                        <span>Requisitos fotográficos</span>
+                        <strong id="totalRequisitos">0</strong>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- CONFIGURACIÓN -->
+
+            <div class="configuration-card">
+
+                <div class="configuration-header">
+
+                    <div>
+                        <h2>Configuración del sistema</h2>
+                        <p>
+                            Selecciona una categoría para administrar sus registros.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- TABS -->
+
+                <div class="configuration-tabs" role="tablist">
+
+                    <button
+                        type="button"
+                        class="configuration-tab active"
+                        data-tab="usuarios"
+                    >
+                        <i class="bi bi-people"></i>
+                        Usuarios
+                    </button>
+
+                    <button
+                        type="button"
+                        class="configuration-tab"
+                        data-tab="clientes"
+                    >
+                        <i class="bi bi-building"></i>
+                        Clientes
+                    </button>
+
+                    <button
+                        type="button"
+                        class="configuration-tab"
+                        data-tab="proyectos"
+                    >
+                        <i class="bi bi-diagram-3"></i>
+                        Proyectos y Sites
+                    </button>
+
+                    <button
+                        type="button"
+                        class="configuration-tab"
+                        data-tab="documentos"
+                    >
+                        <i class="bi bi-file-earmark-text"></i>
+                        Documentos
+                    </button>
+
+                    <button
+                        type="button"
+                        class="configuration-tab"
+                        data-tab="plantillas"
+                    >
+                        <i class="bi bi-file-earmark-richtext"></i>
+                        Plantillas
+                    </button>
+
+                    <button
+                        type="button"
+                        class="configuration-tab"
+                        data-tab="alcances"
+                    >
+                        <i class="bi bi-diagram-3"></i>
+                        Alcances
+                    </button>
+
+                    <button
+                        type="button"
+                        class="configuration-tab"
+                        data-tab="requisitos"
+                    >
+                        <i class="bi bi-camera"></i>
+                        Requisitos
+                    </button>
+
+                </div>
+
+
+                <!-- USUARIOS -->
+
+                <div
+                    class="configuration-panel active"
+                    id="panel-usuarios"
+                >
+
+                    <div class="panel-toolbar">
+
+                        <div>
+                            <h3>Usuarios del sistema</h3>
+                            <p>
+                                Administra las cuentas y roles de acceso.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="btnNuevoUsuario"
+                        >
+                            <i class="bi bi-plus-lg"></i>
+                            Nuevo usuario
+                        </button>
+
+                    </div>
+
+
+                    <div class="table-responsive">
+
+                        <table class="admin-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Correo</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Último acceso</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="usuariosTablaBody">
+
+                                
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CLIENTES -->
+
+                <div
+                    class="configuration-panel"
+                    id="panel-clientes"
+                >
+
+                    <div class="panel-toolbar">
+
+                        <div>
+                            <h3>Clientes</h3>
+                            <p>
+                                Empresas para las que se ejecutan proyectos.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="btnNuevoCliente"
+                        >
+                            <i class="bi bi-plus-lg"></i>
+                            Nuevo cliente
+                        </button>
+
+                    </div>
+
+                    <div
+                        class="entity-grid"
+                        id="clientesGrid">
+                    </div>
+
+                </div>
+
+
+                <!-- PROYECTOS Y SITES -->
+                <div class="configuration-panel" id="panel-proyectos">
+
+                    <div class="panel-toolbar">
+                        <div>
+                            <h3>Proyectos y Sites</h3>
+                            <p>Organiza los proyectos y sites pertenecientes a cada cliente.</p>
+                        </div>
+
+                        <button type="button" class="btn btn-primary" id="btnNuevoProyecto">
+                            <i class="bi bi-plus-lg"></i>
+                            Nuevo proyecto
+                        </button>
+                    </div>
+
+
+                    <div class="client-project-list" id="clientProjectList">
+
+                    </div>
+
+                </div>
+
+
+                <!-- DOCUMENTOS -->
+
+                <div
+                    class="configuration-panel"
+                    id="panel-documentos"
+                >
+
+                    <div class="panel-toolbar">
+
+                        <div>
+                            <h3>Tipos de documentos</h3>
+                            <p>
+                                Define los documentos utilizados en los proyectos.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="btnNuevoTipoDocumento"
+                        >
+                            <i class="bi bi-plus-lg"></i>
+                            Nuevo tipo
+                        </button>
+
+                    </div>
+
+
+                    <div class="config-list" id="listaTiposDocumento">
+
+                    </div>
+
+                </div>
+
+                <!-- PLANTILLAS -->
+                <div class="configuration-panel" id="panel-plantillas">
+
+                    <div class="panel-toolbar">
+                        <div>
+                            <h3>Plantillas</h3>
+                            <p>
+                                Administra las versiones de las plantillas documentales.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="btnNuevaPlantilla"
+                        >
+                            <i class="bi bi-upload"></i>
+                            Nueva plantilla
+                        </button>
+                    </div>
+
+                    <!-- BUSCADOR Y FILTROS DE PLANTILLAS -->
+                    <div class="template-list-toolbar">
+
+                        <div class="template-search">
+                            <i class="bi bi-search"></i>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="buscarPlantillas"
+                                placeholder="Buscar por nombre de plantilla..."
+                                aria-label="Buscar plantillas"
+                            >
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-light template-filter-button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#filtrosPlantillas"
+                            aria-expanded="false"
+                            aria-controls="filtrosPlantillas"
+                            id="btnFiltrosPlantillas"
+                        >
+                            <i class="bi bi-sliders"></i>
+                            Filtros
+                        </button>
+
+                    </div>
+
+                    <!-- PANEL DE FILTROS -->
+                    <div class="collapse" id="filtrosPlantillas">
+
+                        <div class="template-filters">
+
+                            <div>
+                                <label
+                                    for="filtroPlantillaTipoDocumento"
+                                    class="form-label"
+                                >
+                                    Tipo de documento
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="filtroPlantillaTipoDocumento"
+                                >
+                                    <option value="">Todos los tipos</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label
+                                    for="filtroPlantillaEstado"
+                                    class="form-label"
+                                >
+                                    Estado
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="filtroPlantillaEstado"
+                                >
+                                    <option value="">Todos los estados</option>
+                                    <option value="true">Activas</option>
+                                    <option value="false">Inactivas</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label
+                                    for="filtroPlantillaFechaDesde"
+                                    class="form-label"
+                                >
+                                    Fecha desde
+                                </label>
+
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="filtroPlantillaFechaDesde"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    for="filtroPlantillaFechaHasta"
+                                    class="form-label"
+                                >
+                                    Fecha hasta
+                                </label>
+
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="filtroPlantillaFechaHasta"
+                                >
+                            </div>
+
+                            <div class="template-filter-actions">
+                                <button
+                                    type="button"
+                                    class="btn btn-light"
+                                    id="btnLimpiarFiltrosPlantillas"
+                                >
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                    Limpiar filtros
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- LISTADO JERÁRQUICO -->
+                    <div
+                        id="listaPlantillas"
+                        class="template-hierarchy"
+                        aria-live="polite"
+                    >
+                        <div class="text-muted">
+                            Cargando plantillas...
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ALCANCES -->
+
+                <div
+                    class="configuration-panel"
+                    id="panel-alcances"
+                >
+
+                    <div class="panel-toolbar">
+
+                        <div>
+                            <h3>Alcances</h3>
+                            <p>
+                                Define los trabajos que pueden formar parte de un subproyecto.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="btnNuevoAlcance"
+                        >
+                            <i class="bi bi-plus-lg"></i>
+                            Nuevo alcance
+                        </button>
+
+                    </div>
+
+
+                    <div 
+                        class="installation-grid"
+                        id="listaAlcances"
+                    >
+
+                    </div>
+
+                </div>
+
+
+                <!-- REQUISITOS -->
+
+                <div
+                    class="configuration-panel"
+                    id="panel-requisitos"
+                >
+
+                    <div class="panel-toolbar">
+
+                        <div>
+                            <h3>Requisitos fotográficos</h3>
+                            <p>
+                                Define las evidencias que debe registrar el técnico.
+                            </p>
+                        </div>
+
+                        <button 
+                            type="button"
+                            class="btn btn-primary"
+                            id="btnNuevoRequisito"
+                            >
+                            <i class="bi bi-plus-lg"></i>
+                            Nuevo requisito
+                        </button>
+
+                    </div>
+
+
+                    <div class="requirement-list" id="listaRequisitos">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- MODAL NUEVO USUARIO -->
+<div
+    class="modal fade"
+    id="nuevoUsuarioModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h5 class="modal-title">Nuevo usuario</h5>
+                    <p>Registra un nuevo usuario del sistema.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="usuarioNombre"
+                            placeholder="Nombre"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Apellido</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="usuarioApellido"
+                            placeholder="Apellido"
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Correo electrónico</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="usuarioCorreo"
+                            placeholder="usuario@empresa.com"
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Rol</label>
+
+                        <select class="form-select" id="usuarioRol">
+
+                            <option value="" selected disabled>
+                                Seleccionar rol
+                            </option>
+
+                            <option value="administrador">Administrador</option>
+                            <option value="tecnico">Técnico</option>
+                            <option value="documentador">Documentador</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Contraseña temporal</label>
+
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="usuarioPassword"
+                            placeholder="Contraseña"
+                        >
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="guardarUsuario"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar usuario
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL EDITAR USUARIO -->
+<div
+    class="modal fade"
+    id="editarUsuarioModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h5 class="modal-title">Editar usuario</h5>
+                    <p>Actualiza los datos del usuario seleccionado.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre</label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editarUsuarioNombre"
+                            placeholder="Nombre"
+                        >
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <label class="form-label">Apellido</label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editarUsuarioApellido"
+                            placeholder="Apellido"
+                        >
+                    </div>
+
+
+                    <div class="col-12">
+                        <label class="form-label">
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="editarUsuarioCorreo"
+                            placeholder="usuario@empresa.com"
+                        >
+                    </div>
+
+
+                    <div class="col-12">
+                        <label class="form-label">Rol</label>
+
+                        <select
+                            class="form-select"
+                            id="editarUsuarioRol"
+                        >
+
+                            <option value="" disabled>
+                                Seleccionar rol
+                            </option>
+
+                            <option value="administrador">
+                                Administrador
+                            </option>
+
+                            <option value="tecnico">
+                                Técnico
+                            </option>
+
+                            <option value="documentador">
+                                Documentador
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-12">
+                        <label class="form-label">Estado</label>
+
+                        <select
+                            class="form-select"
+                            id="editarUsuarioEstado"
+                        >
+
+                            <option value="true">
+                                Activo
+                            </option>
+
+                            <option value="false">
+                                Inactivo
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Nueva contraseña</label>
+
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="editarUsuarioPassword"
+                            placeholder="Nueva contraseña (Opcional)"
+                        >
+
+                        <small class="text-muted">
+                            Solo completa este campo si deseas cambiar la contraseña.
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="actualizarUsuario"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar cambios
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINACIÓN DE USUARIO -->
+<div
+    class="modal fade"
+    id="eliminarUsuarioModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h5 class="modal-title">Eliminar usuario</h5>
+                    <p>Confirma la eliminación de la cuenta seleccionada.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="delete-confirmation">
+
+                    <div class="delete-confirmation-icon">
+                        <i
+                            class="bi bi-exclamation-triangle"
+                            aria-hidden="true"
+                        ></i>
+                    </div>
+
+                    <div>
+                        <strong id="eliminarUsuarioNombre">
+                            ¿Eliminar usuario?
+                        </strong>
+
+                        <p>
+                            Esta acción eliminará la cuenta del sistema.
+                            Verifica que sea el usuario correcto antes
+                            de continuar.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="confirmarEliminarUsuario"
+                >
+                    <i class="bi bi-trash"></i>
+                    Eliminar usuario
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL NUEVO CLIENTE -->
+<div
+    class="modal fade"
+    id="nuevoClienteModal"
+    tabindex="-1"
+    aria-labelledby="nuevoClienteModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5
+                    class="modal-title"
+                    id="nuevoClienteModalLabel"
+                >
+                    Nuevo cliente
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-8">
+                        <label
+                            for="clienteNombre"
+                            class="form-label"
+                        >
+                            Nombre del cliente
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="clienteNombre"
+                            placeholder="Ingrese el nombre del cliente"
+                        >
+                    </div>
+
+                    <div class="col-md-4">
+                        <label
+                            for="clienteRuc"
+                            class="form-label"
+                        >
+                            RUC
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="clienteRuc"
+                            placeholder="Ingrese el RUC"
+                            inputmode="numeric"
+                            maxlength="10"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label
+                            for="clienteContacto"
+                            class="form-label"
+                        >
+                            Contacto
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="clienteContacto"
+                            placeholder="Nombre del contacto"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label
+                            for="clienteTelefono"
+                            class="form-label"
+                        >
+                            Teléfono
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="clienteTelefono"
+                            placeholder="Número de teléfono"
+                            inputmode="numeric"
+                        >
+                    </div>
+
+                    <div class="col-md-8">
+                        <label
+                            for="clienteCorreo"
+                            class="form-label"
+                        >
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="clienteCorreo"
+                            placeholder="correo@empresa.com"
+                        >
+                    </div>
+
+                    <div class="col-md-4">
+                        <label
+                            for="clienteEstado"
+                            class="form-label"
+                        >
+                            Estado
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="clienteEstado"
+                        >
+                            <option value="activo" selected>
+                                Activo
+                            </option>
+
+                            <option value="inactivo">
+                                Inactivo
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnGuardarCliente"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar cliente
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL VER CLIENTE -->
+<div
+    class="modal fade"
+    id="verClienteModal"
+    tabindex="-1"
+    aria-labelledby="verClienteModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="verClienteModalLabel"
+                >
+                    Información del cliente
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <!-- NOMBRE -->
+
+                    <div class="col-md-8">
+
+                        <div class="client-detail">
+
+                            <span class="client-detail-label">
+                                Nombre del cliente
+                            </span>
+
+                            <strong
+                                id="verClienteNombre"
+                                class="client-detail-value"
+                            >
+                                -
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ESTADO -->
+
+                    <div class="col-md-4">
+
+                        <div class="client-detail">
+
+                            <span class="client-detail-label">
+                                Estado
+                            </span>
+
+                            <strong
+                                id="verClienteEstado"
+                                class="client-detail-value"
+                            >
+                                -
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RUC -->
+
+                    <div class="col-md-6">
+
+                        <div class="client-detail">
+
+                            <span class="client-detail-label">
+                                RUC
+                            </span>
+
+                            <span
+                                id="verClienteRuc"
+                                class="client-detail-value"
+                            >
+                                -
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CONTACTO -->
+
+                    <div class="col-md-6">
+
+                        <div class="client-detail">
+
+                            <span class="client-detail-label">
+                                Contacto
+                            </span>
+
+                            <span
+                                id="verClienteContacto"
+                                class="client-detail-value"
+                            >
+                                -
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TELÉFONO -->
+
+                    <div class="col-md-6">
+
+                        <div class="client-detail">
+
+                            <span class="client-detail-label">
+                                Teléfono
+                            </span>
+
+                            <span
+                                id="verClienteTelefono"
+                                class="client-detail-value"
+                            >
+                                -
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CORREO -->
+
+                    <div class="col-md-6">
+
+                        <div class="client-detail">
+
+                            <span class="client-detail-label">
+                                Correo electrónico
+                            </span>
+
+                            <span
+                                id="verClienteCorreo"
+                                class="client-detail-value"
+                            >
+                                -
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cerrar
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR CLIENTE -->
+<div
+    class="modal fade"
+    id="editarClienteModal"
+    tabindex="-1"
+    aria-labelledby="editarClienteModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="editarClienteModalLabel"
+                >
+                    Editar cliente
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <!-- NOMBRE -->
+
+                    <div class="col-md-8">
+
+                        <label
+                            for="editarClienteNombre"
+                            class="form-label"
+                        >
+                            Nombre del cliente
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editarClienteNombre"
+                            placeholder="Ingrese el nombre del cliente"
+                        >
+
+                    </div>
+
+
+                    <!-- RUC -->
+
+                    <div class="col-md-4">
+
+                        <label
+                            for="editarClienteRuc"
+                            class="form-label"
+                        >
+                            RUC
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editarClienteRuc"
+                            placeholder="Ingrese el RUC"
+                            inputmode="numeric"
+                            maxlength="10"
+                        >
+
+                    </div>
+
+
+                    <!-- CONTACTO -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="editarClienteContacto"
+                            class="form-label"
+                        >
+                            Contacto
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editarClienteContacto"
+                            placeholder="Nombre del contacto"
+                        >
+
+                    </div>
+
+
+                    <!-- TELÉFONO -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="editarClienteTelefono"
+                            class="form-label"
+                        >
+                            Teléfono
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editarClienteTelefono"
+                            placeholder="Número de teléfono"
+                            inputmode="numeric"
+                        >
+
+                    </div>
+
+
+                    <!-- CORREO -->
+
+                    <div class="col-md-8">
+
+                        <label
+                            for="editarClienteCorreo"
+                            class="form-label"
+                        >
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="editarClienteCorreo"
+                            placeholder="correo@empresa.com"
+                        >
+
+                    </div>
+
+
+                    <!-- ESTADO -->
+
+                    <div class="col-md-4">
+
+                        <label
+                            for="editarClienteEstado"
+                            class="form-label"
+                        >
+                            Estado
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarClienteEstado"
+                        >
+
+                            <option
+                                value="activo"
+                                selected
+                            >
+                                Activo
+                            </option>
+
+                            <option value="inactivo">
+                                Inactivo
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnActualizarCliente"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Actualizar cliente
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ELIMINAR CLIENTE -->
+<div
+    class="modal fade"
+    id="eliminarClienteModal"
+    tabindex="-1"
+    aria-labelledby="eliminarClienteModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="eliminarClienteModalLabel"
+                >
+                    Eliminar cliente
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar este cliente?
+                    </p>
+
+                    <p
+                        id="eliminarClienteMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el registro del cliente.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarCliente"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar cliente
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL NUEVO PROYECTO -->
+<div class="modal fade" id="nuevoProyectoModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h5>Nuevo proyecto</h5>
+                    <p>Registra un nuevo proyecto asociado a un cliente existente.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <!-- CLIENTE -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Cliente
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="proyectoCliente">
+
+                        <option value="">
+                            Seleccionar cliente
+                        </option>
+
+                    </select>
+
+                    <div class="form-text">
+                        El proyecto quedará asociado al cliente seleccionado.
+                    </div>
+
+                </div>
+
+
+                <!-- PROYECTO -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Nombre del proyecto
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="proyectoNombre"
+                        placeholder="Ej. SPACEX">
+
+                </div>
+
+
+                <!-- DESCRIPCIÓN -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Descripción
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        id="proyectoDescripcion"
+                        rows="3"
+                        placeholder="Descripción del proyecto"></textarea>
+
+                </div>
+
+
+                <!-- ESTADO -->
+
+                <div>
+
+                    <label class="form-label">
+                        Estado
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="proyectoEstado">
+
+                        <option value="activo">
+                            Activo
+                        </option>
+
+                        <option value="cerrado">
+                            Cerrado
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="guardarProyecto">
+                    <i class="bi bi-check-lg"></i>
+                    Crear proyecto
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL EDITAR PROYECTO -->
+<div class="modal fade" id="editarProyectoModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h5>Editar proyecto</h5>
+                    <p>Actualiza la información del proyecto seleccionado.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <!-- CLIENTE -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Cliente
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="editarProyectoCliente">
+
+                        <option value="">
+                            Seleccionar cliente
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- NOMBRE -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Nombre del proyecto
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="editarProyectoNombre"
+                        placeholder="Ej. SPACEX">
+
+                </div>
+
+
+                <!-- DESCRIPCIÓN -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Descripción
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        id="editarProyectoDescripcion"
+                        rows="3"
+                        placeholder="Descripción del proyecto"></textarea>
+
+                </div>
+
+
+                <!-- FECHAS -->
+
+                <div class="row g-3 mb-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Fecha de inicio
+                        </label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="editarProyectoFechaInicio">
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Fecha de fin
+                        </label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="editarProyectoFechaFin">
+
+                    </div>
+
+                </div>
+
+
+                <!-- ESTADO -->
+
+                <div>
+
+                    <label class="form-label">
+                        Estado
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="editarProyectoEstado">
+
+                        <option value="activo">
+                            Activo
+                        </option>
+
+                        <option value="cerrado">
+                            Cerrado
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="actualizarProyecto">
+
+                    <i class="bi bi-check-lg"></i>
+                    Guardar cambios
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL ELIMINAR PROYECTO -->
+<div
+    class="modal fade"
+    id="eliminarProyectoModal"
+    tabindex="-1"
+    aria-labelledby="eliminarProyectoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="eliminarProyectoModalLabel"
+                >
+                    Eliminar proyecto
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar este proyecto?
+                    </p>
+
+                    <p
+                        id="eliminarProyectoMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el registro del proyecto.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarProyecto"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar proyecto
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL NUEVO SITE -->
+<div class="modal fade" id="nuevoSiteModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h5>Nuevo site</h5>
+                    <p>Registra un site asociado a un proyecto existente.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <!-- CLIENTE -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Cliente
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="siteCliente">
+
+                        <option value="">
+                            Seleccionar cliente
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- PROYECTO -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Proyecto
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="siteProyecto"
+                        disabled>
+
+                        <option value="">
+                            Selecciona primero un cliente
+                        </option>
+
+                    </select>
+
+                    <div class="form-text">
+                        Solo se mostrarán proyectos asociados al cliente seleccionado.
+                    </div>
+
+                </div>
+
+
+                <!-- NOMBRE DEL SITE -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Código / nombre del site
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="siteNombre"
+                        placeholder="Ej. 012938_LM_Miraflores">
+
+                </div>
+
+
+                <!-- DIRECCIÓN -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Dirección
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="siteDireccion"
+                        placeholder="Ej. Av. Larco 1234">
+
+                </div>
+
+
+                <!-- DEPARTAMENTO -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Departamento
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="siteDepartamento"
+                        placeholder="Ej. Lima">
+
+                </div>
+
+
+                <!-- PROVINCIA -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Provincia
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="siteProvincia"
+                        placeholder="Ej. Lima">
+
+                </div>
+
+
+                <!-- DISTRITO -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Distrito
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="siteDistrito"
+                        placeholder="Ej. Miraflores">
+
+                </div>
+
+
+                <!-- ESTADO -->
+
+                <div>
+
+                    <label class="form-label">
+                        Estado
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="siteEstado">
+
+                        <option value="activo">
+                            Activo
+                        </option>
+
+                        <option value="inactivo">
+                            Inactivo
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="guardarSite">
+
+                    <i class="bi bi-check-lg"></i>
+                    Crear site
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL EDITAR SITE -->
+<div class="modal fade" id="editarSiteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div>
+                    <h5>Editar site</h5>
+                    <p>Actualiza la información del site seleccionado.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <label class="form-label">Cliente</label>
+
+                    <select
+                        class="form-select"
+                        id="editarSiteCliente">
+                        <option value="">
+                            Seleccionar cliente
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Proyecto</label>
+
+                    <select
+                        class="form-select"
+                        id="editarSiteProyecto"
+                        disabled>
+                        <option value="">
+                            Selecciona primero un cliente
+                        </option>
+                    </select>
+
+                    <div class="form-text">
+                        Solo se mostrarán proyectos asociados al cliente seleccionado.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Código / nombre del site
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="editarSiteNombre"
+                        placeholder="Ej. 012938_LM_Miraflores">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Dirección
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="editarSiteDireccion"
+                        placeholder="Ej. Av. Larco 1234">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Departamento
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="editarSiteDepartamento"
+                        placeholder="Ej. Lima">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Provincia
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="editarSiteProvincia"
+                        placeholder="Ej. Lima">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Distrito
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="editarSiteDistrito"
+                        placeholder="Ej. Miraflores">
+                </div>
+
+                <div>
+                    <label class="form-label">
+                        Estado
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="editarSiteEstado">
+                        <option value="true">
+                            Activo
+                        </option>
+
+                        <option value="false">
+                            Inactivo
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="actualizarSite">
+                    <i class="bi bi-check-lg"></i>
+                    Guardar cambios
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ELIMINAR SITE -->
+<div
+    class="modal fade"
+    id="eliminarSiteModal"
+    tabindex="-1"
+    aria-labelledby="eliminarSiteModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5
+                    class="modal-title"
+                    id="eliminarSiteModalLabel"
+                >
+                    Eliminar site
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar este site?
+                    </p>
+
+                    <p
+                        id="eliminarSiteMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el registro del site.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarSite"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar site
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL NUEVO SUBPROYECTO -->
+<div class="modal fade" id="nuevoSubproyectoModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h5>Nuevo subproyecto</h5>
+                    <p>Define los alcances y el flujo documental del subproyecto.</p>
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <!-- CONTEXTO -->
+
+                <div class="subproject-context">
+
+                    <div>
+                        <span>Cliente</span>
+                        <strong id="subproyectoCliente">-</strong>
+                    </div>
+
+                    <div>
+                        <span>Proyecto</span>
+                        <strong id="subproyectoProyecto">-</strong>
+                    </div>
+
+                    <div>
+                        <span>Site</span>
+                        <strong id="subproyectoSite">-</strong>
+                    </div>
+
+                </div>
+
+
+                <!-- NOMBRE -->
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+                        Nombre del subproyecto
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="subproyectoNombre"
+                           placeholder="Ej. Ampliación DWDM"
+                           maxlength="200"
+                           required>
+
+                </div>
+
+
+                <!-- ALCANCES -->
+
+                <div class="subproject-config-section">
+
+                    <div class="subproject-section-header">
+
+                        <div>
+                            <h6>Alcances</h6>
+                            <p>
+                                Selecciona los trabajos que forman parte del subproyecto.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="scope-selection" id="subproyectoAlcances">
+                        
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="guardarSubproyecto"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Crear subproyecto
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL EDITAR SUBPROYECTO -->
+<div
+    class="modal fade"
+    id="editarSubproyectoModal"
+    tabindex="-1"
+    aria-labelledby="editarSubproyectoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="editarSubproyectoModalLabel"
+                >
+                    Editar subproyecto
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+
+                    <label
+                        for="editarSubproyectoNombre"
+                        class="form-label"
+                    >
+                        Nombre del subproyecto
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="editarSubproyectoNombre"
+                        placeholder="Ej. Ampliación DWDM"
+                        maxlength="200"
+                        required
+                    >
+
+                </div>
+
+                <div class="subproject-config-section">
+
+                    <div class="subproject-section-header">
+
+                        <div>
+                            <h6>Alcances</h6>
+                            <p>
+                                Selecciona los trabajos que forman parte
+                                del subproyecto.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="scope-selection"
+                        id="editarSubproyectoAlcances"
+                    ></div>
+
+                </div>
+
+                <div class="mb-3 mt-4">
+
+                    <label
+                        for="editarSubproyectoEstado"
+                        class="form-label"
+                    >
+                        Estado
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="editarSubproyectoEstado"
+                    >
+                        <option value="true">
+                            Activo
+                        </option>
+
+                        <option value="false">
+                            Inactivo
+                        </option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="guardarEdicionSubproyecto"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar cambios
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL ELIMINAR SUBPROYECTO -->
+<div
+    class="modal fade"
+    id="eliminarSubproyectoModal"
+    tabindex="-1"
+    aria-labelledby="eliminarSubproyectoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="eliminarSubproyectoModalLabel"
+                >
+                    Eliminar subproyecto
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar este subproyecto?
+                    </p>
+
+                    <p
+                        id="eliminarSubproyectoMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el registro del subproyecto.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarSubproyecto"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar subproyecto
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL NUEVO TIPO DE DOCUMENTO -->
+<div
+    class="modal fade"
+    id="nuevoTipoDocumentoModal"
+    tabindex="-1"
+    aria-labelledby="nuevoTipoDocumentoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="nuevoTipoDocumentoModalLabel"
+                >
+                    Nuevo tipo de documento
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+
+                    <label
+                        for="tipoDocumentoNombre"
+                        class="form-label"
+                    >
+                        Nombre
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="tipoDocumentoNombre"
+                        placeholder="Ej. TSS"
+                    >
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label
+                        for="tipoDocumentoDescripcion"
+                        class="form-label"
+                    >
+                        Descripción
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        id="tipoDocumentoDescripcion"
+                        rows="3"
+                        placeholder="Describe el tipo de documento"
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="guardarTipoDocumento"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Crear tipo
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL EDITAR TIPO DE DOCUMENTO -->
+<div
+    class="modal fade"
+    id="editarTipoDocumentoModal"
+    tabindex="-1"
+    aria-labelledby="editarTipoDocumentoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="editarTipoDocumentoModalLabel"
+                >
+                    Editar tipo de documento
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+
+                    <label
+                        for="editarTipoDocumentoNombre"
+                        class="form-label"
+                    >
+                        Nombre
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="editarTipoDocumentoNombre"
+                        placeholder="Ej. TSS"
+                    >
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label
+                        for="editarTipoDocumentoDescripcion"
+                        class="form-label"
+                    >
+                        Descripción
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        id="editarTipoDocumentoDescripcion"
+                        rows="3"
+                        placeholder="Describe el tipo de documento"
+                    ></textarea>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label
+                        for="editarTipoDocumentoEstado"
+                        class="form-label"
+                    >
+                        Estado
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="editarTipoDocumentoEstado"
+                    >
+                        <option value="true">
+                            Activo
+                        </option>
+
+                        <option value="false">
+                            Inactivo
+                        </option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="actualizarTipoDocumento"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar cambios
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL ELIMINAR TIPO DE DOCUMENTO -->
+<div
+    class="modal fade"
+    id="eliminarTipoDocumentoModal"
+    tabindex="-1"
+    aria-labelledby="eliminarTipoDocumentoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="eliminarTipoDocumentoModalLabel"
+                >
+                    Eliminar tipo de documento
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar este tipo de documento?
+                    </p>
+
+                    <p
+                        id="eliminarTipoDocumentoMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el registro del tipo de documento.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarTipoDocumento"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar tipo
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL NUEVA PLANTILLA -->
+<div
+    class="modal fade"
+    id="nuevaPlantillaModal"
+    tabindex="-1"
+    aria-labelledby="nuevaPlantillaModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5
+                    class="modal-title"
+                    id="nuevaPlantillaModalLabel"
+                >
+                    Nueva plantilla
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label
+                            for="plantillaCliente"
+                            class="form-label"
+                        >
+                            Cliente
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="plantillaCliente"
+                        >
+                            <option value="" selected>
+                                Seleccione un cliente
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label
+                            for="plantillaTipoDocumento"
+                            class="form-label"
+                        >
+                            Tipo de documento
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="plantillaTipoDocumento"
+                            required
+                        >
+                            <option value="" selected disabled>
+                                Seleccione un tipo de documento
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label
+                            for="plantillaNombre"
+                            class="form-label"
+                        >
+                            Nombre de la plantilla
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="plantillaNombre"
+                            placeholder="Ingrese el nombre de la plantilla"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label
+                            for="plantillaDescripcion"
+                            class="form-label"
+                        >
+                            Descripción
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            id="plantillaDescripcion"
+                            rows="3"
+                            placeholder="Describa brevemente la plantilla"
+                        ></textarea>
+                    </div>
+
+                    <div class="col-12">
+
+                        <div class="subproject-config-section">
+
+                            <div class="subproject-section-header">
+                                <div>
+                                    <h6>Alcances</h6>
+                                    <p>
+                                        Selecciona uno o varios alcances asociados a la plantilla.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="scope-selection"
+                                id="plantillaAlcancesContainer"
+                            >
+                                <div class="text-muted">
+                                    Cargando alcances...
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-12">
+                        <label
+                            for="plantillaArchivo"
+                            class="form-label"
+                        >
+                            Archivo de plantilla
+                        </label>
+
+                        <input
+                            type="file"
+                            class="form-control"
+                            id="plantillaArchivo"
+                            accept=".doc,.docx,.xls,.xlsx,.pdf,.ppt,.pptx,.odt,.ods"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnGuardarPlantilla"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar plantilla
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<!-- MODAL: HISTORIAL DE VERSIONES DE PLANTILLAS -->
+<div
+    class="modal fade"
+    id="historialPlantillasModal"
+    tabindex="-1"
+    aria-labelledby="tituloHistorialPlantillas"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div class="template-history-heading">
+                    <div class="template-history-heading-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+
+                    <div>
+                        <h5
+                            class="modal-title"
+                            id="tituloHistorialPlantillas"
+                        >
+                            Historial de versiones
+                        </h5>
+
+                        <p>
+                            Consulta y descarga las versiones registradas
+                            de esta plantilla.
+                        </p>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div
+                class="modal-body"
+                id="contenidoHistorialPlantillas"
+            >
+                <div class="text-muted text-center py-4">
+                    Selecciona una plantilla para consultar sus versiones.
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL SUBIR NUEVA VERSION DE PLANTILLA -->
+<div
+    class="modal fade"
+    id="subirVersionPlantillaModal"
+    tabindex="-1"
+    aria-labelledby="tituloSubirVersionPlantilla"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div>
+                    <h5
+                        class="modal-title"
+                        id="tituloSubirVersionPlantilla"
+                    >
+                        Subir nueva versión
+                    </h5>
+
+                    <p class="text-muted mb-0 small">
+                        Actualiza el archivo sin perder las versiones anteriores.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input
+                    type="hidden"
+                    id="subirVersionPlantillaId"
+                >
+
+                <div class="mb-3">
+                    <label
+                        for="subirVersionPlantillaArchivo"
+                        class="form-label"
+                    >
+                        Archivo de la nueva versión
+                    </label>
+
+                    <input
+                        type="file"
+                        class="form-control"
+                        id="subirVersionPlantillaArchivo"
+                        required
+                    >
+
+                    <div class="form-text">
+                        Selecciona el archivo que reemplazará al vigente.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label
+                        for="subirVersionPlantillaMotivo"
+                        class="form-label"
+                    >
+                        Motivo de la actualización
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        id="subirVersionPlantillaMotivo"
+                        rows="3"
+                        placeholder="Describe por qué se actualiza la plantilla"
+                        required
+                    ></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnConfirmarSubirVersionPlantilla"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Subir versión
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL RESTAURAR VERSIÓN -->
+<div
+    class="modal fade"
+    id="restaurarVersionPlantillaModal"
+    tabindex="-1"
+    aria-labelledby="tituloRestaurarVersionPlantilla"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div>
+                    <h5
+                        class="modal-title"
+                        id="tituloRestaurarVersionPlantilla"
+                    >
+                        Restaurar versión
+                    </h5>
+
+                    <p>
+                        Se creará una nueva versión a partir del archivo seleccionado.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input
+                    type="hidden"
+                    id="restaurarVersionPlantillaId"
+                >
+
+                <input
+                    type="hidden"
+                    id="restaurarVersionId"
+                >
+
+                <div class="mb-3">
+                    <label
+                        for="restaurarVersionMotivo"
+                        class="form-label"
+                    >
+                        Motivo de la restauración
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        id="restaurarVersionMotivo"
+                        rows="3"
+                        placeholder="Ingrese el motivo de la restauración"
+                        required
+                    ></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    id="btnCancelarRestaurarVersion"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnConfirmarRestaurarVersion"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Restaurar versión
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL EDITAR PLANTILLA -->
+<div
+    class="modal fade"
+    id="editarPlantillaModal"
+    tabindex="-1"
+    aria-labelledby="editarPlantillaModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5
+                    class="modal-title"
+                    id="editarPlantillaModalLabel"
+                >
+                    Editar plantilla
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input
+                    type="hidden"
+                    id="editarPlantillaId"
+                >
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label
+                            for="editarPlantillaCliente"
+                            class="form-label"
+                        >
+                            Cliente
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarPlantillaCliente"
+                            required
+                        >
+                            <option value="">
+                                Seleccione un cliente
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label
+                            for="editarPlantillaTipoDocumento"
+                            class="form-label"
+                        >
+                            Tipo de documento
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarPlantillaTipoDocumento"
+                            required
+                        >
+                            <option value="">
+                                Seleccione un tipo de documento
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label
+                            for="editarPlantillaNombre"
+                            class="form-label"
+                        >
+                            Nombre de la plantilla
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editarPlantillaNombre"
+                            maxlength="200"
+                            placeholder="Ingrese el nombre de la plantilla"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label
+                            for="editarPlantillaDescripcion"
+                            class="form-label"
+                        >
+                            Descripción
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            id="editarPlantillaDescripcion"
+                            rows="3"
+                            placeholder="Describa brevemente la plantilla"
+                        ></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="subproject-config-section">
+
+                            <div class="subproject-section-header">
+                                <div>
+                                    <h6>Alcances</h6>
+                                    <p>
+                                        Selecciona uno o varios alcances asociados a la plantilla.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="scope-selection"
+                                id="editarPlantillaAlcancesContainer"
+                            >
+                                <div class="text-muted">
+                                    Cargando alcances...
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="editarPlantillaEstado" class="form-label">Estado</label>
+                        <select class="form-select" id="editarPlantillaEstado" required>
+                            <option value="true">Activa</option>
+                            <option value="false">Inactiva</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-text">
+                            La edición no modifica el archivo actual ni el historial de versiones.
+                            Para actualizar el archivo, utiliza la opción de subir nueva versión.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnGuardarEdicionPlantilla"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar cambios
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL ELIMINAR VERSIÓN DE PLANTILLA -->
+<div
+    class="modal fade"
+    id="eliminarVersionPlantillaModal"
+    tabindex="-1"
+    aria-labelledby="eliminarVersionPlantillaModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="eliminarVersionPlantillaModalLabel"
+                >
+                    Eliminar versión
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input
+                    type="hidden"
+                    id="eliminarVersionPlantillaId"
+                >
+
+                <input
+                    type="hidden"
+                    id="eliminarVersionId"
+                >
+
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar esta versión?
+                    </p>
+
+                    <p
+                        id="eliminarVersionPlantillaMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el registro de la versión y su archivo asociado, si corresponde.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarVersion"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar versión
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL NUEVO ALCANCE -->
+<div
+    class="modal fade"
+    id="nuevoAlcanceModal"
+    tabindex="-1"
+    aria-labelledby="nuevoAlcanceModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5
+                    class="modal-title"
+                    id="nuevoAlcanceModalLabel"
+                >
+                    Nuevo alcance
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-12">
+                        <label
+                            for="alcanceNombre"
+                            class="form-label"
+                        >
+                            Nombre del alcance
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="alcanceNombre"
+                            maxlength="150"
+                            placeholder="Ej. Instalación de gabinete"
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label
+                            for="alcanceDescripcion"
+                            class="form-label"
+                        >
+                            Descripción
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            id="alcanceDescripcion"
+                            rows="3"
+                            placeholder="Describa los trabajos que comprende este alcance"
+                        ></textarea>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnGuardarAlcance"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar alcance
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL VER ALCANCE -->
+<div
+    class="modal fade"
+    id="verAlcanceModal"
+    tabindex="-1"
+    aria-labelledby="verAlcanceModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="verAlcanceModalLabel"
+                >
+                    Información del alcance
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <!-- NOMBRE -->
+
+                    <div class="col-md-8">
+
+                        <div class="client-detail">
+
+                            <span class="client-detail-label">
+                                Nombre del alcance
+                            </span>
+
+                            <strong
+                                id="verAlcanceNombre"
+                                class="client-detail-value"
+                            >
+                                -
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ESTADO -->
+
+                    <div class="col-md-4">
+
+                        <div class="client-detail">
+
+                            <span class="client-detail-label">
+                                Estado
+                            </span>
+
+                            <strong
+                                id="verAlcanceEstado"
+                                class="client-detail-value"
+                            >
+                                -
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <!-- DESCRIPCIÓN -->
+
+                    <div class="col-12">
+
+                        <div class="client-detail">
+
+                            <span class="client-detail-label">
+                                Descripción
+                            </span>
+
+                            <span
+                                id="verAlcanceDescripcion"
+                                class="client-detail-value"
+                            >
+                                -
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cerrar
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL EDITAR ALCANCE -->
+<div
+    class="modal fade"
+    id="editarAlcanceModal"
+    tabindex="-1"
+    aria-labelledby="editarAlcanceModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="editarAlcanceModalLabel"
+                >
+                    Editar alcance
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <!-- NOMBRE -->
+
+                    <div class="col-12">
+
+                        <label
+                            for="editarAlcanceNombre"
+                            class="form-label"
+                        >
+                            Nombre del alcance
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editarAlcanceNombre"
+                            placeholder="Ingrese el nombre del alcance"
+                            maxlength="150"
+                        >
+
+                    </div>
+
+                    <!-- DESCRIPCIÓN -->
+
+                    <div class="col-12">
+
+                        <label
+                            for="editarAlcanceDescripcion"
+                            class="form-label"
+                        >
+                            Descripción
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            id="editarAlcanceDescripcion"
+                            rows="3"
+                            placeholder="Ingrese una descripción del alcance"
+                        ></textarea>
+
+                    </div>
+
+                    <!-- ESTADO -->
+
+                    <div class="col-md-4">
+
+                        <label
+                            for="editarAlcanceEstado"
+                            class="form-label"
+                        >
+                            Estado
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarAlcanceEstado"
+                        >
+
+                            <option value="activo" selected>
+                                Activo
+                            </option>
+
+                            <option value="inactivo">
+                                Inactivo
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnActualizarAlcance"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Actualizar alcance
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL ELIMINAR ALCANCE -->
+<div
+    class="modal fade"
+    id="eliminarAlcanceModal"
+    tabindex="-1"
+    aria-labelledby="eliminarAlcanceModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="eliminarAlcanceModalLabel"
+                >
+                    Eliminar alcance
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar este alcance?
+                    </p>
+
+                    <p
+                        id="eliminarAlcanceMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el registro del alcance.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarAlcance"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar alcance
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL NUEVO REQUISITO -->
+<div
+    class="modal fade"
+    id="nuevoRequisitoModal"
+    tabindex="-1"
+    aria-labelledby="nuevoRequisitoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5
+                    class="modal-title"
+                    id="nuevoRequisitoModalLabel"
+                >
+                    Nuevo requisito
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-12">
+                        <label
+                            for="requisitoNombre"
+                            class="form-label"
+                        >
+                            Nombre del requisito
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="requisitoNombre"
+                            placeholder="Ej. Fotografía general del equipo instalado"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label
+                            for="requisitoDescripcion"
+                            class="form-label"
+                        >
+                            Descripción
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            id="requisitoDescripcion"
+                            rows="3"
+                            placeholder="Indique qué debe mostrar la evidencia"
+                        ></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <label
+                            for="requisitoAlcance"
+                            class="form-label"
+                        >
+                            Alcance
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="requisitoAlcance"
+                            required
+                        >
+                            <option value="">
+                                Seleccionar alcance
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+
+                        <div class="subproject-config-section">
+
+                            <div class="subproject-section-header">
+
+                                <div>
+                                    <h6>Tipos de documento</h6>
+                                    <p>
+                                        Selecciona uno o varios tipos asociados al requisito.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="scope-selection"
+                                id="requisitoTiposDocumento"
+                            >
+                                <div class="text-muted">
+                                    Cargando tipos de documento...
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                id="requisitoObligatorio"
+                                checked
+                            >
+
+                            <label
+                                for="requisitoObligatorio"
+                                class="form-label mb-0"
+                            >
+                                Requisito obligatorio
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnGuardarRequisito"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar requisito
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR REQUISITO -->
+<div
+    class="modal fade"
+    id="editarRequisitoModal"
+    tabindex="-1"
+    aria-labelledby="editarRequisitoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="editarRequisitoModalLabel"
+                >
+                    Editar requisito
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <!-- NOMBRE -->
+
+                    <div class="col-12">
+
+                        <label
+                            for="editarRequisitoNombre"
+                            class="form-label"
+                        >
+                            Nombre del requisito
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editarRequisitoNombre"
+                            placeholder="Ingrese el nombre del requisito"
+                            maxlength="150"
+                            required
+                        >
+
+                    </div>
+
+                    <!-- DESCRIPCIÓN -->
+
+                    <div class="col-12">
+
+                        <label
+                            for="editarRequisitoDescripcion"
+                            class="form-label"
+                        >
+                            Descripción
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            id="editarRequisitoDescripcion"
+                            rows="3"
+                            placeholder="Indique qué debe mostrar la evidencia"
+                        ></textarea>
+
+                    </div>
+
+                    <!-- ALCANCE -->
+
+                    <div class="col-12">
+
+                        <label
+                            for="editarRequisitoAlcance"
+                            class="form-label"
+                        >
+                            Alcance
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarRequisitoAlcance"
+                            required
+                        >
+                            <option value="">
+                                Seleccionar alcance
+                            </option>
+                        </select>
+
+                    </div>
+
+                    <!-- TIPOS DE DOCUMENTO -->
+
+                    <div class="col-12">
+
+                        <div class="subproject-config-section">
+
+                            <div class="subproject-section-header">
+
+                                <div>
+                                    <h6>Tipos de documento</h6>
+                                    <p>
+                                        Selecciona uno o varios tipos asociados al requisito.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="scope-selection"
+                                id="editarRequisitoTiposDocumento"
+                            >
+                                <div class="text-muted">
+                                    Cargando tipos de documento...
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- OBLIGATORIO -->
+
+                    <div class="col-12">
+
+                        <div class="form-check">
+
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                id="editarRequisitoObligatorio"
+                            >
+
+                            <label
+                                for="editarRequisitoObligatorio"
+                                class="form-label mb-0"
+                            >
+                                Requisito obligatorio
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ESTADO -->
+
+                    <div class="col-md-4">
+
+                        <label
+                            for="editarRequisitoEstado"
+                            class="form-label"
+                        >
+                            Estado
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="editarRequisitoEstado"
+                        >
+
+                            <option value="activo">
+                                Activo
+                            </option>
+
+                            <option value="inactivo">
+                                Inactivo
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnActualizarRequisito"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Actualizar requisito
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ELIMINAR REQUISITO -->
+<div
+    class="modal fade"
+    id="eliminarRequisitoModal"
+    tabindex="-1"
+    aria-labelledby="eliminarRequisitoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="eliminarRequisitoModalLabel"
+                >
+                    Eliminar requisito
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar este requisito fotográfico?
+                    </p>
+
+                    <p
+                        id="eliminarRequisitoMensaje"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el registro del requisito fotográfico.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmarEliminarRequisito"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Eliminar requisito
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/administracion.js"></script>
+
+</body>
+</html>
