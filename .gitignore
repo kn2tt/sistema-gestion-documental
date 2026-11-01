@@ -30,6 +30,7 @@ backend/storage/
 # =========================================
 .env
 .env.*
+!.env.example
 
 # =========================================
 # Configuración del Editor y Sistema Operativo

@@ -26,7 +26,22 @@
 
 <body>
 
+<div
+    id="notificationContainer"
+    class="notification-container"
+    aria-live="polite"
+    aria-relevant="additions"
+></div>
+
 <div class="app-layout">
+
+    <!-- NOTIFICACIONES DEL SISTEMA -->
+    <div
+        id="notificationContainer"
+        class="notification-container"
+        aria-live="polite"
+        aria-relevant="additions"
+    ></div>
 
     <!-- SIDEBAR -->
 
@@ -504,20 +519,8 @@
                     <div>
                         <h2>Checklist de evidencias</h2>
                         <p id="checklistSubtitle">
-                            Requisitos fotográficos para completar la asignación
+                            Preparación de los requisitos fotográficos de la asignación
                         </p>
-                    </div>
-
-                    <div class="checklist-management-actions" id="checklistActions" hidden>
-                        <button type="button" class="btn-secondary-custom" id="updateChecklistBtn">
-                            <i class="bi bi-arrow-repeat"></i>
-                            Actualizar
-                        </button>
-
-                        <button type="button" class="btn-secondary-custom" id="deleteChecklistBtn">
-                            <i class="bi bi-trash3"></i>
-                            Eliminar
-                        </button>
                     </div>
                 </div>
 
@@ -529,7 +532,7 @@
                     hidden
                 ></div>
 
-                <div class="checklist-empty-state" id="checklistEmptyState">
+                <div class="checklist-empty-state" id="checklistEmptyState" hidden>
                     <div class="checklist-empty-icon">
                         <i class="bi bi-clipboard-check"></i>
                     </div>
@@ -537,41 +540,39 @@
                     <h3>Aún no se ha generado el checklist</h3>
 
                     <p>
-                        Genera el checklist a partir de la plantilla configurada
-                        para este tipo de documento.
+                        Selecciona los ítems de la plantilla configurada para este tipo
+                        de documento y genera el checklist de la asignación.
                     </p>
 
-                    <button type="button" class="btn-primary-custom" id="generateChecklistBtn">
+                    <button
+                        type="button"
+                        class="btn-primary-custom"
+                        id="generateChecklistBtn"
+                    >
                         <i class="bi bi-plus-lg"></i>
                         Generar checklist
                     </button>
                 </div>
 
                 <div id="checklistContent" hidden>
-                    <div class="progress-container">
-                        <div class="progress-info">
-                            <span>Progreso de evidencias</span>
-                            <strong id="checklistProgressText">0 %</strong>
-                        </div>
 
-                        <div
-                            class="progress"
-                            id="checklistProgress"
-                            role="progressbar"
-                            aria-label="Progreso del checklist"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                            aria-valuenow="0"
-                        >
-                            <div
-                                class="progress-bar"
-                                id="checklistProgressBar"
-                                style="width: 0%;"
-                            ></div>
-                        </div>
+                    <div class="generated-checklist-status">
+                        <span id="generatedChecklistStatus">Borrador</span>
                     </div>
 
                     <div class="checklist" id="checklistItems"></div>
+
+                    <div class="generated-checklist-footer" id="generatedChecklistFooter">
+                        <button
+                            type="button"
+                            class="btn-primary-custom"
+                            id="publishChecklistBtn"
+                        >
+                            <i class="bi bi-check-lg"></i>
+                            Publicar checklist
+                        </button>
+                    </div>
+
                 </div>
 
             </section>
@@ -1025,27 +1026,6 @@
 
             <div id="checklistTemplateFormItems"></div>
 
-            <div class="checklist-template-items-heading">
-                <div>
-                    <h4>Ítems de la plantilla</h4>
-                    <p>
-                        Selecciona los requisitos fotográficos que
-                        formarán parte del checklist.
-                    </p>
-                </div>
-
-                <button
-                    type="button"
-                    class="btn-secondary-custom"
-                    id="addChecklistTemplateItemBtn"
-                >
-                    <i class="bi bi-plus-lg"></i>
-                    Agregar ítem
-                </button>
-            </div>
-
-            <div id="checklistTemplateFormItems"></div>
-
             <div
                 id="checklistTemplateFormMessage"
                 class="checklist-template-message"
@@ -1077,12 +1057,79 @@
     </div>
 </div>
 
-<!-- MODAL ELIMINAR CHECKLIST -->
+<!-- MODAL: SELECCIONAR ÍTEMS DE LA PLANTILLA -->
 <div
     class="modal fade"
-    id="eliminarChecklistModal"
+    id="selectChecklistItemsModal"
     tabindex="-1"
-    aria-labelledby="eliminarChecklistModalLabel"
+    aria-labelledby="selectChecklistItemsModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="selectChecklistItemsModalLabel">
+                        Generar checklist
+                    </h5>
+                    <p class="text-muted small mb-0 mt-1">
+                        Selecciona los ítems que formarán parte del checklist.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+                <div
+                    id="selectChecklistItemsMessage"
+                    class="checklist-template-message"
+                    hidden
+                ></div>
+
+                <div id="selectChecklistItemsContainer">
+                    <div class="checklist-template-empty">
+                        Cargando ítems de la plantilla...
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn-secondary-custom"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-primary-custom"
+                    id="confirmGenerateChecklistBtn"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Generar checklist
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL: AGREGAR O EDITAR ÍTEM GENERADO -->
+<div
+    class="modal fade"
+    id="generatedChecklistItemModal"
+    tabindex="-1"
+    aria-labelledby="generatedChecklistItemModalLabel"
     aria-hidden="true"
 >
     <div class="modal-dialog modal-dialog-centered">
@@ -1091,9 +1138,9 @@
             <div class="modal-header">
                 <h5
                     class="modal-title"
-                    id="eliminarChecklistModalLabel"
+                    id="generatedChecklistItemModalLabel"
                 >
-                    Eliminar checklist
+                    Agregar ítem
                 </h5>
 
                 <button
@@ -1105,29 +1152,57 @@
             </div>
 
             <div class="modal-body">
-                <div class="text-center">
-                    <div class="mb-3">
-                        <i
-                            class="bi bi-trash3"
-                            style="font-size: 32px; color: #dc2626;"
-                        ></i>
-                    </div>
 
-                    <p
-                        class="mb-2"
-                        style="font-size: 14px; font-weight: 600;"
-                    >
-                        ¿Deseas eliminar este checklist?
-                    </p>
+                <div class="mb-3">
+                    <label for="generatedItemTitle" class="form-label">
+                        Título del ítem
+                    </label>
 
-                    <p
-                        id="eliminarChecklistMensaje"
-                        class="text-muted mb-0"
-                        style="font-size: 13px;"
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="generatedItemTitle"
+                        maxlength="200"
+                        placeholder="Escribe el título del ítem"
+                        required
                     >
-                        Esta acción eliminará todos los ítems generados para esta asignación.
-                    </p>
                 </div>
+
+                <div class="mb-3">
+                    <label for="generatedItemDescription" class="form-label">
+                        Descripción
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        id="generatedItemDescription"
+                        rows="3"
+                        placeholder="Describe lo que debe verificarse"
+                    ></textarea>
+                </div>
+
+                <div class="form-check">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="generatedItemRequired"
+                        checked
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="generatedItemRequired"
+                    >
+                        Ítem obligatorio
+                    </label>
+                </div>
+
+                <div
+                    id="generatedChecklistItemMessage"
+                    class="checklist-template-message"
+                    hidden
+                ></div>
+
             </div>
 
             <div class="modal-footer">
@@ -1141,12 +1216,96 @@
 
                 <button
                     type="button"
+                    class="btn btn-primary"
+                    id="saveGeneratedChecklistItemBtn"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Guardar ítem
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ELIMINAR ÍTEM DEL CHECKLIST -->
+<div
+    class="modal fade"
+    id="deleteGeneratedChecklistItemModal"
+    tabindex="-1"
+    aria-labelledby="deleteGeneratedChecklistItemModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="deleteGeneratedChecklistItemModalLabel"
+                >
+                    Eliminar ítem
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-trash3"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p
+                        class="mb-2"
+                        style="font-size: 14px; font-weight: 600;"
+                    >
+                        ¿Deseas eliminar este ítem?
+                    </p>
+
+                    <p
+                        id="deleteGeneratedChecklistItemMessage"
+                        class="text-muted mb-0"
+                        style="font-size: 13px;"
+                    >
+                        Esta acción eliminará el ítem del checklist generado.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
                     class="btn btn-danger"
-                    id="btnConfirmarEliminarChecklist"
+                    id="confirmDeleteGeneratedChecklistItemBtn"
                 >
                     <i class="bi bi-trash3"></i>
-                    Eliminar checklist
+                    Eliminar ítem
                 </button>
+
             </div>
 
         </div>

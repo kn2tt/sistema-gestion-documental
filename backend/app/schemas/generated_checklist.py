@@ -1,6 +1,22 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class GeneratedChecklistItemCreate(BaseModel):
+    requisito_fotografico_id: int = Field(gt=0)
+    titulo: str = Field(min_length=1, max_length=255)
+    descripcion: str | None = None
+    obligatorio: bool = True
+    orden: int = Field(default=1, ge=1)
+
+
+class GeneratedChecklistItemUpdate(BaseModel):
+    requisito_fotografico_id: int | None = Field(default=None, gt=0)
+    titulo: str | None = Field(default=None, min_length=1, max_length=255)
+    descripcion: str | None = None
+    obligatorio: bool | None = None
+    orden: int | None = Field(default=None, ge=1)
 
 
 class GeneratedChecklistItemResponse(BaseModel):
@@ -10,10 +26,16 @@ class GeneratedChecklistItemResponse(BaseModel):
     checklist_id: int
     item_plantilla_id: int | None
     requisito_fotografico_id: int
+    requisito_nombre: str
+    requisito_descripcion: str | None
     titulo: str
     descripcion: str | None
     obligatorio: bool
     orden: int
+
+
+class GeneratedChecklistCreate(BaseModel):
+    item_plantilla_ids: list[int] = Field(min_length=1)
 
 
 class GeneratedChecklistResponse(BaseModel):
@@ -23,4 +45,5 @@ class GeneratedChecklistResponse(BaseModel):
     asignacion_id: int
     plantilla_checklist_id: int | None
     fecha_generacion: datetime
+    estado: str
     items: list[GeneratedChecklistItemResponse]

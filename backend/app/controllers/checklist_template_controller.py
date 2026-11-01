@@ -28,7 +28,12 @@ def obtener_plantilla_o_error(
 ) -> ChecklistTemplate:
     plantilla = (
         db.query(ChecklistTemplate)
-        .options(selectinload(ChecklistTemplate.items))
+        .options(
+            selectinload(ChecklistTemplate.items)
+            .selectinload(
+                ChecklistTemplateItem.requisito_fotografico
+            )
+        )
         .filter(ChecklistTemplate.id == plantilla_id)
         .first()
     )
@@ -81,7 +86,12 @@ def listar_plantillas_checklist(
 ):
     return (
         db.query(ChecklistTemplate)
-        .options(selectinload(ChecklistTemplate.items))
+        .options(
+            selectinload(ChecklistTemplate.items)
+            .selectinload(
+                ChecklistTemplateItem.requisito_fotografico
+            )
+        )
         .order_by(ChecklistTemplate.id.desc())
         .all()
     )
@@ -105,7 +115,12 @@ def obtener_por_tipo_documento(
 
     plantilla = (
         db.query(ChecklistTemplate)
-        .options(selectinload(ChecklistTemplate.items))
+        .options(
+            selectinload(ChecklistTemplate.items)
+            .selectinload(
+                ChecklistTemplateItem.requisito_fotografico
+            )
+        )
         .filter(
             ChecklistTemplate.tipo_documento_id
             == tipo_documento_id

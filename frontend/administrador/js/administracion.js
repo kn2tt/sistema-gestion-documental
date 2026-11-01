@@ -589,6 +589,52 @@ const eliminarRequisitoModal =
    ========================================================= */
 
 /*
+ * Activa el indicador de carga de un botón
+ * y conserva su contenido y estado originales.
+ */
+function iniciarCargaBoton(boton, texto = "Procesando...") {
+
+    if (!boton) {
+        return null;
+    }
+
+    const estadoOriginal = {
+        contenido: boton.innerHTML,
+        deshabilitado: boton.disabled
+    };
+
+    boton.disabled = true;
+    boton.setAttribute("aria-busy", "true");
+
+    boton.innerHTML = `
+        <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+        ></span>
+        ${texto}
+    `;
+
+    return estadoOriginal;
+}
+
+
+/*
+ * Restaura el contenido y estado original del botón.
+ */
+function finalizarCargaBoton(boton, estadoOriginal) {
+
+    if (!boton || !estadoOriginal) {
+        return;
+    }
+
+    boton.innerHTML = estadoOriginal.contenido;
+    boton.disabled = estadoOriginal.deshabilitado;
+    boton.removeAttribute("aria-busy");
+
+}
+
+/*
  * Convierte la respuesta de FastAPI en un mensaje
  * entendible para las notificaciones.
  */
@@ -1193,12 +1239,13 @@ document.getElementById(
         }
 
 
-        const boton =
-            this;
+        const boton = this;
 
-
-        boton.disabled = true;
-
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Guardando..."
+            );
 
         try {
 
@@ -1276,7 +1323,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -1355,11 +1405,13 @@ document.getElementById(
         }
 
 
-        const boton =
-            this;
+        const boton = this;
 
-
-        boton.disabled = true;
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Actualizando..."
+            );
 
 
         try {
@@ -1445,7 +1497,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -1472,11 +1527,13 @@ document.getElementById(
         }
 
 
-        const boton =
-            this;
+        const boton = this;
 
-
-        boton.disabled = true;
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Eliminando..."
+            );
 
 
         try {
@@ -1537,7 +1594,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -1941,11 +2001,13 @@ document.getElementById(
         }
 
 
-        const boton =
-            this;
+        const boton = this;
 
-
-        boton.disabled = true;
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Guardando..."
+            );
 
 
         try {
@@ -2048,7 +2110,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -2146,11 +2211,13 @@ document.getElementById(
         }
 
 
-        const boton =
-            this;
+        const boton = this;
 
-
-        boton.disabled = true;
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Actualizando..."
+            );
 
 
         try {
@@ -2238,7 +2305,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -2836,11 +2906,13 @@ document.getElementById(
         }
 
 
-        const boton =
-            this;
+        const boton = this;
 
-
-        boton.disabled = true;
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Eliminando..."
+            );
 
 
         try {
@@ -2901,7 +2973,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -3577,11 +3652,13 @@ document.getElementById(
         }
 
 
-        const boton =
-            this;
+        const boton = this;
 
-
-        boton.disabled = true;
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Guardando..."
+            );
 
 
         try {
@@ -3691,7 +3768,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -4046,11 +4126,13 @@ document.getElementById(
         }
 
 
-        const boton =
-            this;
+        const boton = this;
 
-
-        boton.disabled = true;
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Actualizando..."
+            );
 
 
         try {
@@ -4139,7 +4221,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -6056,10 +6141,13 @@ document.getElementById(
             return;
         }
 
-        const boton =
-            this;
+        const boton = this;
 
-        boton.disabled = true;
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Eliminando..."
+            );
 
         try {
 
@@ -6122,7 +6210,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -6649,11 +6740,13 @@ document.getElementById(
         }
 
 
-        const boton =
-            this;
+        const boton = this;
 
-
-        boton.disabled = true;
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Guardando..."
+            );
 
 
         try {
@@ -6743,7 +6836,10 @@ document.getElementById(
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
 
         }
 
@@ -7205,13 +7301,14 @@ document.getElementById(
         }
 
         const boton = this;
-        boton.disabled = true;
+
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Actualizando..."
+            );
 
         try {
-
-            /* =============================================
-               ENVIAR ACTUALIZACIÓN AL BACKEND
-               ============================================= */
 
             const respuesta =
                 await fetch(
@@ -7270,10 +7367,6 @@ document.getElementById(
                 throw new Error(mensaje);
             }
 
-            /* =============================================
-               ACTUALIZAR INTERFAZ
-               ============================================= */
-
             editarSiteModal.hide();
 
             await cargarProyectos();
@@ -7299,7 +7392,12 @@ document.getElementById(
             );
 
         } finally {
-            boton.disabled = false;
+
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
+
         }
     }
 );
@@ -7402,7 +7500,12 @@ document.getElementById(
         }
 
         const boton = this;
-        boton.disabled = true;
+
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Eliminando..."
+            );
 
         try {
 
@@ -7464,7 +7567,10 @@ document.getElementById(
             );
 
         } finally {
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
         }
     }
 );
@@ -7678,7 +7784,12 @@ document.getElementById(
         }
 
         const boton = this;
-        boton.disabled = true;
+
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Guardando..."
+            );
 
         try {
 
@@ -7735,7 +7846,10 @@ document.getElementById(
             );
 
         } finally {
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
         }
     }
 );
@@ -7926,7 +8040,12 @@ document.getElementById(
     }
 
     const boton = this;
-    boton.disabled = true;
+
+    const estadoBoton =
+        iniciarCargaBoton(
+            boton,
+            "Editando..."
+        );
 
     try {
         const respuesta = await fetch(
@@ -7977,7 +8096,10 @@ document.getElementById(
         );
 
     } finally {
-        boton.disabled = false;
+        finalizarCargaBoton(
+            boton,
+            estadoBoton
+        );
     }
 });
 
@@ -8023,7 +8145,12 @@ document.getElementById(
     }
 
     const boton = this;
-    boton.disabled = true;
+
+    const estadoBoton =
+        iniciarCargaBoton(
+            boton,
+            "Eliminando..."
+        );
 
     try {
         const respuesta = await fetch(
@@ -8064,7 +8191,10 @@ document.getElementById(
         );
 
     } finally {
-        boton.disabled = false;
+        finalizarCargaBoton(
+            boton,
+            estadoBoton
+        );
     }
 });
 
@@ -12962,7 +13092,12 @@ document.getElementById("btnGuardarRequisito")?.addEventListener(
         };
 
         const boton = this;
-        boton.disabled = true;
+
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Guardando..."
+            );
 
         try {
             const respuesta = await fetch(
@@ -12998,7 +13133,10 @@ document.getElementById("btnGuardarRequisito")?.addEventListener(
                 "error"
             );
         } finally {
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
         }
     }
 );
@@ -13069,7 +13207,12 @@ document
         }
 
         const boton = this;
-        boton.disabled = true;
+
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Actualizando..."
+            );
 
         try {
 
@@ -13140,7 +13283,11 @@ document
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
+
         }
     });
 
@@ -13399,7 +13546,12 @@ document
         }
 
         const boton = this;
-        boton.disabled = true;
+
+        const estadoBoton =
+            iniciarCargaBoton(
+                boton,
+                "Eliminando..."
+            );
 
         try {
 
@@ -13440,7 +13592,11 @@ document
 
         } finally {
 
-            boton.disabled = false;
+            finalizarCargaBoton(
+                boton,
+                estadoBoton
+            );
+
         }
     });
 

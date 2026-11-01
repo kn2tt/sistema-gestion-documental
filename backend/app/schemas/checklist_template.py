@@ -17,6 +17,14 @@ class ChecklistTemplateItemUpdate(BaseModel):
     orden: int | None = None
 
 
+class ChecklistRequirementResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    nombre: str
+    descripcion: str | None
+
+
 class ChecklistTemplateItemResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -27,6 +35,7 @@ class ChecklistTemplateItemResponse(BaseModel):
     descripcion: str | None
     obligatorio: bool
     orden: int
+    requisito_fotografico: ChecklistRequirementResponse
 
 
 class ChecklistTemplateCreate(BaseModel):
