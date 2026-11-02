@@ -563,6 +563,27 @@
                     <div class="checklist" id="checklistItems"></div>
 
                     <div class="generated-checklist-footer" id="generatedChecklistFooter">
+
+                        <button
+                            type="button"
+                            class="btn-secondary-custom"
+                            id="startChecklistUpdateBtn"
+                            hidden
+                        >
+                            <i class="bi bi-pencil-square"></i>
+                            Actualizar checklist
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn-secondary-custom"
+                            id="discardChecklistUpdateBtn"
+                            hidden
+                        >
+                            <i class="bi bi-x-circle"></i>
+                            Descartar actualización
+                        </button>
+
                         <button
                             type="button"
                             class="btn-primary-custom"
@@ -571,6 +592,7 @@
                             <i class="bi bi-check-lg"></i>
                             Publicar checklist
                         </button>
+
                     </div>
 
                 </div>
@@ -1304,6 +1326,154 @@
                 >
                     <i class="bi bi-trash3"></i>
                     Eliminar ítem
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: DESCARTAR ACTUALIZACIÓN DEL CHECKLIST -->
+<div
+    class="modal fade"
+    id="discardChecklistUpdateModal"
+    tabindex="-1"
+    aria-labelledby="discardChecklistUpdateModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5
+                    class="modal-title"
+                    id="discardChecklistUpdateModalLabel"
+                >
+                    Descartar actualización
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-exclamation-triangle"
+                            style="font-size: 32px; color: #dc2626;"
+                        ></i>
+                    </div>
+
+                    <p class="mb-2" style="font-size: 14px; font-weight: 600;">
+                        ¿Deseas descartar esta actualización?
+                    </p>
+
+                    <p class="text-muted mb-0" style="font-size: 13px;">
+                        Se perderán todos los cambios realizados en el borrador
+                        y se conservará la última versión publicada del checklist.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Seguir editando
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="confirmDiscardChecklistUpdateBtn"
+                >
+                    <i class="bi bi-trash3"></i>
+                    Descartar cambios
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: PUBLICAR CHECKLIST -->
+<div
+    class="modal fade"
+    id="publishChecklistModal"
+    tabindex="-1"
+    aria-labelledby="publishChecklistModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5
+                    class="modal-title"
+                    id="publishChecklistModalLabel"
+                >
+                    Publicar checklist
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-clipboard-check"
+                            style="font-size: 32px; color: #2563eb;"
+                        ></i>
+                    </div>
+
+                    <p class="mb-2" style="font-size: 14px; font-weight: 600;">
+                        ¿Deseas publicar este checklist?
+                    </p>
+
+                    <p class="text-muted mb-0" style="font-size: 13px;">
+                        Una vez publicado, el checklist dejará de ser editable.
+                        Verifica que todos los ítems estén correctamente configurados.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="confirmPublishChecklistBtn"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Confirmar publicación
                 </button>
 
             </div>

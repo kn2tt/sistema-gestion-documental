@@ -2308,16 +2308,36 @@ const generateChecklistBtn = document.getElementById("generateChecklistBtn");
 const generatedChecklistStatus = document.getElementById("generatedChecklistStatus");
 const generatedChecklistFooter = document.getElementById("generatedChecklistFooter");
 const publishChecklistBtn = document.getElementById("publishChecklistBtn");
-
+const startChecklistUpdateBtn = document.getElementById(
+    "startChecklistUpdateBtn"
+);
+const discardChecklistUpdateBtn = document.getElementById(
+    "discardChecklistUpdateBtn"
+);
 const selectChecklistItemsModal = document.getElementById("selectChecklistItemsModal");
 const selectChecklistItemsContainer = document.getElementById("selectChecklistItemsContainer");
 const selectChecklistItemsMessage = document.getElementById("selectChecklistItemsMessage");
 const confirmGenerateChecklistBtn = document.getElementById("confirmGenerateChecklistBtn");
 
 const generatedChecklistItemModal = document.getElementById("generatedChecklistItemModal");
-const deleteGeneratedChecklistItemModal = document.getElementById(
-    "deleteGeneratedChecklistItemModal"
+
+const discardChecklistUpdateModal = document.getElementById(
+    "discardChecklistUpdateModal"
 );
+
+const confirmDiscardChecklistUpdateBtn = document.getElementById(
+    "confirmDiscardChecklistUpdateBtn"
+);
+
+const publishChecklistModal = document.getElementById(
+    "publishChecklistModal"
+);
+
+const confirmPublishChecklistBtn = document.getElementById(
+    "confirmPublishChecklistBtn"
+);
+
+let publicandoChecklist = false;
 
 const deleteGeneratedChecklistItemMessage = document.getElementById(
     "deleteGeneratedChecklistItemMessage"
@@ -2337,6 +2357,9 @@ const generatedChecklistItemMessage = document.getElementById("generatedChecklis
 const saveGeneratedChecklistItemBtn = document.getElementById("saveGeneratedChecklistItemBtn");
 
 let checklistActual = null;
+let borradorActualizacion = null;
+let iniciandoActualizacionChecklist = false;
+let descartandoActualizacionChecklist = false;
 let plantillaParaGenerar = null;
 let requisitoItemActual = null;
 let itemEditandoActual = null;
@@ -2415,6 +2438,20 @@ function obtenerEstadoChecklist(checklist) {
 
 function checklistEstaPublicado() {
     return obtenerEstadoChecklist(checklistActual) === "publicado";
+}
+
+function checklistSePuedeEditar() {
+    return Boolean(
+        borradorActualizacion ||
+        (
+            checklistActual &&
+            !checklistEstaPublicado()
+        )
+    );
+}
+
+function obtenerChecklistEdicion() {
+    return borradorActualizacion || checklistActual;
 }
 
 function abrirModalChecklist(elemento) {
@@ -2551,17 +2588,48 @@ async function cargarChecklistAsignacion() {
 
         checklistActual = data;
 
-        if (checklistEmptyState) checklistEmptyState.hidden = true;
-        if (checklistContent) checklistContent.hidden = false;
+        let borrador = null;
 
-        renderizarChecklistAsignacion(data);
+        // Buscar si existe una actualización temporal.
+        try {
+            borrador = await solicitarChecklist(
+                `${API_URL}/asignaciones/checklist/${encodeURIComponent(data.id)}/actualizacion`
+            );
+        } catch (error) {
+            if (error.status !== 404) {
+                throw error;
+            }
+        }
+
+        borradorActualizacion = borrador;
+
+        if (checklistEmptyState) {
+            checklistEmptyState.hidden = true;
+        }
+
+        if (checklistContent) {
+            checklistContent.hidden = false;
+        }
+
+        // Si existe un borrador, mostrarlo sin modificar
+        // el objeto correspondiente al checklist publicado.
+        renderizarChecklistAsignacion(
+            borrador || data,
+            Boolean(borrador)
+        );
 
     } catch (error) {
         if (error.status === 404) {
             checklistActual = null;
+            borradorActualizacion = null;
 
-            if (checklistEmptyState) checklistEmptyState.hidden = false;
-            if (checklistContent) checklistContent.hidden = true;
+            if (checklistEmptyState) {
+                checklistEmptyState.hidden = false;
+            }
+
+            if (checklistContent) {
+                checklistContent.hidden = true;
+            }
 
             return;
         }
@@ -2572,6 +2640,7 @@ async function cargarChecklistAsignacion() {
             error.message || "No se pudo cargar el checklist.",
             true
         );
+
     } finally {
         cargandoChecklist = false;
     }
@@ -2868,22 +2937,37 @@ async function generarChecklistAsignacion() {
    RENDERIZAR ÍTEMS AGRUPADOS POR REQUERIMIENTO
    ===================================================== */
 
-function renderizarChecklistAsignacion(checklist) {
+function renderizarChecklistAsignacion(
+    checklist,
+    esBorradorActualizacion = false
+) {
     if (!checklistItemsContainer) return;
 
-    checklistActual = checklist;
+    if (esBorradorActualizacion) {
+        borradorActualizacion = checklist;
+    } else {
+        checklistActual = checklist;
+    }
+
     checklistItemsContainer.replaceChildren();
 
     const items = Array.isArray(checklist?.items)
         ? [...checklist.items]
         : [];
 
-    const publicado = checklistEstaPublicado();
+    const publicado =
+        !esBorradorActualizacion &&
+        checklistEstaPublicado();
+
+    const soloLectura = publicado;
 
     if (generatedChecklistStatus) {
-        generatedChecklistStatus.textContent = publicado
-            ? "Publicado"
-            : "Borrador";
+        generatedChecklistStatus.textContent =
+            esBorradorActualizacion
+                ? "Borrador de actualización"
+                : publicado
+                    ? "Publicado"
+                    : "Borrador";
 
         generatedChecklistStatus.classList.toggle(
             "is-published",
@@ -2892,17 +2976,33 @@ function renderizarChecklistAsignacion(checklist) {
     }
 
     if (generatedChecklistFooter) {
-        generatedChecklistFooter.hidden = publicado;
+        generatedChecklistFooter.hidden = false;
+    }
+
+    if (startChecklistUpdateBtn) {
+        startChecklistUpdateBtn.hidden = !publicado;
+    }
+
+    if (discardChecklistUpdateBtn) {
+        discardChecklistUpdateBtn.hidden =
+            !esBorradorActualizacion;
     }
 
     if (publishChecklistBtn) {
         publishChecklistBtn.hidden = publicado;
+
+        publishChecklistBtn.innerHTML =
+            esBorradorActualizacion
+                ? '<i class="bi bi-check-lg"></i> Publicar actualización'
+                : '<i class="bi bi-check-lg"></i> Publicar checklist';
     }
 
     const grupos = new Map();
 
     items.forEach(item => {
-        const requisitoId = Number(item.requisito_fotografico_id);
+        const requisitoId = Number(
+            item.requisito_fotografico_id
+        );
 
         if (!grupos.has(requisitoId)) {
             grupos.set(requisitoId, []);
@@ -2911,7 +3011,8 @@ function renderizarChecklistAsignacion(checklist) {
         grupos.get(requisitoId).push(item);
     });
 
-    // Mostrar también los requerimientos configurados que aún no tienen ítems.
+    // Mostrar también los requerimientos configurados
+    // que todavía no tienen ítems.
     obtenerRequisitosDelTipoDocumento().forEach(requisito => {
         if (!grupos.has(Number(requisito.id))) {
             grupos.set(Number(requisito.id), []);
@@ -2949,14 +3050,24 @@ function renderizarChecklistAsignacion(checklist) {
         informacion.className = "generated-checklist-group-info";
 
         const titulo = document.createElement("h3");
+
         titulo.textContent =
             requisito?.nombre ||
-            (itemsGrupo[0] ? obtenerNombreRequisito(itemsGrupo[0]) : `Requerimiento ${requisitoId}`);
+            (
+                itemsGrupo[0]
+                    ? obtenerNombreRequisito(itemsGrupo[0])
+                    : `Requerimiento ${requisitoId}`
+            );
 
         const descripcion = document.createElement("p");
+
         descripcion.textContent =
             requisito?.descripcion ||
-            (itemsGrupo[0] ? obtenerDescripcionRequisito(itemsGrupo[0]) : "");
+            (
+                itemsGrupo[0]
+                    ? obtenerDescripcionRequisito(itemsGrupo[0])
+                    : ""
+            );
 
         informacion.append(titulo);
 
@@ -2966,10 +3077,12 @@ function renderizarChecklistAsignacion(checklist) {
 
         encabezado.append(informacion);
 
-        if (!publicado) {
+        if (!soloLectura) {
             const botonAgregar = document.createElement("button");
+
             botonAgregar.type = "button";
             botonAgregar.className = "checklist-add-item-btn";
+
             botonAgregar.innerHTML =
                 '<i class="bi bi-plus-lg"></i> Agregar ítem';
 
@@ -2984,17 +3097,21 @@ function renderizarChecklistAsignacion(checklist) {
         lista.className = "generated-checklist-items";
 
         itemsGrupo
-            .sort((a, b) => Number(a.orden || 0) - Number(b.orden || 0))
+            .sort((a, b) =>
+                Number(a.orden || 0) - Number(b.orden || 0)
+            )
             .forEach(item => {
                 lista.appendChild(
-                    crearFilaItemChecklist(item, publicado)
+                    crearFilaItemChecklist(item, soloLectura)
                 );
             });
 
         if (itemsGrupo.length === 0) {
             const vacio = document.createElement("p");
+
             vacio.className = "generated-checklist-group-empty";
-            vacio.textContent = publicado
+
+            vacio.textContent = soloLectura
                 ? "Este requerimiento no tiene ítems."
                 : "Todavía no se han agregado ítems a este requerimiento.";
 
@@ -3002,12 +3119,14 @@ function renderizarChecklistAsignacion(checklist) {
         }
 
         grupo.append(encabezado, lista);
+
         checklistItemsContainer.appendChild(grupo);
     });
 }
 
-function crearFilaItemChecklist(item, publicado) {
+function crearFilaItemChecklist(item, soloLectura) {
     const fila = document.createElement("article");
+
     fila.className = "generated-checklist-item";
     fila.dataset.itemId = item.id;
 
@@ -3021,7 +3140,9 @@ function crearFilaItemChecklist(item, publicado) {
     descripcion.textContent = item.descripcion || "";
 
     const obligatorio = document.createElement("small");
+
     obligatorio.className = "generated-checklist-item-required";
+
     obligatorio.textContent = item.obligatorio
         ? "Obligatorio"
         : "Opcional";
@@ -3036,16 +3157,24 @@ function crearFilaItemChecklist(item, publicado) {
 
     fila.appendChild(contenido);
 
-    if (!publicado) {
+    if (!soloLectura) {
         const acciones = document.createElement("div");
+
         acciones.className = "generated-checklist-item-actions";
 
         const botonEditar = document.createElement("button");
+
         botonEditar.type = "button";
         botonEditar.className = "checklist-item-action";
         botonEditar.title = "Editar ítem";
-        botonEditar.setAttribute("aria-label", "Editar ítem");
-        botonEditar.innerHTML = '<i class="bi bi-pencil"></i>';
+
+        botonEditar.setAttribute(
+            "aria-label",
+            "Editar ítem"
+        );
+
+        botonEditar.innerHTML =
+            '<i class="bi bi-pencil"></i>';
 
         botonEditar.addEventListener("click", () => {
             abrirModalItemGenerado(
@@ -3055,17 +3184,27 @@ function crearFilaItemChecklist(item, publicado) {
         });
 
         const botonEliminar = document.createElement("button");
+
         botonEliminar.type = "button";
-        botonEliminar.className = "checklist-item-action delete";
+        botonEliminar.className =
+            "checklist-item-action delete";
+
         botonEliminar.title = "Eliminar ítem";
-        botonEliminar.setAttribute("aria-label", "Eliminar ítem");
-        botonEliminar.innerHTML = '<i class="bi bi-trash3"></i>';
+
+        botonEliminar.setAttribute(
+            "aria-label",
+            "Eliminar ítem"
+        );
+
+        botonEliminar.innerHTML =
+            '<i class="bi bi-trash3"></i>';
 
         botonEliminar.addEventListener("click", () => {
             eliminarItemChecklist(item);
         });
 
         acciones.append(botonEditar, botonEliminar);
+
         fila.appendChild(acciones);
     }
 
@@ -3078,46 +3217,61 @@ function crearFilaItemChecklist(item, publicado) {
    ===================================================== */
 
 function abrirModalItemGenerado(requisitoId, item = null) {
-    if (checklistEstaPublicado()) return;
+    if (!checklistSePuedeEditar()) {
+        mostrarNotificacion(
+            "No se puede modificar un checklist publicado directamente.",
+            "warning"
+        );
+        return;
+    }
 
     requisitoItemActual = Number(requisitoId);
-    itemEditandoActual = item;
+    itemEditandoActual = item ? { ...item } : null;
 
     ocultarMensajeItemGenerado();
 
-    if (generatedItemTitle) {
-        generatedItemTitle.value = item?.titulo || "";
-    }
+    generatedChecklistItemModalLabel.textContent = item
+        ? "Editar ítem"
+        : "Agregar ítem";
 
-    if (generatedItemDescription) {
-        generatedItemDescription.value = item?.descripcion || "";
-    }
-
-    if (generatedItemRequired) {
-        generatedItemRequired.checked = item
-            ? Boolean(item.obligatorio)
-            : true;
-    }
-
-    if (generatedChecklistItemModalLabel) {
-        generatedChecklistItemModalLabel.textContent = item
-            ? "Editar ítem"
-            : "Agregar ítem";
-    }
-
-    if (saveGeneratedChecklistItemBtn) {
-        saveGeneratedChecklistItemBtn.innerHTML = item
-            ? '<i class="bi bi-check-lg"></i> Guardar cambios'
-            : '<i class="bi bi-check-lg"></i> Guardar ítem';
-    }
+    generatedItemTitle.value = item?.titulo || "";
+    generatedItemDescription.value = item?.descripcion || "";
+    generatedItemRequired.checked = item
+        ? Boolean(item.obligatorio)
+        : true;
 
     abrirModalChecklist(generatedChecklistItemModal);
+
+    generatedItemTitle.focus();
+}
+
+
+function eliminarItemChecklist(item) {
+    if (!checklistSePuedeEditar()) {
+        mostrarNotificacion(
+            "No se puede modificar un checklist publicado directamente.",
+            "warning"
+        );
+        return;
+    }
+
+    itemChecklistEliminando = item;
+
+    if (deleteGeneratedChecklistItemMessage) {
+        deleteGeneratedChecklistItemMessage.textContent =
+            `¿Estás seguro de que deseas eliminar el ítem "${item.titulo || "Sin título"}"?`;
+    }
+
+    abrirModalChecklist(deleteGeneratedChecklistItemModal);
 }
 
 async function guardarItemChecklist() {
+    const checklistEdicion = obtenerChecklistEdicion();
+    const esActualizacion = Boolean(borradorActualizacion);
+
     if (
-        !checklistActual ||
-        checklistEstaPublicado() ||
+        !checklistEdicion ||
+        !checklistSePuedeEditar() ||
         guardandoItemChecklist
     ) {
         return;
@@ -3132,6 +3286,7 @@ async function guardarItemChecklist() {
             "El título del ítem es obligatorio.",
             true
         );
+
         generatedItemTitle.focus();
         return;
     }
@@ -3140,13 +3295,15 @@ async function guardarItemChecklist() {
     const contenidoOriginal = boton.innerHTML;
 
     guardandoItemChecklist = true;
+
     boton.disabled = true;
+
     boton.innerHTML =
         '<span class="documenter-save-spinner" aria-hidden="true"></span> Guardando...';
 
     try {
-        const itemsActuales = Array.isArray(checklistActual.items)
-            ? checklistActual.items
+        const itemsActuales = Array.isArray(checklistEdicion.items)
+            ? checklistEdicion.items
             : [];
 
         const orden = itemEditandoActual
@@ -3173,16 +3330,25 @@ async function guardarItemChecklist() {
         let metodo;
 
         if (itemEditandoActual) {
-            url = `${API_URL}/asignaciones/checklist/items/${encodeURIComponent(itemEditandoActual.id)}`;
+            // Editar ítem existente.
+            url = esActualizacion
+                ? `${API_URL}/asignaciones/checklist/actualizacion/items/${encodeURIComponent(itemEditandoActual.id)}`
+                : `${API_URL}/asignaciones/checklist/items/${encodeURIComponent(itemEditandoActual.id)}`;
+
             metodo = "PUT";
+
         } else {
-            url = `${API_URL}/asignaciones/checklist/${encodeURIComponent(checklistActual.id)}/items`;
+            // Agregar un nuevo ítem.
+            url = esActualizacion
+                ? `${API_URL}/asignaciones/checklist/actualizacion/${encodeURIComponent(checklistEdicion.id)}/items`
+                : `${API_URL}/asignaciones/checklist/${encodeURIComponent(checklistEdicion.id)}/items`;
+
             metodo = "POST";
 
             payload.requisito_fotografico_id = requisitoItemActual;
         }
 
-        const data = await solicitarChecklist(url, {
+        await solicitarChecklist(url, {
             method: metodo,
             headers: {
                 "Content-Type": "application/json"
@@ -3208,8 +3374,10 @@ async function guardarItemChecklist() {
             error.message || "No se pudo guardar el ítem.",
             true
         );
+
     } finally {
         guardandoItemChecklist = false;
+
         boton.disabled = false;
         boton.innerHTML = contenidoOriginal;
     }
@@ -3220,32 +3388,14 @@ async function guardarItemChecklist() {
    ELIMINAR ÍTEM DEL CHECKLIST GENERADO
    ===================================================== */
 
-/* =====================================================
-   ELIMINAR ÍTEM DEL CHECKLIST GENERADO
-   ===================================================== */
-
-function eliminarItemChecklist(item) {
-    if (checklistEstaPublicado() || !item) return;
-
-    itemChecklistEliminando = item;
-
-    deleteGeneratedChecklistItemMessage.textContent =
-        `Se eliminará el ítem "${item.titulo}". Esta acción no se puede deshacer.`;
-
-    abrirModalChecklist(
-        deleteGeneratedChecklistItemModal
-    );
-}
-
-
-/* =====================================================
-   CONFIRMAR ELIMINACIÓN DEL ÍTEM
-   ===================================================== */
-
 async function confirmarEliminarItemChecklist() {
+    const checklistEdicion = obtenerChecklistEdicion();
+    const esActualizacion = Boolean(borradorActualizacion);
+
     if (
         !itemChecklistEliminando ||
-        checklistEstaPublicado() ||
+        !checklistEdicion ||
+        !checklistSePuedeEditar() ||
         eliminandoItemChecklist
     ) {
         return;
@@ -3262,20 +3412,21 @@ async function confirmarEliminarItemChecklist() {
         '<span class="documenter-save-spinner" aria-hidden="true"></span> Eliminando...';
 
     try {
-        await solicitarChecklist(
-            `${API_URL}/asignaciones/checklist/items/${encodeURIComponent(itemChecklistEliminando.id)}`,
-            {
-                method: "DELETE"
-            }
-        );
+        const url = esActualizacion
+            ? `${API_URL}/asignaciones/checklist/actualizacion/items/${encodeURIComponent(itemChecklistEliminando.id)}`
+            : `${API_URL}/asignaciones/checklist/items/${encodeURIComponent(itemChecklistEliminando.id)}`;
+
+        await solicitarChecklist(url, {
+            method: "DELETE"
+        });
 
         cerrarModalChecklist(
             deleteGeneratedChecklistItemModal
         );
 
-        await cargarChecklistAsignacion();
-
         itemChecklistEliminando = null;
+
+        await cargarChecklistAsignacion();
 
         mostrarNotificacion(
             "El ítem se eliminó correctamente.",
@@ -3302,14 +3453,149 @@ async function confirmarEliminarItemChecklist() {
 }
 
 /* =====================================================
+   INICIAR ACTUALIZACIÓN DEL CHECKLIST
+   ===================================================== */
+
+async function iniciarActualizacionChecklist() {
+    if (
+        !checklistActual ||
+        !checklistEstaPublicado() ||
+        borradorActualizacion ||
+        iniciandoActualizacionChecklist
+    ) {
+        return;
+    }
+
+    const boton = startChecklistUpdateBtn;
+    const contenidoOriginal = boton.innerHTML;
+
+    iniciandoActualizacionChecklist = true;
+
+    boton.disabled = true;
+
+    boton.innerHTML =
+        '<span class="documenter-save-spinner" aria-hidden="true"></span> Preparando...';
+
+    try {
+        const borrador = await solicitarChecklist(
+            `${API_URL}/asignaciones/checklist/${encodeURIComponent(checklistActual.id)}/actualizacion`,
+            {
+                method: "POST"
+            }
+        );
+
+        borradorActualizacion = borrador;
+
+        renderizarChecklistAsignacion(
+            borrador,
+            true
+        );
+
+        mostrarNotificacion(
+            "Se inició la actualización del checklist. Los cambios todavía no afectan al checklist publicado.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error(
+            "Error al iniciar la actualización:",
+            error
+        );
+
+        mostrarNotificacion(
+            error.message || "No se pudo iniciar la actualización.",
+            "error"
+        );
+
+    } finally {
+        iniciandoActualizacionChecklist = false;
+
+        boton.disabled = false;
+        boton.innerHTML = contenidoOriginal;
+    }
+}
+
+
+/* =====================================================
+   DESCARTAR ACTUALIZACIÓN DEL CHECKLIST
+   ===================================================== */
+
+async function descartarActualizacionChecklist() {
+    if (
+        !borradorActualizacion ||
+        descartandoActualizacionChecklist
+    ) {
+        return;
+    }
+
+    const boton = confirmDiscardChecklistUpdateBtn;
+    const contenidoOriginal = boton.innerHTML;
+
+    descartandoActualizacionChecklist = true;
+
+    boton.disabled = true;
+
+    boton.innerHTML =
+        '<span class="documenter-save-spinner" aria-hidden="true"></span> Descartando...';
+
+    try {
+        await solicitarChecklist(
+            `${API_URL}/asignaciones/checklist/actualizacion/${encodeURIComponent(borradorActualizacion.id)}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        borradorActualizacion = null;
+
+        // Esperar a que termine de cargarse la vista actualizada.
+        await cargarChecklistAsignacion();
+
+        mostrarNotificacion(
+            "La actualización se descartó correctamente. El checklist publicado no sufrió modificaciones.",
+            "success"
+        );
+
+        // Cerrar el modal solamente cuando todo haya terminado.
+        cerrarModalChecklist(discardChecklistUpdateModal);
+
+    } catch (error) {
+        console.error(
+            "Error al descartar la actualización:",
+            error
+        );
+
+        mostrarNotificacion(
+            error.message || "No se pudo descartar la actualización.",
+            "error"
+        );
+
+    } finally {
+        descartandoActualizacionChecklist = false;
+
+        boton.disabled = false;
+        boton.innerHTML = contenidoOriginal;
+    }
+}
+
+/* =====================================================
    PUBLICAR CHECKLIST
    ===================================================== */
 
 async function publicarChecklistAsignacion() {
-    if (!checklistActual || checklistEstaPublicado()) return;
+    const checklistEdicion = obtenerChecklistEdicion();
+    const esActualizacion = Boolean(borradorActualizacion);
 
-    const items = Array.isArray(checklistActual.items)
-        ? checklistActual.items
+    if (
+        !checklistEdicion ||
+        !checklistSePuedeEditar() ||
+        publicandoChecklist
+    ) {
+        return;
+    }
+
+    const items = Array.isArray(checklistEdicion.items)
+        ? checklistEdicion.items
         : [];
 
     if (items.length === 0) {
@@ -3320,50 +3606,60 @@ async function publicarChecklistAsignacion() {
         return;
     }
 
-    const confirmar = window.confirm(
-        "¿Deseas publicar este checklist? Después de publicarlo ya no podrás modificar sus ítems."
-    );
-
-    if (!confirmar) return;
-
-    const boton = publishChecklistBtn;
+    const boton = confirmPublishChecklistBtn;
     const contenidoOriginal = boton.innerHTML;
 
+    publicandoChecklist = true;
+
     boton.disabled = true;
+
     boton.innerHTML =
         '<span class="documenter-save-spinner" aria-hidden="true"></span> Publicando...';
 
     try {
-        const data = await solicitarChecklist(
-            `${API_URL}/asignaciones/checklist/${encodeURIComponent(checklistActual.id)}/publicar`,
-            {
-                method: "POST"
-            }
-        );
+        const url = esActualizacion
+            ? `${API_URL}/asignaciones/checklist/actualizacion/${encodeURIComponent(checklistEdicion.id)}/publicar`
+            : `${API_URL}/asignaciones/checklist/${encodeURIComponent(checklistEdicion.id)}/publicar`;
 
-        checklistActual = data || checklistActual;
+        await solicitarChecklist(url, {
+            method: "POST"
+        });
 
-        if (!data) {
-            checklistActual.estado = "publicado";
+        if (esActualizacion) {
+            borradorActualizacion = null;
         }
 
+        // Esperar a que termine de cargarse la vista actualizada.
         await cargarChecklistAsignacion();
 
-        mostrarMensajeChecklist("El checklist se publicó correctamente.");
+        mostrarNotificacion(
+            esActualizacion
+                ? "La actualización del checklist se publicó correctamente."
+                : "El checklist se publicó correctamente.",
+            "success"
+        );
+
+        // Cerrar el modal solamente cuando todo haya terminado.
+        cerrarModalChecklist(publishChecklistModal);
 
     } catch (error) {
-        console.error("Error al publicar el checklist:", error);
+        console.error(
+            "Error al publicar el checklist:",
+            error
+        );
 
         mostrarMensajeChecklist(
             error.message || "No se pudo publicar el checklist.",
             true
         );
+
     } finally {
+        publicandoChecklist = false;
+
         boton.disabled = false;
         boton.innerHTML = contenidoOriginal;
     }
 }
-
 
 /* =====================================================
    EVENTOS DEL CHECKLIST
@@ -3384,15 +3680,65 @@ saveGeneratedChecklistItemBtn?.addEventListener(
     guardarItemChecklist
 );
 
-publishChecklistBtn?.addEventListener(
+// Abrir confirmación para publicar.
+publishChecklistBtn?.addEventListener("click", function () {
+    if (
+        !checklistSePuedeEditar() ||
+        publicandoChecklist
+    ) {
+        return;
+    }
+
+    const items = obtenerChecklistEdicion()?.items || [];
+
+    if (items.length === 0) {
+        mostrarMensajeChecklist(
+            "No puedes publicar un checklist sin ítems.",
+            true
+        );
+        return;
+    }
+
+    abrirModalChecklist(publishChecklistModal);
+});
+
+
+// Confirmar publicación.
+confirmPublishChecklistBtn?.addEventListener(
     "click",
     publicarChecklistAsignacion
+);
+
+
+// Abrir confirmación para descartar.
+discardChecklistUpdateBtn?.addEventListener("click", function () {
+    if (
+        !borradorActualizacion ||
+        descartandoActualizacionChecklist
+    ) {
+        return;
+    }
+
+    abrirModalChecklist(discardChecklistUpdateModal);
+});
+
+
+// Confirmar descarte.
+confirmDiscardChecklistUpdateBtn?.addEventListener(
+    "click",
+    descartarActualizacionChecklist
 );
 
 confirmDeleteGeneratedChecklistItemBtn?.addEventListener(
     "click",
     confirmarEliminarItemChecklist
 );
+
+startChecklistUpdateBtn?.addEventListener(
+    "click",
+    iniciarActualizacionChecklist
+);
+
 
 /* =====================================================
    NAVEGACIÓN
