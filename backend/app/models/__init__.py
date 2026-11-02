@@ -17,3 +17,7 @@ from app.models.checklist_template import ChecklistTemplate
 from app.models.checklist_template_item import ChecklistTemplateItem
 from app.models.generated_checklist import GeneratedChecklist
 from app.models.generated_checklist_item import GeneratedChecklistItem
+from app.models.generated_checklist_draft import (
+    GeneratedChecklistDraft,
+    GeneratedChecklistDraftItem,
+)
