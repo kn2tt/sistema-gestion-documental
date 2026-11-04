@@ -10,6 +10,15 @@
 
 const API_URL = "http://127.0.0.1:8000";
 
+// Realizar peticiones al backend enviando la cookie de sesión.
+async function apiFetch(url, opciones = {}) {
+
+    return window.fetch(url, {
+        ...opciones,
+        credentials: "include"
+    });
+
+}
 
 /* =========================================================
    2. VARIABLES GLOBALES
@@ -749,7 +758,7 @@ async function cargarUsuarios() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/usuarios/`
             );
 
@@ -1250,7 +1259,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/usuarios/`,
                     {
                         method: "POST",
@@ -1436,7 +1445,7 @@ document.getElementById(
 
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/usuarios/${usuarioEditandoId}`,
                     {
                         method: "PUT",
@@ -1539,7 +1548,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/usuarios/${usuarioEliminandoId}`,
                     {
                         method: "DELETE"
@@ -1626,7 +1635,7 @@ async function cargarClientes() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/clientes/`
             );
 
@@ -2013,7 +2022,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/clientes/`,
                     {
                         method: "POST",
@@ -2223,7 +2232,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/clientes/${clienteId}`,
                     {
                         method: "PUT",
@@ -2918,7 +2927,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/clientes/${clienteEliminandoId}`,
                     {
                         method: "DELETE"
@@ -3411,7 +3420,7 @@ async function cargarClientesEnSelectProyecto() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/clientes/activos`
             );
 
@@ -3664,7 +3673,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/proyectos/`,
                     {
                         method: "POST",
@@ -3797,7 +3806,7 @@ async function cargarClientesEnSelectEditarProyecto() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/clientes/`
             );
 
@@ -3918,7 +3927,7 @@ document.addEventListener(
 
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/proyectos/${proyectoId}`
                 );
 
@@ -4138,7 +4147,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/proyectos/${proyectoId}`,
                     {
                         method: "PUT",
@@ -4349,19 +4358,19 @@ async function cargarProyectos() {
             respuestaSubproyectos
         ] = await Promise.all([
 
-            fetch(
+            apiFetch(
                 `${API_URL}/clientes/`
             ),
 
-            fetch(
+            apiFetch(
                 `${API_URL}/proyectos/`
             ),
 
-            fetch(
+            apiFetch(
                 `${API_URL}/sites/`
             ),
 
-            fetch(
+            apiFetch(
                 `${API_URL}/subproyectos/`
             )
 
@@ -6152,7 +6161,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/proyectos/${proyectoId}`,
                     {
                         method: "DELETE"
@@ -6243,7 +6252,7 @@ async function cargarClientesEnSelectSite() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/clientes/activos`
             );
 
@@ -6388,7 +6397,7 @@ async function cargarProyectosEnSelectSite(
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/proyectos/cliente/${clienteId}`
             );
 
@@ -6752,7 +6761,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/sites/`,
                     {
                         method: "POST",
@@ -6861,7 +6870,7 @@ async function cargarClientesEnSelectEditarSite() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/clientes/`
             );
 
@@ -6961,7 +6970,7 @@ async function cargarProyectosEnSelectEditarSite(
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/proyectos/cliente/${clienteId}`
             );
 
@@ -7096,7 +7105,7 @@ document.addEventListener(
                ============================================= */
 
             const respuestaSite =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/sites/${siteId}`
                 );
 
@@ -7125,7 +7134,7 @@ document.addEventListener(
                ============================================= */
 
             const respuestaProyecto =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/proyectos/${site.proyecto_id}`
                 );
 
@@ -7311,7 +7320,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/sites/${siteId}`,
                     {
                         method: "PUT",
@@ -7514,7 +7523,7 @@ document.getElementById(
                ============================================= */
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/sites/${siteId}`,
                     {
                         method: "DELETE"
@@ -7588,7 +7597,7 @@ async function cargarAlcancesSubproyecto() {
     contenedor.innerHTML = "";
 
     try {
-        const respuesta = await fetch(`${API_URL}/alcances/`);
+        const respuesta = await apiFetch(`${API_URL}/alcances/`);
 
         if (!respuesta.ok) {
             throw new Error(
@@ -7794,7 +7803,7 @@ document.getElementById(
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/subproyectos/`,
                     {
                         method: "POST",
@@ -7864,7 +7873,7 @@ async function cargarAlcancesSubproyectoEdicion(alcancesSeleccionados) {
 
     contenedor.innerHTML = "";
 
-    const respuesta = await fetch(`${API_URL}/alcances/`);
+    const respuesta = await apiFetch(`${API_URL}/alcances/`);
 
     if (!respuesta.ok) {
         throw new Error(
@@ -7947,7 +7956,7 @@ document.addEventListener("click", async function (event) {
     boton.disabled = true;
 
     try {
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/subproyectos/${subproyectoId}`
         );
 
@@ -8048,7 +8057,7 @@ document.getElementById(
         );
 
     try {
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/subproyectos/${subproyectoEditandoId}`,
             {
                 method: "PUT",
@@ -8153,7 +8162,7 @@ document.getElementById(
         );
 
     try {
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/subproyectos/${subproyectoEliminandoId}`,
             {
                 method: "DELETE"
@@ -8256,11 +8265,16 @@ document.getElementById(
             return;
         }
 
+        const boton = this;
+        const estadoCarga = iniciarCargaBoton(
+            boton,
+            "Guardando..."
+        );
 
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/tipos-documento/`,
                     {
                         method: "POST",
@@ -8313,6 +8327,13 @@ document.getElementById(
                 "error"
             );
 
+        } finally {
+
+            finalizarCargaBoton(
+                boton,
+                estadoCarga
+            );
+
         }
 
     }
@@ -8360,10 +8381,16 @@ document.getElementById(
             return;
         }
 
+        const boton = this;
+        const estadoCarga = iniciarCargaBoton(
+            boton,
+            "Guardando cambios..."
+        );
+
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/tipos-documento/${tipoDocumentoEditandoId}`,
                     {
                         method: "PUT",
@@ -8419,6 +8446,13 @@ document.getElementById(
                 "error"
             );
 
+        } finally {
+
+            finalizarCargaBoton(
+                boton,
+                estadoCarga
+            );
+
         }
 
     }
@@ -8430,7 +8464,7 @@ async function cargarTiposDocumento() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/tipos-documento/`
             );
 
@@ -8522,7 +8556,7 @@ async function cargarTiposDocumento() {
                         try {
 
                             const respuesta =
-                                await fetch(
+                                await apiFetch(
                                     `${API_URL}/tipos-documento/${tipo.id}`
                                 );
 
@@ -8626,10 +8660,16 @@ document.getElementById(
             return;
         }
 
+        const boton = this;
+        const estadoCarga = iniciarCargaBoton(
+            boton,
+            "Eliminando..."
+        );
+
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/tipos-documento/${tipoDocumentoEliminandoId}`,
                     {
                         method: "DELETE"
@@ -8671,6 +8711,13 @@ document.getElementById(
                 "error"
             );
 
+        } finally {
+
+            finalizarCargaBoton(
+                boton,
+                estadoCarga
+            );
+
         }
 
     }
@@ -8692,7 +8739,7 @@ async function cargarTiposDocumentoPlantilla() {
 
     try {
 
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/tipos-documento/activos`
         );
 
@@ -8752,7 +8799,7 @@ async function cargarClientesPlantilla() {
     if (!select) return;
 
     try {
-        const respuesta = await fetch(`${API_URL}/clientes/`);
+        const respuesta = await apiFetch(`${API_URL}/clientes/`);
 
         if (!respuesta.ok) {
             throw new Error("No se pudieron cargar los clientes.");
@@ -8809,7 +8856,7 @@ async function cargarAlcancesPlantilla() {
     `;
 
     try {
-        const respuesta = await fetch(`${API_URL}/alcances/`);
+        const respuesta = await apiFetch(`${API_URL}/alcances/`);
 
         if (!respuesta.ok) {
             throw new Error("No se pudieron cargar los alcances.");
@@ -8901,7 +8948,7 @@ async function cargarAlcancesEdicionPlantilla(alcancesSeleccionados = []) {
         <div class="text-muted">Cargando alcances...</div>
     `;
 
-    const respuesta = await fetch(`${API_URL}/alcances/`);
+    const respuesta = await apiFetch(`${API_URL}/alcances/`);
 
     if (!respuesta.ok) {
         throw new Error("No se pudieron cargar los alcances.");
@@ -9211,7 +9258,7 @@ document.getElementById(
                 archivo
             );
 
-            const respuesta = await fetch(
+            const respuesta = await apiFetch(
                 `${API_URL}/plantillas/`,
                 {
                     method: "POST",
@@ -9310,9 +9357,9 @@ async function cargarPlantillas() {
             respuestaClientes,
             respuestaTipos
         ] = await Promise.all([
-            fetch(`${API_URL}/plantillas/`),
-            fetch(`${API_URL}/clientes/`),
-            fetch(`${API_URL}/tipos-documento/activos`)
+            apiFetch(`${API_URL}/plantillas/`),
+            apiFetch(`${API_URL}/clientes/`),
+            apiFetch(`${API_URL}/tipos-documento/activos`)
         ]);
 
         if (
@@ -9860,8 +9907,8 @@ document.getElementById(
 
                 const [respuestaClientes, respuestaTipos] =
                     await Promise.all([
-                        fetch(`${API_URL}/clientes/`),
-                        fetch(`${API_URL}/tipos-documento/activos`)
+                        apiFetch(`${API_URL}/clientes/`),
+                        apiFetch(`${API_URL}/tipos-documento/activos`)
                     ]);
 
                 if (!respuestaClientes.ok || !respuestaTipos.ok) {
@@ -10007,7 +10054,7 @@ async function mostrarHistorialPlantillas(plantillaId) {
 
     try {
 
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/plantillas/${encodeURIComponent(plantillaId)}/versiones`
         );
 
@@ -10392,7 +10439,7 @@ document.getElementById(
             const formulario = new FormData();
             formulario.append("motivo", motivo);
 
-            const respuesta = await fetch(
+            const respuesta = await apiFetch(
                 `${API_URL}/plantillas/${encodeURIComponent(plantillaId)}/versiones/${encodeURIComponent(versionId)}/restaurar`,
                 {
                     method: "POST",
@@ -10604,7 +10651,7 @@ document.getElementById(
             datos.append("archivo", archivo);
             datos.append("motivo", motivo);
 
-            const respuesta = await fetch(
+            const respuesta = await apiFetch(
                 `${API_URL}/plantillas/${encodeURIComponent(plantillaId)}/versiones`,
                 {
                     method: "POST",
@@ -10696,7 +10743,7 @@ document.getElementById(
         `;
 
         try {
-            const respuesta = await fetch(
+            const respuesta = await apiFetch(
                 `${API_URL}/plantillas/${encodeURIComponent(plantillaId)}/versiones/${encodeURIComponent(versionId)}`,
                 {
                     method: "DELETE"
@@ -10828,7 +10875,7 @@ document.getElementById(
 
         try {
 
-            const respuesta = await fetch(
+            const respuesta = await apiFetch(
                 `${API_URL}/plantillas/${encodeURIComponent(plantillaId)}`,
                 {
                     method: "PUT",
@@ -11089,7 +11136,7 @@ async function cargarAlcances() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API_URL}/alcances/`
             );
 
@@ -11703,7 +11750,7 @@ document.getElementById(
             try {
 
                 const respuesta =
-                    await fetch(
+                    await apiFetch(
                         `${API_URL}/alcances/${alcanceId}`
                     );
 
@@ -11783,7 +11830,7 @@ document.getElementById(
             try {
 
                 const respuesta =
-                    await fetch(
+                    await apiFetch(
                         `${API_URL}/alcances/${alcanceId}`
                     );
 
@@ -11911,11 +11958,16 @@ document.getElementById(
             return;
         }
 
+        const boton = this;
+        const estadoCarga = iniciarCargaBoton(
+            boton,
+            "Guardando..."
+        );
 
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/alcances/`,
                     {
                         method: "POST",
@@ -11966,6 +12018,13 @@ document.getElementById(
                 error.message ||
                 "No se pudo crear el alcance.",
                 "error"
+            );
+
+        } finally {
+
+            finalizarCargaBoton(
+                boton,
+                estadoCarga
             );
 
         }
@@ -12024,10 +12083,16 @@ document.getElementById(
             return;
         }
 
+        const boton = this;
+        const estadoCarga = iniciarCargaBoton(
+            boton,
+            "Guardando cambios..."
+        );
+
         try {
 
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/alcances/${alcanceId}`,
                     {
                         method: "PUT",
@@ -12081,6 +12146,13 @@ document.getElementById(
                 "error"
             );
 
+        } finally {
+
+            finalizarCargaBoton(
+                boton,
+                estadoCarga
+            );
+
         }
 
     }
@@ -12104,9 +12176,16 @@ document.getElementById(
             return;
         }
 
+        const boton = this;
+        const estadoCarga = iniciarCargaBoton(
+            boton,
+            "Eliminando..."
+        );
+
         try {
+
             const respuesta =
-                await fetch(
+                await apiFetch(
                     `${API_URL}/alcances/${alcanceId}`,
                     {
                         method: "DELETE"
@@ -12135,6 +12214,7 @@ document.getElementById(
             );
 
         } catch (error) {
+
             console.error(
                 "Error al eliminar el alcance:",
                 error
@@ -12145,10 +12225,18 @@ document.getElementById(
                 "No se pudo eliminar el alcance.",
                 "error"
             );
+
+        } finally {
+
+            finalizarCargaBoton(
+                boton,
+                estadoCarga
+            );
+
         }
+
     }
 );
-
 
 
 /* =========================================================
@@ -12279,11 +12367,11 @@ async function cargarRequisitos() {
             respuestaTiposDocumento
         ] = await Promise.all([
 
-            fetch(`${API_URL}/alcances/`),
+            apiFetch(`${API_URL}/alcances/`),
 
-            fetch(`${API_URL}/requisitos-fotograficos/`),
+            apiFetch(`${API_URL}/requisitos-fotograficos/`),
 
-            fetch(`${API_URL}/tipos-documento/`)
+            apiFetch(`${API_URL}/tipos-documento/`)
 
         ]);
 
@@ -12798,7 +12886,7 @@ async function cargarAlcancesRequisito() {
         document.getElementById("requisitoAlcance");
 
     const respuesta =
-        await fetch(`${API_URL}/alcances/`);
+        await apiFetch(`${API_URL}/alcances/`);
 
     if (!respuesta.ok) {
         throw new Error(
@@ -12835,7 +12923,7 @@ async function cargarTiposDocumentoRequisito() {
         document.getElementById("requisitoTiposDocumento");
 
     const respuesta =
-        await fetch(`${API_URL}/tipos-documento/activos`);
+        await apiFetch(`${API_URL}/tipos-documento/activos`);
 
     if (!respuesta.ok) {
         throw new Error(
@@ -13100,7 +13188,7 @@ document.getElementById("btnGuardarRequisito")?.addEventListener(
             );
 
         try {
-            const respuesta = await fetch(
+            const respuesta = await apiFetch(
                 `${API_URL}/requisitos-fotograficos/`,
                 {
                     method: "POST",
@@ -13216,7 +13304,7 @@ document
 
         try {
 
-            const respuestaActual = await fetch(
+            const respuestaActual = await apiFetch(
                 `${API_URL}/requisitos-fotograficos/${requisitoEditandoId}`
             );
 
@@ -13242,7 +13330,7 @@ document
                 activo: activo
             };
 
-            const respuesta = await fetch(
+            const respuesta = await apiFetch(
                 `${API_URL}/requisitos-fotograficos/${requisitoEditandoId}`,
                 {
                     method: "PUT",
@@ -13296,7 +13384,7 @@ async function prepararEditarRequisito(requisitoId) {
 
     try {
 
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/requisitos-fotograficos/${requisitoId}`
         );
 
@@ -13337,7 +13425,7 @@ async function prepararEditarRequisito(requisitoId) {
                 "editarRequisitoAlcance"
             );
 
-        const respuestaAlcances = await fetch(
+        const respuestaAlcances = await apiFetch(
             `${API_URL}/alcances/`
         );
 
@@ -13384,7 +13472,7 @@ async function prepararEditarRequisito(requisitoId) {
         contenedor.innerHTML =
             '<div class="text-muted">Cargando tipos de documento...</div>';
 
-        const respuestaTipos = await fetch(
+        const respuestaTipos = await apiFetch(
             `${API_URL}/tipos-documento/activos`
         );
 
@@ -13555,7 +13643,7 @@ document
 
         try {
 
-            const respuesta = await fetch(
+            const respuesta = await apiFetch(
                 `${API_URL}/requisitos-fotograficos/${requisitoEliminandoId}`,
                 {
                     method: "DELETE"

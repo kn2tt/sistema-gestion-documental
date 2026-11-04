@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Depends
 from sqlalchemy import text
 
 from fastapi import HTTPException
@@ -15,9 +16,12 @@ from app.services.assignment_scheduler import (
 
 from app.core.storage import verificar_conexion_storage
 
-from app.core.database import engine
+from app.core.database import engine, settings
+
+from app.core.auth import get_current_user, require_admin
 
 from app.controllers.user_controller import router as user_router
+from app.controllers.auth_controller import router as auth_router
 from app.controllers.client_controller import router as client_router
 from app.controllers.project_controller import router as project_router
 from app.controllers.site_controller import router as site_router
@@ -90,26 +94,99 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        origin.strip()
+        for origin in settings.FRONTEND_ORIGINS.split(",")
+        if origin.strip()
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(user_router)
-app.include_router(client_router)
-app.include_router(project_router)
-app.include_router(site_router)
-app.include_router(document_type_router)
-app.include_router(template_router)
-app.include_router(photo_requirement_router)
-app.include_router(assignment_router)
-app.include_router(evidence_router)
-app.include_router(document_router)
-app.include_router(subproject_router)
-app.include_router(scope_router)
-app.include_router(checklist_template_router)
-app.include_router(generated_checklist_router)
+app.include_router(auth_router)
+
+# =========================================================
+# MÓDULOS DE ADMINISTRACIÓN
+# Solo el administrador puede acceder.
+# =========================================================
+
+app.include_router(
+    user_router,
+    dependencies=[Depends(require_admin)],
+)
+
+app.include_router(
+    client_router,
+    dependencies=[Depends(require_admin)],
+)
+
+app.include_router(
+    project_router,
+    dependencies=[Depends(require_admin)],
+)
+
+app.include_router(
+    site_router,
+    dependencies=[Depends(require_admin)],
+)
+
+app.include_router(
+    scope_router,
+    dependencies=[Depends(require_admin)],
+)
+
+app.include_router(
+    checklist_template_router,
+    dependencies=[Depends(require_admin)],
+)
+
+app.include_router(
+    document_type_router,
+    dependencies=[Depends(require_admin)],
+)
+
+app.include_router(
+    template_router,
+    dependencies=[Depends(require_admin)],
+)
+
+app.include_router(
+    photo_requirement_router,
+    dependencies=[Depends(require_admin)],
+)
+
+app.include_router(
+    subproject_router,
+    dependencies=[Depends(require_admin)],
+)
+
+
+# =========================================================
+# MÓDULOS OPERATIVOS
+# Por ahora requieren una sesión válida.
+# Los permisos por asignación se implementarán después.
+# =========================================================
+
+app.include_router(
+    assignment_router,
+    dependencies=[Depends(get_current_user)],
+)
+
+app.include_router(
+    generated_checklist_router,
+    dependencies=[Depends(get_current_user)],
+)
+
+app.include_router(
+    evidence_router,
+    dependencies=[Depends(get_current_user)],
+)
+
+app.include_router(
+    document_router,
+    dependencies=[Depends(get_current_user)],
+)
 
 @app.get("/")
 def inicio():
@@ -119,7 +196,10 @@ def inicio():
     }
 
 
-@app.get("/test-db")
+@app.get(
+    "/test-db",
+    dependencies=[Depends(require_admin)],
+)
 def test_db():
     with engine.connect() as connection:
         resultado = connection.execute(text("SELECT 1"))
@@ -131,7 +211,10 @@ def test_db():
         "resultado": valor,
     }
 
-@app.get("/test-storage")
+@app.get(
+    "/test-storage",
+    dependencies=[Depends(require_admin)],
+)
 def test_storage():
     try:
         return verificar_conexion_storage()

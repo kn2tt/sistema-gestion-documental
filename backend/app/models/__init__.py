@@ -21,3 +21,4 @@ from app.models.generated_checklist_draft import (
     GeneratedChecklistDraft,
     GeneratedChecklistDraftItem,
 )
+from app.models.user_session import UserSession
