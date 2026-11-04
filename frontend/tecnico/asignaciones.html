@@ -19,6 +19,9 @@
     <link rel="stylesheet" href="../administrador/css/dashboard.css">
     <link rel="stylesheet" href="../administrador/css/asignaciones.css">
     <link rel="stylesheet" href="css/asignaciones.css">
+
+    <link rel="stylesheet" href="../shared/css/logout.css">
+
 </head>
 
 <body>
@@ -63,6 +66,16 @@
                     <strong id="sidebarUserName">Técnico</strong>
                     <span id="sidebarUserEmail">Usuario del sistema</span>
                 </div>
+
+                <button
+                    type="button"
+                    class="sidebar-logout-button"
+                    id="logoutButton"
+                    title="Cerrar sesión"
+                    aria-label="Cerrar sesión"
+                >
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
 
             </div>
         </div>
@@ -183,6 +196,69 @@
 
             </div>
 
+            <!-- CLIENTE SELECCIONADO -->
+            <div class="assignment-client-card" id="assignmentClientCard">
+
+                <div class="assignment-client-icon">
+                    <i class="bi bi-building"></i>
+                </div>
+
+                <div class="assignment-client-info">
+                    <h2 id="clienteAsignacionesNombre">Seleccionar cliente</h2>
+                    <p id="clienteAsignacionesEstado">Cliente actual</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="assignment-client-toggle"
+                    id="btnCambiarCliente"
+                    aria-label="Mostrar clientes"
+                    aria-expanded="false"
+                    aria-controls="selectorClientesPanel"
+                >
+                    <i class="bi bi-chevron-down" id="iconoCambiarCliente"></i>
+                </button>
+
+            </div>
+
+
+            <!-- SELECTOR DESPLEGABLE DE CLIENTES -->
+            <div
+                class="assignment-client-dropdown"
+                id="selectorClientesPanel"
+                hidden
+            >
+                <div class="assignment-client-dropdown-header">
+
+                    <div>
+                        <h3>Selecciona un cliente</h3>
+                        <p>Elige el cliente cuyas asignaciones deseas consultar.</p>
+                    </div>
+
+                </div>
+
+                <div
+                    class="assignment-client-options"
+                    id="listaClientesAsignaciones"
+                >
+                    <!-- Las opciones se cargarán con los clientes del sistema. -->
+                </div>
+
+                <p class="assignment-client-empty" id="mensajeClientesVacios" hidden>
+                    No hay clientes disponibles.
+                </p>
+
+            </div>
+
+            <!-- SELECT PARA MANTENER LA COMPATIBILIDAD CON EL JS -->
+            <select
+                id="clienteAsignacionesSelect"
+                class="visually-hidden"
+                tabindex="-1"
+                aria-hidden="true"
+            >
+                <option value="">Cargando clientes...</option>
+            </select>
 
             <!-- VISTAS POR ESTADO -->
             <div class="assignment-status-views">
@@ -246,8 +322,8 @@
             </div>
 
 
-            <!-- BUSCADOR -->
-            <div class="assignment-list-toolbar">
+            <!-- FILTROS -->
+            <div class="assignment-list-toolbar technician-filters">
 
                 <div class="assignment-search">
                     <i class="bi bi-search"></i>
@@ -259,6 +335,18 @@
                         placeholder="Buscar por proyecto, site o documento..."
                         aria-label="Buscar asignaciones"
                     >
+                </div>
+
+                <div class="technician-client-filter">
+                    <i class="bi bi-building"></i>
+
+                    <select
+                        class="form-select"
+                        id="clientFilter"
+                        aria-label="Filtrar por cliente"
+                    >
+                        <option value="">Todos los clientes</option>
+                    </select>
                 </div>
 
             </div>
@@ -322,78 +410,10 @@
 
 </div>
 
-
-<!-- MODAL: CHECKLIST PUBLICADO -->
-<div
-    class="modal fade"
-    id="technicianChecklistModal"
-    tabindex="-1"
-    aria-labelledby="technicianChecklistModalLabel"
-    aria-hidden="true"
->
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content technician-checklist-modal">
-
-            <div class="modal-header">
-
-                <div>
-                    <h5
-                        class="modal-title"
-                        id="technicianChecklistModalLabel"
-                    >
-                        Checklist de asignación
-                    </h5>
-
-                    <p
-                        class="text-muted small mb-0 mt-1"
-                        id="technicianChecklistSubtitle"
-                    >
-                        Consulta los requisitos fotográficos de esta asignación.
-                    </p>
-                </div>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Cerrar"
-                ></button>
-
-            </div>
-
-            <div class="modal-body">
-
-                <div
-                    id="technicianChecklistMessage"
-                    class="technician-checklist-message"
-                    hidden
-                ></div>
-
-                <div id="technicianChecklistContainer">
-                    <div class="text-center text-muted py-4">
-                        Selecciona una asignación para consultar su checklist.
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="modal-footer">
-                <button
-                    type="button"
-                    class="btn btn-light"
-                    data-bs-dismiss="modal"
-                >
-                    Cerrar
-                </button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/asignaciones.js"></script>
+
+<script src="../shared/js/logout.js"></script>
 
 </body>
 </html>

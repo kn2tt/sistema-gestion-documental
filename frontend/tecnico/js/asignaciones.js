@@ -10,6 +10,8 @@ let asignacionesData = [];
 let paginaActualAsignaciones = 1;
 let vistaAsignacionesActual = "activas";
 
+let clienteSeleccionado = "";
+
 
 /* =========================================
    ELEMENTOS
@@ -25,13 +27,31 @@ const assignmentViewCards = document.querySelectorAll(
     ".assignment-view-card"
 );
 
-const checklistModalElement = document.getElementById(
-    "technicianChecklistModal"
+const clienteAsignacionesSelect = document.getElementById(
+    "clienteAsignacionesSelect"
 );
 
-const checklistModal = bootstrap.Modal.getOrCreateInstance(
-    checklistModalElement
+const clienteAsignacionesNombre = document.getElementById(
+    "clienteAsignacionesNombre"
 );
+
+const btnCambiarCliente = document.getElementById(
+    "btnCambiarCliente"
+);
+
+const selectorClientesPanel = document.getElementById(
+    "selectorClientesPanel"
+);
+
+const listaClientesAsignaciones = document.getElementById(
+    "listaClientesAsignaciones"
+);
+
+const mensajeClientesVacios = document.getElementById(
+    "mensajeClientesVacios"
+);
+
+const clientFilter = document.getElementById("clientFilter");
 
 
 /* =========================================
@@ -233,6 +253,166 @@ function mostrarNotificacion(mensaje, tipo = "info") {
     }, 4500);
 }
 
+/* =========================================
+   SELECTOR DE CLIENTES
+   ========================================= */
+
+function mostrarSelectorClientes(mostrar) {
+    if (!selectorClientesPanel || !btnCambiarCliente) return;
+
+    selectorClientesPanel.hidden = !mostrar;
+
+    btnCambiarCliente.setAttribute("aria-expanded", String(mostrar));
+    btnCambiarCliente.setAttribute(
+        "aria-label",
+        mostrar ? "Ocultar clientes" : "Mostrar clientes"
+    );
+}
+
+function actualizarClienteSeleccionado() {
+    if (!clienteAsignacionesSelect || !clienteAsignacionesNombre) return;
+
+    const option = clienteAsignacionesSelect.selectedOptions[0];
+
+    clienteAsignacionesNombre.textContent =
+        option && option.value
+            ? option.textContent.trim()
+            : "Seleccionar cliente";
+}
+
+function actualizarOpcionesSeleccionadas() {
+    if (!clienteAsignacionesSelect || !listaClientesAsignaciones) return;
+
+    listaClientesAsignaciones
+        .querySelectorAll(".assignment-client-option")
+        .forEach(function (button) {
+            const selected =
+                button.dataset.value === clienteAsignacionesSelect.value;
+
+            button.classList.toggle("selected", selected);
+            button.setAttribute("aria-pressed", String(selected));
+        });
+}
+
+function aplicarFiltroClienteAsignaciones(clienteNombre) {
+    clienteSeleccionado = clienteNombre || "";
+    paginaActualAsignaciones = 1;
+    renderizarAsignaciones();
+}
+
+function seleccionarClienteAsignaciones(clienteNombre) {
+    if (!clienteAsignacionesSelect) return;
+
+    clienteAsignacionesSelect.value = clienteNombre;
+
+    clienteAsignacionesSelect.dispatchEvent(
+        new Event("change", { bubbles: true })
+    );
+
+    actualizarClienteSeleccionado();
+    actualizarOpcionesSeleccionadas();
+    mostrarSelectorClientes(false);
+}
+
+function renderizarClientesAsignaciones(clientes) {
+    if (!listaClientesAsignaciones) return;
+
+    listaClientesAsignaciones.innerHTML = "";
+
+    if (mensajeClientesVacios) {
+        mensajeClientesVacios.hidden = clientes.length > 0;
+    }
+
+    clientes.forEach(function (cliente) {
+        const nombre = cliente.nombre;
+
+        if (!nombre) return;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "assignment-client-option";
+        button.dataset.value = nombre;
+
+        const icon = document.createElement("span");
+        icon.className = "assignment-client-option-icon";
+        icon.innerHTML = '<i class="bi bi-building"></i>';
+
+        const text = document.createElement("span");
+        text.className = "assignment-client-option-name";
+        text.textContent = nombre;
+
+        button.append(icon, text);
+
+        button.addEventListener("click", function () {
+            seleccionarClienteAsignaciones(nombre);
+        });
+
+        listaClientesAsignaciones.appendChild(button);
+    });
+
+    actualizarOpcionesSeleccionadas();
+}
+
+function cargarClientesAsignaciones() {
+    if (!listaClientesAsignaciones) return;
+
+    const nombresClientes = [
+        ...new Set(
+            asignacionesData
+                .map(assignment => assignment.cliente_nombre)
+                .filter(Boolean)
+        )
+    ].sort((a, b) => a.localeCompare(b));
+
+    const clientes = nombresClientes.map(nombre => ({ nombre }));
+
+    if (clienteAsignacionesSelect) {
+        clienteAsignacionesSelect.innerHTML = "";
+
+        clientes.forEach(function (cliente) {
+            const option = document.createElement("option");
+            option.value = cliente.nombre;
+            option.textContent = cliente.nombre;
+
+            clienteAsignacionesSelect.appendChild(option);
+        });
+    }
+
+    renderizarClientesAsignaciones(clientes);
+
+    if (
+        clienteSeleccionado &&
+        nombresClientes.includes(clienteSeleccionado)
+    ) {
+        clienteAsignacionesSelect.value = clienteSeleccionado;
+    } else {
+        clienteSeleccionado = nombresClientes[0] || "";
+        clienteAsignacionesSelect.value = clienteSeleccionado;
+    }
+
+    actualizarClienteSeleccionado();
+    actualizarOpcionesSeleccionadas();
+
+    aplicarFiltroClienteAsignaciones(clienteSeleccionado);
+}
+
+btnCambiarCliente?.addEventListener("click", function () {
+    const isOpen =
+        btnCambiarCliente.getAttribute("aria-expanded") === "true";
+
+    mostrarSelectorClientes(!isOpen);
+});
+
+clienteAsignacionesSelect?.addEventListener(
+    "change",
+    function () {
+        actualizarClienteSeleccionado();
+        actualizarOpcionesSeleccionadas();
+
+        aplicarFiltroClienteAsignaciones(this.value);
+    }
+);
+
 
 /* =========================================
    SESIÓN DEL TÉCNICO
@@ -413,7 +593,12 @@ function obtenerAsignacionesFiltradas() {
             coincideVista = assignment.estado === "completado";
         }
 
-        return coincideBusqueda && coincideVista;
+        const coincideCliente =
+            clienteSeleccionado !== "" &&
+            normalizarTexto(assignment.cliente_nombre) ===
+            normalizarTexto(clienteSeleccionado);
+
+        return coincideCliente && coincideBusqueda && coincideVista;
     });
 }
 
@@ -437,6 +622,11 @@ assignmentViewCards.forEach(button => {
 
 
 searchInput.addEventListener("input", function () {
+    paginaActualAsignaciones = 1;
+    renderizarAsignaciones();
+});
+
+clientFilter.addEventListener("change", function () {
     paginaActualAsignaciones = 1;
     renderizarAsignaciones();
 });
@@ -551,15 +741,14 @@ function renderizarAsignaciones() {
                 </td>
 
                 <td>
-                    <button
-                        type="button"
+                    <a
+                        href="detalle-asignacion.html?id=${encodeURIComponent(id)}"
                         class="technician-checklist-button"
-                        data-view-checklist="${id}"
-                        title="Consultar checklist"
+                        title="Ver detalles de la asignación"
                     >
-                        <i class="bi bi-clipboard-check"></i>
-                        Ver checklist
-                    </button>
+                        <i class="bi bi-eye"></i>
+                        Ver detalles
+                    </a>
                 </td>
             </tr>
         `;
@@ -662,204 +851,6 @@ function actualizarPaginacion(totalPaginas) {
     );
 }
 
-
-/* =========================================
-   CONSULTAR CHECKLIST PUBLICADO
-   ========================================= */
-
-async function consultarChecklist(assignmentId, boton) {
-    const container = document.getElementById(
-        "technicianChecklistContainer"
-    );
-
-    const message = document.getElementById(
-        "technicianChecklistMessage"
-    );
-
-    const subtitle = document.getElementById(
-        "technicianChecklistSubtitle"
-    );
-
-    message.hidden = true;
-    message.textContent = "";
-
-    container.innerHTML = `
-        <div class="text-center text-muted py-4">
-            <div class="spinner-border spinner-border-sm mb-2"></div>
-            <div>Consultando checklist...</div>
-        </div>
-    `;
-
-    const assignment = asignacionesData.find(
-        item => String(item.id) === String(assignmentId)
-    );
-
-    subtitle.textContent = assignment
-        ? `${assignment.proyecto_nombre} · ${assignment.site_nombre}`
-        : `Asignación ${assignmentId}`;
-
-    checklistModal.show();
-
-    if (boton) {
-        boton.disabled = true;
-    }
-
-    try {
-        const response = await apiFetch(
-            `${API_URL}/asignaciones/tecnico/${encodeURIComponent(
-                assignmentId
-            )}/checklist`
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                typeof data.detail === "string"
-                    ? data.detail
-                    : "No se pudo consultar el checklist."
-            );
-        }
-
-        if (data.estado !== "publicado") {
-            throw new Error(
-                "El checklist todavía no se encuentra publicado."
-            );
-        }
-
-        renderizarChecklist(data);
-
-    } catch (error) {
-        console.error("Error al consultar checklist:", error);
-
-        container.innerHTML = `
-            <div class="technician-checklist-empty">
-                <i class="bi bi-clipboard-x"></i>
-                <strong>No se pudo mostrar el checklist</strong>
-                <p class="mb-0 mt-2">${escapeHTML(error.message)}</p>
-            </div>
-        `;
-
-    } finally {
-        if (boton) {
-            boton.disabled = false;
-        }
-    }
-}
-
-
-/* =========================================
-   AGRUPAR CHECKLIST POR ALCANCE
-   ========================================= */
-
-function renderizarChecklist(checklist) {
-    const container = document.getElementById(
-        "technicianChecklistContainer"
-    );
-
-    const items = checklist.items ?? [];
-
-    if (!items.length) {
-        container.innerHTML = `
-            <div class="technician-checklist-empty">
-                <i class="bi bi-clipboard-x"></i>
-                Este checklist no contiene ítems.
-            </div>
-        `;
-        return;
-    }
-
-    const grupos = new Map();
-
-    items.forEach(item => {
-        const alcanceId = item.alcance_id ?? "sin-alcance";
-        const alcanceNombre =
-            item.alcance_nombre || "Otros requisitos";
-
-        if (!grupos.has(alcanceId)) {
-            grupos.set(alcanceId, {
-                nombre: alcanceNombre,
-                items: []
-            });
-        }
-
-        grupos.get(alcanceId).items.push(item);
-    });
-
-    container.innerHTML = [...grupos.values()].map(grupo => {
-        const itemsHTML = grupo.items.map(item => `
-            <div class="technician-checklist-item">
-
-                <div class="technician-checklist-item-icon">
-                    <i class="bi bi-camera"></i>
-                </div>
-
-                <div class="technician-checklist-item-content">
-
-                    <strong>${escapeHTML(item.titulo)}</strong>
-
-                    ${
-                        item.descripcion
-                            ? `<p>${escapeHTML(item.descripcion)}</p>`
-                            : item.requisito_descripcion
-                                ? `<p>${escapeHTML(item.requisito_descripcion)}</p>`
-                                : ""
-                    }
-
-                    ${
-                        item.obligatorio
-                            ? `<span class="technician-checklist-required">
-                                Obligatorio
-                               </span>`
-                            : `<span class="technician-checklist-optional">
-                                Opcional
-                               </span>`
-                    }
-
-                </div>
-
-            </div>
-        `).join("");
-
-        return `
-            <section class="technician-checklist-group">
-
-                <div class="technician-checklist-group-header">
-                    <i class="bi bi-folder2-open"></i>
-
-                    <h3>${escapeHTML(grupo.nombre)}</h3>
-
-                    <span>
-                        ${grupo.items.length}
-                        ${grupo.items.length === 1 ? "ítem" : "ítems"}
-                    </span>
-                </div>
-
-                <div>
-                    ${itemsHTML}
-                </div>
-
-            </section>
-        `;
-    }).join("");
-}
-
-
-/* =========================================
-   EVENTOS DE LA TABLA
-   ========================================= */
-
-assignmentTableBody.addEventListener("click", function (event) {
-    const button = event.target.closest("[data-view-checklist]");
-
-    if (!button) return;
-
-    const assignmentId = button.dataset.viewChecklist;
-
-    consultarChecklist(assignmentId, button);
-});
-
-
 /* =========================================
    SIDEBAR RESPONSIVE
    ========================================= */
@@ -889,6 +880,7 @@ async function inicializarPanelTecnico() {
     if (!sesionValida) return;
 
     await cargarAsignaciones();
+    cargarClientesAsignaciones();
 }
 
 inicializarPanelTecnico();
