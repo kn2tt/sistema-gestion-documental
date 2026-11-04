@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy.exc import IntegrityError
 
@@ -8,6 +8,7 @@ from app.models.checklist_template_item import ChecklistTemplateItem
 from app.models.generated_checklist import GeneratedChecklist
 from app.models.generated_checklist_item import GeneratedChecklistItem
 from app.models.photo_requirement import PhotoRequirement
+from app.models.user import User
 
 
 class GeneratedChecklistService:
@@ -127,6 +128,42 @@ class GeneratedChecklistService:
             return None
 
         return self._serialize(checklist)
+
+
+    def get_published_by_technician(
+        self,
+        assignment_id: int,
+        tecnico_id: int,
+    ):
+        assignment = self.db.execute(
+            select(Assignment).where(
+                Assignment.id == assignment_id,
+                or_(
+                    Assignment.tecnico_id == tecnico_id,
+                    Assignment.tecnicos.any(User.id == tecnico_id),
+                ),
+            )
+        ).scalar_one_or_none()
+
+        if assignment is None:
+            raise PermissionError(
+                "No tienes acceso a esta asignación."
+            )
+
+        checklist = self._get_checklist(assignment_id)
+
+        if checklist is None:
+            raise ValueError(
+                "Esta asignación todavía no tiene un checklist generado."
+            )
+
+        if checklist.estado != "publicado":
+            raise ValueError(
+                "El checklist de esta asignación todavía no ha sido publicado."
+            )
+
+        return self._serialize(checklist)
+
 
     def generate(
         self,

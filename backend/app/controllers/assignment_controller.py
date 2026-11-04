@@ -1,8 +1,9 @@
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.auth import get_current_user, require_roles
+from app.models.user import User
 from app.schemas.assignment import (
     AssignmentCreate,
     AssignmentResponse,
@@ -16,6 +17,16 @@ router = APIRouter(
     tags=["Asignaciones"],
 )
 
+@router.get(
+    "/tecnico/mis-asignaciones",
+    response_model=list[AssignmentResponse],
+)
+def listar_mis_asignaciones(
+    db: Session = Depends(get_db),
+    tecnico: User = Depends(require_roles("tecnico")),
+):
+    service = AssignmentService(db)
+    return service.get_by_tecnico(tecnico.id)
 
 @router.get(
     "/",

@@ -308,6 +308,12 @@ class AssignmentService:
             for assignment in self.repository.get_all()
         ]
 
+    def get_by_tecnico(self, tecnico_id: int):
+        return [
+            self._serialize(assignment)
+            for assignment in self.repository.get_by_tecnico(tecnico_id)
+        ]
+
     def get_by_estado(self, estado: str):
         if estado not in ESTADOS_ASIGNACION:
             raise ValueError("El estado de la asignación no es válido.")
@@ -451,3 +457,9 @@ class AssignmentService:
             raise ValueError("La asignación no existe.")
 
         self.repository.delete(assignment)
+
+    def get_by_tecnico(self, tecnico_id: int):
+        return [
+            self._serialize(assignment)
+            for assignment in self.repository.get_by_tecnico(tecnico_id)
+        ]

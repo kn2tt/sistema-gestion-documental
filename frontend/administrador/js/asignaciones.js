@@ -4,6 +4,13 @@
 
 const API_URL = "http://127.0.0.1:8000";
 
+function apiFetch(url, opciones = {}) {
+    return fetch(url, {
+        ...opciones,
+        credentials: "include"
+    });
+}
+
 /* =========================================
    VARIABLES GLOBALES
    ========================================= */
@@ -400,7 +407,7 @@ async function cargarAsignaciones() {
     `;
 
     try {
-        const response = await fetch(`${API_URL}/asignaciones/`);
+        const response = await apiFetch(`${API_URL}/asignaciones/`);
 
         if (!response.ok) {
             throw new Error(`Error al consultar asignaciones: HTTP ${response.status}`);
@@ -473,7 +480,7 @@ async function actualizarFiltroTiposDocumento() {
     const valorActual = documentFilter.value;
 
     try {
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/tipos-documento/activos`
         );
 
@@ -1046,7 +1053,7 @@ async function guardarAsignacion() {
     `;
 
     try {
-        const response = await fetch(`${API_URL}/asignaciones/`, {
+        const response = await apiFetch(`${API_URL}/asignaciones/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -1171,7 +1178,7 @@ btnConfirmarEliminarAsignacion?.addEventListener(
         `;
 
         try {
-            const response = await fetch(
+            const response = await apiFetch(
                 `${API_URL}/asignaciones/${assignmentIdToDelete}`,
                 {
                     method: "DELETE"
@@ -1293,7 +1300,7 @@ async function aplicarFiltroClienteAsignaciones(clienteId) {
     }
 
     try {
-        const response = await fetch(
+        const response = await apiFetch(
             `${API_URL}/proyectos/cliente/${encodeURIComponent(clienteId)}`
         );
 
@@ -1401,7 +1408,7 @@ async function cargarClientesAsignaciones() {
     }
 
     try {
-        const response = await fetch(`${API_URL}/clientes/activos`);
+        const response = await apiFetch(`${API_URL}/clientes/activos`);
 
         if (!response.ok) {
             throw new Error(`Error al consultar clientes: HTTP ${response.status}`);
@@ -1499,7 +1506,7 @@ async function cargarClientesModalAsignacion() {
     const select = document.getElementById("assignmentClient");
     if (!select) return;
 
-    const respuesta = await fetch(`${API_URL}/clientes/activos`);
+    const respuesta = await apiFetch(`${API_URL}/clientes/activos`);
 
     if (!respuesta.ok) {
         throw new Error("No se pudieron cargar los clientes.");
@@ -1533,7 +1540,7 @@ async function cargarProyectosModalAsignacion(clienteId) {
 
     if (!clienteId) return;
 
-    const respuesta = await fetch(
+    const respuesta = await apiFetch(
         `${API_URL}/proyectos/cliente/${clienteId}`
     );
 
@@ -1571,7 +1578,7 @@ async function cargarSitesModalAsignacion(proyectoId) {
      * La ruta GET /sites/ ya se utiliza en el proyecto.
      * Filtramos por proyecto_id para no inventar una ruta nueva.
      */
-    const respuesta = await fetch(`${API_URL}/sites/`);
+    const respuesta = await apiFetch(`${API_URL}/sites/`);
 
     if (!respuesta.ok) {
         throw new Error("No se pudieron cargar los sites.");
@@ -1604,7 +1611,7 @@ async function cargarSubproyectosModalAsignacion(siteId) {
 
     if (!siteId) return;
 
-    const respuesta = await fetch(`${API_URL}/subproyectos/`);
+    const respuesta = await apiFetch(`${API_URL}/subproyectos/`);
 
     if (!respuesta.ok) {
         throw new Error("No se pudieron cargar los subproyectos.");
@@ -1631,7 +1638,7 @@ async function cargarTiposDocumentoModalAsignacion() {
     const select = document.getElementById("assignmentDocumentType");
     if (!select) return;
 
-    const respuesta = await fetch(`${API_URL}/tipos-documento/activos`);
+    const respuesta = await apiFetch(`${API_URL}/tipos-documento/activos`);
 
     if (!respuesta.ok) {
         throw new Error("No se pudieron cargar los tipos de documento.");
@@ -1650,7 +1657,7 @@ async function cargarTiposDocumentoModalAsignacion() {
 
 /* CARGAR PLANTILLAS */
 async function cargarPlantillasModalAsignacion() {
-    const respuesta = await fetch(`${API_URL}/plantillas/`);
+    const respuesta = await apiFetch(`${API_URL}/plantillas/`);
 
     if (!respuesta.ok) {
         throw new Error("No se pudieron cargar las plantillas.");
@@ -1692,7 +1699,7 @@ function filtrarPlantillasModalAsignacion() {
 
 /* CARGAR TÉCNICOS Y DOCUMENTADORES */
 async function cargarUsuariosModalAsignacion() {
-    const respuesta = await fetch(`${API_URL}/usuarios/`);
+    const respuesta = await apiFetch(`${API_URL}/usuarios/`);
 
     if (!respuesta.ok) {
         throw new Error("No se pudieron cargar los usuarios.");
@@ -1827,7 +1834,7 @@ function llenarSelectEdicion(id, registros, textoInicial, obtenerTexto) {
 }
 
 async function cargarClientesEdicion() {
-    const response = await fetch(`${API_URL}/clientes/activos`);
+    const response = await apiFetch(`${API_URL}/clientes/activos`);
 
     if (!response.ok) {
         throw new Error("No se pudieron cargar los clientes para editar.");
@@ -1867,7 +1874,7 @@ async function cargarProyectosEdicion(clienteId) {
 
     if (!clienteId) return [];
 
-    const response = await fetch(
+    const response = await apiFetch(
         `${API_URL}/proyectos/cliente/${encodeURIComponent(clienteId)}`
     );
 
@@ -1916,7 +1923,7 @@ async function cargarSitesEdicion(proyectoId) {
 
     if (!proyectoId) return [];
 
-    const response = await fetch(`${API_URL}/sites/`);
+    const response = await apiFetch(`${API_URL}/sites/`);
 
     if (!response.ok) {
         throw new Error("No se pudieron cargar los sites.");
@@ -1946,7 +1953,7 @@ async function cargarSubproyectosEdicion(siteId) {
 
     if (!siteId) return [];
 
-    const response = await fetch(`${API_URL}/subproyectos/`);
+    const response = await apiFetch(`${API_URL}/subproyectos/`);
 
     if (!response.ok) {
         throw new Error("No se pudieron cargar los subproyectos.");
@@ -1971,7 +1978,7 @@ async function cargarSubproyectosEdicion(siteId) {
 }
 
 async function cargarTiposDocumentoEdicion() {
-    const response = await fetch(`${API_URL}/tipos-documento/activos`);
+    const response = await apiFetch(`${API_URL}/tipos-documento/activos`);
 
     if (!response.ok) {
         throw new Error("No se pudieron cargar los tipos de documento.");
@@ -2024,7 +2031,7 @@ function nombreUsuarioAsignacion(usuario) {
 
 async function cargarPersonalEdicion() {
     if (!usuariosAsignacion.length) {
-        const response = await fetch(`${API_URL}/usuarios/`);
+        const response = await apiFetch(`${API_URL}/usuarios/`);
 
         if (!response.ok) {
             throw new Error("No se pudieron cargar los usuarios.");
@@ -2250,7 +2257,7 @@ async function abrirModalEditarAsignacion(asignacion) {
             cargarPersonalEdicion()
         ]);
 
-        const respuestaPlantillas = await fetch(`${API_URL}/plantillas/`);
+        const respuestaPlantillas = await apiFetch(`${API_URL}/plantillas/`);
 
         if (!respuestaPlantillas.ok) {
             throw new Error("No se pudieron cargar las plantillas para editar.");
@@ -2263,7 +2270,7 @@ async function abrirModalEditarAsignacion(asignacion) {
         let proyectosEncontrados = [];
 
         for (const cliente of clientes) {
-            const response = await fetch(
+            const response = await apiFetch(
                 `${API_URL}/proyectos/cliente/${encodeURIComponent(cliente.id)}`
             );
 
@@ -2516,7 +2523,7 @@ btnActualizarAsignacion?.addEventListener(
         `;
 
         try {
-            const response = await fetch(
+            const response = await apiFetch(
                 `${API_URL}/asignaciones/${assignmentEditingId}`,
                 {
                     method: "PUT",

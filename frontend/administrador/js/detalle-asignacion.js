@@ -4,6 +4,13 @@
 
 const API_URL = "http://127.0.0.1:8000";
 
+function apiFetch(url, opciones = {}) {
+    return fetch(url, {
+        ...opciones,
+        credentials: "include"
+    });
+}
+
 const params = new URLSearchParams(window.location.search);
 const assignmentId = params.get("id");
 
@@ -421,7 +428,7 @@ function actualizarTarjetasInformacion(asignacion) {
 async function obtenerNombreCliente(proyectoId) {
     if (!proyectoId) return null;
 
-    const respuesta = await fetch(
+    const respuesta = await apiFetch(
         `${API_URL}/proyectos/cliente`
     );
 
@@ -637,7 +644,7 @@ async function cargarAsignacion() {
     }
 
     try {
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/asignaciones/${encodeURIComponent(assignmentId)}`
         );
 
@@ -889,7 +896,7 @@ async function abrirModalDocumentador() {
     documenterModal.classList.add("show");
 
     try {
-        const respuesta = await fetch(`${API_URL}/usuarios/`);
+        const respuesta = await apiFetch(`${API_URL}/usuarios/`);
 
         if (!respuesta.ok) {
             throw new Error("No se pudieron cargar los usuarios.");
@@ -982,7 +989,7 @@ saveDocumenterBtn?.addEventListener("click", async function () {
     documenterModalMessage.textContent = "";
 
     try {
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/asignaciones/${encodeURIComponent(assignmentId)}`,
             {
                 method: "PUT",
@@ -1187,7 +1194,7 @@ async function abrirModalTecnicos() {
     techniciansModal.classList.add("show");
 
     try {
-        const respuesta = await fetch(`${API_URL}/usuarios/`);
+        const respuesta = await apiFetch(`${API_URL}/usuarios/`);
 
         if (!respuesta.ok) {
             throw new Error("No se pudieron cargar los usuarios.");
@@ -1299,7 +1306,7 @@ saveTechniciansBtn?.addEventListener("click", async function () {
     techniciansModalMessage.textContent = "";
 
     try {
-        const respuesta = await fetch(
+        const respuesta = await apiFetch(
             `${API_URL}/asignaciones/${encodeURIComponent(assignmentId)}`,
             {
                 method: "PUT",
@@ -1442,7 +1449,7 @@ function ocultarMensajeAdministracionChecklist(formulario = false) {
 }
 
 async function solicitarAPIChecklist(url, opciones = {}) {
-    const respuesta = await fetch(url, opciones);
+    const respuesta = await apiFetch(url, opciones);
 
     if (!respuesta.ok) {
         let mensaje = `Error HTTP ${respuesta.status}`;
@@ -2470,7 +2477,7 @@ function cerrarModalChecklist(elemento) {
 }
 
 async function solicitarChecklist(url, opciones = {}) {
-    const respuesta = await fetch(url, opciones);
+    const respuesta = await apiFetch(url, opciones);
 
     if (!respuesta.ok) {
         let mensaje = `Error HTTP ${respuesta.status}`;

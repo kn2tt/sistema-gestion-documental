@@ -1,8 +1,10 @@
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+
+from app.core.auth import require_roles
+from app.models.user import User
 
 from app.services.generated_checklist_service import (
     GeneratedChecklistService,
@@ -42,6 +44,35 @@ def convertir_error(error: ValueError):
         detail=mensaje,
     )
 
+# =========================================================
+# CHECKLIST PARA EL TÉCNICO
+# =========================================================
+
+@router.get(
+    "/tecnico/{assignment_id}/checklist",
+    response_model=GeneratedChecklistResponse,
+)
+def obtener_checklist_tecnico(
+    assignment_id: int,
+    db: Session = Depends(get_db),
+    tecnico: User = Depends(require_roles("tecnico")),
+):
+    service = GeneratedChecklistService(db)
+
+    try:
+        return service.get_published_by_technician(
+            assignment_id,
+            tecnico.id,
+        )
+
+    except PermissionError as error:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(error),
+        )
+
+    except ValueError as error:
+        convertir_error(error)
 
 # =========================================================
 # CHECKLIST INICIAL

@@ -1,10 +1,10 @@
-
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.assignment import Assignment
 from app.models.assignment_specification import AssignmentSpecification
 from app.models.specification_activity import SpecificationActivity
+from app.models.user import User
 
 
 class AssignmentRepository:
@@ -34,6 +34,22 @@ class AssignmentRepository:
 
         return list(
             self.db.execute(statement).scalars().all()
+        )
+
+    def get_by_tecnico(self, tecnico_id: int) -> list[Assignment]:
+        statement = (
+            self._query()
+            .where(
+                or_(
+                    Assignment.tecnico_id == tecnico_id,
+                    Assignment.tecnicos.any(User.id == tecnico_id),
+                )
+            )
+            .order_by(Assignment.id.desc())
+        )
+
+        return list(
+            self.db.execute(statement).scalars().unique().all()
         )
 
     def get_by_estado(self, estado: str) -> list[Assignment]:
