@@ -24,6 +24,7 @@ class GeneratedChecklistService:
                 .selectinload(
                     GeneratedChecklistItem.requisito_fotografico
                 )
+                .selectinload(PhotoRequirement.alcance)
             )
             .where(
                 GeneratedChecklist.asignacion_id == assignment_id
@@ -40,6 +41,7 @@ class GeneratedChecklistService:
                 .selectinload(
                     GeneratedChecklistItem.requisito_fotografico
                 )
+                .selectinload(PhotoRequirement.alcance)
             )
             .where(GeneratedChecklist.id == checklist_id)
         )
@@ -67,6 +69,8 @@ class GeneratedChecklistService:
                     "requisito_descripcion": (
                         item.requisito_fotografico.descripcion
                     ),
+                    "alcance_id": item.requisito_fotografico.alcance_id,
+                    "alcance_nombre": item.requisito_fotografico.alcance.nombre,
                     "titulo": item.titulo,
                     "descripcion": item.descripcion,
                     "obligatorio": item.obligatorio,

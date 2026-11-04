@@ -22,6 +22,9 @@
     <!-- Estilos -->
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/detalle-asignacion.css">
+
+    <link rel="stylesheet" href="../shared/css/logout.css">
+
 </head>
 
 <body>
@@ -110,10 +113,14 @@
 
                 <button
                     type="button"
-                    class="sidebar-user-menu"
-                    title="Opciones"
+                    class="sidebar-logout-button"
+                    id="logoutButton"
+                    title="Cerrar sesión"
+                    aria-label="Cerrar sesión"
+                    data-api-url="http://127.0.0.1:8000"
+                    data-login-url="../index.html"
                 >
-                    <i class="bi bi-three-dots"></i>
+                    <i class="bi bi-box-arrow-right"></i>
                 </button>
 
             </div>
@@ -1485,6 +1492,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="js/detalle-asignacion.js"></script>
+
+<script src="../shared/js/logout.js"></script>
 
 </body>
 </html>

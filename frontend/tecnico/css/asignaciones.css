@@ -1,0 +1,257 @@
+/* =========================================
+   PANEL DEL TÉCNICO
+   ========================================= */
+
+.technician-assignments-page {
+    min-height: calc(100vh - 72px);
+}
+
+.technician-table {
+    min-width: 1050px;
+}
+
+.technician-table td {
+    white-space: nowrap;
+}
+
+.technician-table .assignment-name {
+    max-width: 220px;
+}
+
+
+/* =========================================
+   ACCIÓN VER CHECKLIST
+   ========================================= */
+
+.technician-checklist-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 33px;
+    padding: 6px 10px;
+    border: 1px solid #dbe5f5;
+    border-radius: 7px;
+    background: #f5f8ff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.technician-checklist-button:hover {
+    background: #eaf2ff;
+    border-color: #b9cdf5;
+}
+
+.technician-checklist-button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+
+/* =========================================
+   MODAL CHECKLIST
+   ========================================= */
+
+.technician-checklist-modal {
+    border: 0;
+    border-radius: 13px;
+    overflow: hidden;
+}
+
+.technician-checklist-modal .modal-header {
+    padding: 21px 24px;
+    border-bottom: 1px solid #eef0f3;
+}
+
+.technician-checklist-modal .modal-title {
+    color: #172033;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.technician-checklist-modal .modal-body {
+    max-height: 68vh;
+    padding: 22px 24px;
+    overflow-y: auto;
+}
+
+.technician-checklist-modal .modal-footer {
+    padding: 14px 24px;
+    border-top: 1px solid #eef0f3;
+}
+
+
+/* =========================================
+   GRUPOS POR ALCANCE
+   ========================================= */
+
+.technician-checklist-group {
+    margin-bottom: 20px;
+    overflow: hidden;
+    border: 1px solid #e7eaf0;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.technician-checklist-group:last-child {
+    margin-bottom: 0;
+}
+
+.technician-checklist-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #e7eaf0;
+}
+
+.technician-checklist-group-header i {
+    color: #2563eb;
+    font-size: 15px;
+}
+
+.technician-checklist-group-header h3 {
+    margin: 0;
+    color: #172033;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.technician-checklist-group-header span {
+    margin-left: auto;
+    color: #8a92a0;
+    font-size: 11px;
+}
+
+
+/* =========================================
+   ÍTEMS DEL CHECKLIST
+   ========================================= */
+
+.technician-checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px 16px;
+    border-bottom: 1px solid #f0f2f4;
+}
+
+.technician-checklist-item:last-child {
+    border-bottom: 0;
+}
+
+.technician-checklist-item-icon {
+    width: 31px;
+    height: 31px;
+    flex: 0 0 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 14px;
+}
+
+.technician-checklist-item-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.technician-checklist-item-content strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.technician-checklist-item-content p {
+    margin: 0;
+    color: #7a8291;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.technician-checklist-required {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 7px;
+    padding: 3px 7px;
+    border-radius: 5px;
+    background: #fff7ed;
+    color: #c2410c;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.technician-checklist-optional {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 7px;
+    padding: 3px 7px;
+    border-radius: 5px;
+    background: #f3f4f6;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   MENSAJES
+   ========================================= */
+
+.technician-checklist-message {
+    margin-bottom: 15px;
+    padding: 12px 14px;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    background: #fff7ed;
+    color: #9a3412;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.technician-checklist-empty {
+    padding: 30px 15px;
+    color: #7a8291;
+    text-align: center;
+    font-size: 13px;
+}
+
+.technician-checklist-empty i {
+    display: block;
+    margin-bottom: 10px;
+    color: #94a3b8;
+    font-size: 28px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    .technician-checklist-modal .modal-header,
+    .technician-checklist-modal .modal-body,
+    .technician-checklist-modal .modal-footer {
+        padding-left: 17px;
+        padding-right: 17px;
+    }
+
+    .technician-checklist-group-header {
+        padding: 12px;
+    }
+
+    .technician-checklist-item {
+        padding: 13px 12px;
+    }
+
+}

@@ -28,6 +28,8 @@ class GeneratedChecklistItemResponse(BaseModel):
     requisito_fotografico_id: int
     requisito_nombre: str
     requisito_descripcion: str | None
+    alcance_id: int
+    alcance_nombre: str
     titulo: str
     descripcion: str | None
     obligatorio: bool

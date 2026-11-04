@@ -1,0 +1,60 @@
+/* =====================================================
+   BOTÓN CERRAR SESIÓN
+   ===================================================== */
+
+.sidebar-logout-button {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45);
+
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-logout-button:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+}
+
+.sidebar-logout-button:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+.sidebar-logout-button i {
+    font-size: 15px;
+}
+
+/* =====================================================
+   INDICADOR DE CARGA
+   ===================================================== */
+
+.sidebar-logout-button.is-loading {
+    color: #60a5fa;
+    cursor: wait;
+    opacity: 0.9;
+}
+
+.sidebar-logout-button.is-loading i {
+    animation: logoutSpin 0.8s linear infinite;
+}
+
+@keyframes logoutSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

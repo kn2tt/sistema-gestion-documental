@@ -49,8 +49,16 @@ async function comprobarSesion() {
 
         const data = await response.json();
 
-        if (data.rol?.toLowerCase() === "administrador") {
+        const rol = data.rol?.toLowerCase();
+
+        if (rol === "administrador") {
             window.location.href = "administrador/dashboard.html";
+            return;
+        }
+
+        if (rol === "tecnico") {
+            window.location.href = "tecnico/asignaciones.html";
+            return;
         }
 
     } catch (error) {
@@ -110,14 +118,21 @@ loginForm.addEventListener("submit", async function (event) {
             return;
         }
 
-        if (usuario.rol?.toLowerCase() === "administrador") {
+        const rol = usuario.rol?.toLowerCase();
+
+        if (rol === "administrador") {
             window.location.href = "administrador/dashboard.html";
             return;
         }
 
+        if (rol === "tecnico") {
+            window.location.href = "tecnico/asignaciones.html";
+            return;
+        }
+
         mostrarMensaje(
-            "Inicio de sesión correcto. El panel para tu rol todavía no está habilitado.",
-            "success"
+            "Tu rol todavía no tiene un panel habilitado.",
+            "error"
         );
 
     } catch (error) {

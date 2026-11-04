@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mis asignaciones | Gestión Documental</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="../administrador/css/dashboard.css">
+    <link rel="stylesheet" href="../administrador/css/asignaciones.css">
+    <link rel="stylesheet" href="css/asignaciones.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div>
+                <strong>Gestión Documental</strong>
+                <span>Plataforma empresarial</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">
+                PRINCIPAL
+            </div>
+
+            <a href="asignaciones.html" class="nav-item active">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Mis asignaciones</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+
+                <div class="user-avatar" id="sidebarUserAvatar">
+                    T
+                </div>
+
+                <div class="user-info">
+                    <strong id="sidebarUserName">Técnico</strong>
+                    <span id="sidebarUserEmail">Usuario del sistema</span>
+                </div>
+
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="Abrir menú"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="breadcrumb-area">
+                    <span class="breadcrumb-section">Principal</span>
+                    <i class="bi bi-chevron-right"></i>
+                    <strong>Mis asignaciones</strong>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-user">
+
+                    <div class="topbar-avatar" id="topbarUserAvatar">
+                        T
+                    </div>
+
+                    <div class="topbar-user-info">
+                        <strong id="topbarUserName">Técnico</strong>
+                        <span>Técnico de campo</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+        <!-- PAGE -->
+        <section class="assignments-page technician-assignments-page">
+
+            <div class="page-header">
+                <div>
+                    <h1>Mis asignaciones</h1>
+
+                    <p>
+                        Consulta los proyectos y documentos que tienes asignados.
+                    </p>
+                </div>
+            </div>
+
+
+            <!-- SUMMARY -->
+            <div class="assignment-summary">
+
+                <div class="summary-card">
+                    <div class="summary-icon total">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+
+                    <div>
+                        <span>Total asignaciones</span>
+                        <strong id="totalAsignaciones">0</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon process">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </div>
+
+                    <div>
+                        <span>En proceso</span>
+                        <strong id="asignacionesEnProceso">0</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon pending">
+                        <i class="bi bi-clock"></i>
+                    </div>
+
+                    <div>
+                        <span>Pendientes</span>
+                        <strong id="asignacionesPendientes">0</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon complete">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+
+                    <div>
+                        <span>Completadas</span>
+                        <strong id="asignacionesCompletadas">0</strong>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- VISTAS POR ESTADO -->
+            <div class="assignment-status-views">
+
+                <button
+                    type="button"
+                    class="assignment-view-card active"
+                    data-assignment-view="activas"
+                    aria-pressed="true"
+                >
+                    <span class="assignment-view-icon active-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </span>
+
+                    <span class="assignment-view-content">
+                        <strong>Activas</strong>
+                        <small>Pendientes y en proceso</small>
+                    </span>
+
+                    <i class="bi bi-chevron-right assignment-view-arrow"></i>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="assignment-view-card"
+                    data-assignment-view="observadas"
+                    aria-pressed="false"
+                >
+                    <span class="assignment-view-icon observed-icon">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </span>
+
+                    <span class="assignment-view-content">
+                        <strong>Observadas</strong>
+                        <small>Requieren atención</small>
+                    </span>
+
+                    <i class="bi bi-chevron-right assignment-view-arrow"></i>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="assignment-view-card"
+                    data-assignment-view="completadas"
+                    aria-pressed="false"
+                >
+                    <span class="assignment-view-icon completed-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </span>
+
+                    <span class="assignment-view-content">
+                        <strong>Completadas</strong>
+                        <small>Trabajo finalizado</small>
+                    </span>
+
+                    <i class="bi bi-chevron-right assignment-view-arrow"></i>
+                </button>
+
+            </div>
+
+
+            <!-- BUSCADOR -->
+            <div class="assignment-list-toolbar">
+
+                <div class="assignment-search">
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="searchInput"
+                        placeholder="Buscar por proyecto, site o documento..."
+                        aria-label="Buscar asignaciones"
+                    >
+                </div>
+
+            </div>
+
+
+            <!-- TABLE -->
+            <div class="assignments-card">
+
+                <div class="table-header">
+                    <div>
+                        <h2>Asignaciones registradas</h2>
+                        <span id="totalResultados">Cargando asignaciones...</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="assignments-table technician-table">
+                        <thead>
+                            <tr>
+                                <th>Asignación</th>
+                                <th>Site</th>
+                                <th>Subproyecto</th>
+                                <th>Documento</th>
+                                <th>Fecha límite</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="assignmentTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    Cargando asignaciones...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="table-footer">
+
+                    <span id="contadorAsignaciones">
+                        Cargando asignaciones...
+                    </span>
+
+                    <div
+                        class="pagination"
+                        id="paginacionAsignaciones"
+                        aria-label="Paginación de asignaciones"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- MODAL: CHECKLIST PUBLICADO -->
+<div
+    class="modal fade"
+    id="technicianChecklistModal"
+    tabindex="-1"
+    aria-labelledby="technicianChecklistModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content technician-checklist-modal">
+
+            <div class="modal-header">
+
+                <div>
+                    <h5
+                        class="modal-title"
+                        id="technicianChecklistModalLabel"
+                    >
+                        Checklist de asignación
+                    </h5>
+
+                    <p
+                        class="text-muted small mb-0 mt-1"
+                        id="technicianChecklistSubtitle"
+                    >
+                        Consulta los requisitos fotográficos de esta asignación.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div
+                    id="technicianChecklistMessage"
+                    class="technician-checklist-message"
+                    hidden
+                ></div>
+
+                <div id="technicianChecklistContainer">
+                    <div class="text-center text-muted py-4">
+                        Selecciona una asignación para consultar su checklist.
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/asignaciones.js"></script>
+
+</body>
+</html>
