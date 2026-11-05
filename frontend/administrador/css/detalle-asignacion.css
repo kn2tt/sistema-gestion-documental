@@ -4129,3 +4129,15 @@
         height: 28px;
     }
 }
+
+/* Encabezado integrado al contenedor del checklist */
+.generated-checklist-group {
+    overflow: hidden;
+}
+
+.generated-checklist-group-header {
+    margin: -14px -16px 11px;
+    padding: 11px 16px;
+    background-color: #eff6ff;
+    border-bottom: 1px solid #dbeafe;
+}

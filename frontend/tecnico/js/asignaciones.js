@@ -693,9 +693,13 @@ function renderizarAsignaciones() {
         return `
             <tr>
                 <td>
-                    <span class="assignment-name">
+                    <a
+                        href="detalle-asignacion.html?id=${encodeURIComponent(id)}"
+                        class="assignment-name"
+                        title="Ver detalles de la asignación"
+                    >
                         ${escapeHTML(proyecto)}
-                    </span>
+                    </a>
 
                     <span class="assignment-code">
                         ${codigo}
