@@ -51,9 +51,6 @@ const mensajeClientesVacios = document.getElementById(
     "mensajeClientesVacios"
 );
 
-const clientFilter = document.getElementById("clientFilter");
-
-
 /* =========================================
    API
    ========================================= */
@@ -622,11 +619,6 @@ assignmentViewCards.forEach(button => {
 
 
 searchInput.addEventListener("input", function () {
-    paginaActualAsignaciones = 1;
-    renderizarAsignaciones();
-});
-
-clientFilter.addEventListener("change", function () {
     paginaActualAsignaciones = 1;
     renderizarAsignaciones();
 });
