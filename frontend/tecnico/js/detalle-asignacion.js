@@ -472,12 +472,422 @@ async function cargarChecklistPublicado() {
 }
 
 
+/* =========================================
+   EVIDENCIAS DEL CHECKLIST
+   ========================================= */
+
+const evidenciasPorItem = new Map();
+let totalItemsChecklist = 0;
+
+function actualizarProgresoChecklist() {
+    const porcentaje = document.getElementById(
+        "checklistProgressPercentage"
+    );
+
+    const barra = document.getElementById(
+        "checklistProgressBar"
+    );
+
+    const contenedorBarra = document.getElementById(
+        "checklistProgressBarContainer"
+    );
+
+    const completadosElemento = document.getElementById(
+        "checklistCompletedCount"
+    );
+
+    const pendientesElemento = document.getElementById(
+        "checklistPendingCount"
+    );
+
+    if (
+        !porcentaje ||
+        !barra ||
+        !contenedorBarra ||
+        !completadosElemento ||
+        !pendientesElemento
+    ) {
+        return;
+    }
+
+    const completados = Array.from(
+        evidenciasPorItem.values()
+    ).filter(evidencias => evidencias.length > 0).length;
+
+    const pendientes = Math.max(
+        totalItemsChecklist - completados,
+        0
+    );
+
+    const progreso = totalItemsChecklist > 0
+        ? Math.round((completados / totalItemsChecklist) * 100)
+        : 0;
+
+    porcentaje.textContent = `${progreso}%`;
+
+    barra.style.width = `${progreso}%`;
+
+    contenedorBarra.setAttribute(
+        "aria-valuenow",
+        progreso
+    );
+
+    completadosElemento.textContent =
+        `${completados} de ${totalItemsChecklist} ${
+            totalItemsChecklist === 1 ? "ítem completado" : "ítems completados"
+        }`;
+
+    pendientesElemento.textContent =
+        `${pendientes} ${
+            pendientes === 1 ? "pendiente" : "pendientes"
+        }`;
+}
+
+function actualizarEstadoItem(itemId, evidencias, error = false) {
+    const estado = document.getElementById(`estado-item-${itemId}`);
+
+    if (!estado) return;
+
+    if (error) {
+        estado.className = "technician-item-status unavailable";
+        estado.textContent = "No disponible";
+        return;
+    }
+
+    const completado = evidencias.length > 0;
+
+    estado.className = `technician-item-status ${
+        completado ? "completed" : "pending"
+    }`;
+
+    estado.textContent = completado ? "Completado" : "Pendiente";
+}
+
+async function cargarEvidenciasItem(itemId) {
+    const lista = document.getElementById(`evidencias-item-${itemId}`);
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/evidencias/tecnico/asignaciones/${assignmentId}/items/${itemId}`
+        );
+
+        if (respuesta.status === 401 || respuesta.status === 403) {
+            window.location.href = "../index.html";
+            return null;
+        }
+
+        const datos = await respuesta.json().catch(() => ({}));
+
+        if (!respuesta.ok) {
+            throw new Error(
+                datos.detail || `Error HTTP ${respuesta.status}`
+            );
+        }
+
+        if (!Array.isArray(datos)) {
+            throw new Error("El servidor no devolvió una lista de evidencias válida.");
+        }
+
+        evidenciasPorItem.set(Number(itemId), datos);
+
+        actualizarEstadoItem(itemId, datos);
+        renderizarEvidenciasItem(itemId, datos);
+        actualizarProgresoChecklist();
+
+        return datos;
+
+    } catch (error) {
+        console.error(`Error al consultar evidencias del ítem ${itemId}:`, error);
+
+        actualizarEstadoItem(itemId, [], true);
+
+        evidenciasPorItem.set(Number(itemId), []);
+        actualizarProgresoChecklist();
+
+        if (lista) {
+            lista.replaceChildren();
+
+            const mensaje = document.createElement("p");
+            mensaje.className = "technician-evidence-empty";
+            mensaje.textContent = "No se pudieron consultar las fotografías.";
+
+            lista.appendChild(mensaje);
+        }
+
+        return null;
+    }
+}
+
+
+function renderizarEvidenciasItem(itemId, evidencias) {
+    const lista = document.getElementById(`evidencias-item-${itemId}`);
+
+    if (!lista) return;
+
+    lista.replaceChildren();
+
+    if (!evidencias.length) {
+        const mensaje = document.createElement("p");
+        mensaje.className = "technician-evidence-empty";
+        mensaje.textContent =
+            "Todavía no se han cargado fotografías para este ítem.";
+
+        lista.appendChild(mensaje);
+        return;
+    }
+
+    const galeria = document.createElement("div");
+    galeria.className = "technician-evidence-gallery";
+
+    evidencias.forEach(evidencia => {
+        const contenedor = document.createElement("div");
+        contenedor.className = "technician-evidence-preview";
+
+        if (evidencia.archivo_url) {
+            const enlace = document.createElement("a");
+            enlace.className = "technician-evidence-image-link";
+            enlace.href = evidencia.archivo_url;
+            enlace.target = "_blank";
+            enlace.rel = "noopener noreferrer";
+            enlace.title = "Ver fotografía en tamaño completo";
+
+            const imagen = document.createElement("img");
+            imagen.src = evidencia.archivo_url;
+            imagen.alt = "Fotografía de evidencia";
+            imagen.loading = "lazy";
+
+            enlace.appendChild(imagen);
+            contenedor.appendChild(enlace);
+        } else {
+            const sinVista = document.createElement("div");
+            sinVista.className = "technician-evidence-no-preview";
+
+            const icono = document.createElement("i");
+            icono.className = "bi bi-image";
+
+            const texto = document.createElement("span");
+            texto.textContent = "Vista previa no disponible";
+
+            sinVista.append(icono, texto);
+            contenedor.appendChild(sinVista);
+        }
+
+        if (evidencia.estado_almacenamiento === "pendiente") {
+            const botonEliminar = document.createElement("button");
+            botonEliminar.type = "button";
+            botonEliminar.className = "technician-evidence-preview-delete";
+            botonEliminar.title = "Eliminar fotografía";
+            botonEliminar.setAttribute(
+                "aria-label",
+                "Eliminar fotografía"
+            );
+
+            const iconoEliminar = document.createElement("i");
+            iconoEliminar.className = "bi bi-trash3";
+
+            botonEliminar.appendChild(iconoEliminar);
+
+            botonEliminar.addEventListener("click", () => {
+                solicitarEliminarEvidencia(itemId, evidencia.id);
+            });
+
+            contenedor.appendChild(botonEliminar);
+        }
+
+        galeria.appendChild(contenedor);
+    });
+
+    lista.appendChild(galeria);
+}
+
+
+/* =========================================
+   SUBIR FOTOGRAFÍA
+   ========================================= */
+
+async function subirEvidenciaItem(itemId, archivo, boton) {
+    if (!archivo) return;
+
+    const extensionesPermitidas = /\.(jpg|jpeg|png|webp)$/i;
+
+    if (!extensionesPermitidas.test(archivo.name)) {
+        mostrarNotificacion(
+            "Solo se permiten imágenes JPG, JPEG, PNG y WEBP.",
+            "warning"
+        );
+        return;
+    }
+
+    if (archivo.size > 10 * 1024 * 1024) {
+        mostrarNotificacion(
+            "La fotografía supera el tamaño máximo de 10 MB.",
+            "warning"
+        );
+        return;
+    }
+
+    const formulario = new FormData();
+    formulario.append("archivo", archivo);
+
+    try {
+        boton.disabled = true;
+
+        const respuesta = await apiFetch(
+            `${API_URL}/evidencias/tecnico/asignaciones/${assignmentId}/items/${itemId}`,
+            {
+                method: "POST",
+                body: formulario
+            }
+        );
+
+        const datos = await respuesta.json().catch(() => ({}));
+
+        if (respuesta.status === 401 || respuesta.status === 403) {
+            window.location.href = "../index.html";
+            return;
+        }
+
+        if (!respuesta.ok) {
+            throw new Error(
+                datos.detail || `No se pudo cargar la fotografía (HTTP ${respuesta.status}).`
+            );
+        }
+
+        mostrarNotificacion(
+            "La fotografía se cargó correctamente.",
+            "success"
+        );
+
+        const lista = document.getElementById(`evidencias-item-${itemId}`);
+
+        if (lista) lista.hidden = false;
+
+        await cargarEvidenciasItem(itemId);
+
+    } catch (error) {
+        console.error("Error al subir la fotografía:", error);
+
+        mostrarNotificacion(
+            error.message || "No se pudo cargar la fotografía.",
+            "error"
+        );
+
+    } finally {
+        boton.disabled = false;
+    }
+}
+
+
+/* =========================================
+   CONFIRMAR ELIMINACIÓN DE EVIDENCIA
+   ========================================= */
+
+let evidenciaEliminando = null;
+
+const eliminarEvidenciaModal = new bootstrap.Modal(
+    document.getElementById("eliminarEvidenciaModal")
+);
+
+
+function solicitarEliminarEvidencia(itemId, evidenciaId) {
+    evidenciaEliminando = {
+        itemId,
+        evidenciaId
+    };
+
+    eliminarEvidenciaModal.show();
+}
+
+
+document.getElementById(
+    "btnConfirmarEliminarEvidencia"
+)?.addEventListener("click", async function () {
+
+    if (!evidenciaEliminando) {
+        mostrarNotificacion(
+            "No se pudo identificar la fotografía.",
+            "error"
+        );
+        return;
+    }
+
+    const boton = this;
+    const contenidoOriginal = boton.innerHTML;
+
+    const { itemId, evidenciaId } = evidenciaEliminando;
+
+    boton.disabled = true;
+    boton.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Eliminando...
+    `;
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/evidencias/tecnico/asignaciones/${assignmentId}/items/${itemId}/${evidenciaId}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const datos = await respuesta.json().catch(() => ({}));
+
+        if (respuesta.status === 401 || respuesta.status === 403) {
+            window.location.href = "../index.html";
+            return;
+        }
+
+        if (!respuesta.ok) {
+            throw new Error(
+                datos.detail || "No se pudo eliminar la fotografía."
+            );
+        }
+
+        eliminarEvidenciaModal.hide();
+
+        evidenciaEliminando = null;
+
+        await cargarEvidenciasItem(itemId);
+
+        mostrarNotificacion(
+            datos.mensaje ||
+            "La fotografía se eliminó correctamente.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error("Error al eliminar la fotografía:", error);
+
+        mostrarNotificacion(
+            error.message ||
+            "No se pudo conectar con el servidor.",
+            "error"
+        );
+
+    } finally {
+        boton.disabled = false;
+        boton.innerHTML = contenidoOriginal;
+    }
+});
+
+
+document.getElementById("eliminarEvidenciaModal")
+    ?.addEventListener("hidden.bs.modal", () => {
+        evidenciaEliminando = null;
+    });
+
+
 function renderizarChecklist(items) {
     const contenedor = document.getElementById("checklistItems");
 
     if (!contenedor) return;
 
     contenedor.replaceChildren();
+    evidenciasPorItem.clear();
+
+    totalItemsChecklist = items.length;
+
+    actualizarProgresoChecklist();
 
     if (!items.length) {
         contenedor.innerHTML = `
@@ -535,6 +945,8 @@ function renderizarChecklist(items) {
         itemsGrupo
             .sort((a, b) => Number(a.orden || 0) - Number(b.orden || 0))
             .forEach(item => {
+                const itemId = Number(item.id);
+
                 const fila = document.createElement("div");
                 fila.className =
                     "generated-checklist-item technician-checklist-item";
@@ -549,6 +961,11 @@ function renderizarChecklist(items) {
                 const detalle = document.createElement("p");
                 detalle.textContent = item.descripcion || "Sin descripción";
 
+                const estado = document.createElement("span");
+                estado.id = `estado-item-${itemId}`;
+                estado.className = "technician-item-status loading";
+                estado.textContent = "Consultando...";
+
                 contenido.append(nombre, detalle);
 
                 if (item.obligatorio) {
@@ -560,62 +977,118 @@ function renderizarChecklist(items) {
                     contenido.appendChild(obligatorio);
                 }
 
-                // Acciones de evidencias
+                // Acciones
                 const acciones = document.createElement("div");
                 acciones.className =
                     "generated-checklist-item-actions technician-evidence-actions";
 
-                const accionesEvidencia = [
-                    {
-                        icono: "bi-cloud-arrow-up",
-                        titulo: "Cargar evidencia",
-                        clase: ""
-                    },
-                    {
-                        icono: "bi-eye",
-                        titulo: "Consultar evidencia",
-                        clase: ""
-                    },
-                    {
-                        icono: "bi-trash3",
-                        titulo: "Eliminar evidencia",
-                        clase: "delete"
-                    },
-                    {
-                        icono: "bi-camera",
-                        titulo: "Disponible próximamente: integración con la APK Android",
-                        clase: "camera"
+                acciones.appendChild(estado);
+
+                // Botón cargar
+                const botonSubir = document.createElement("button");
+                botonSubir.type = "button";
+                botonSubir.className =
+                    "checklist-item-action technician-evidence-action";
+                botonSubir.title = "Cargar evidencia";
+                botonSubir.setAttribute("aria-label", "Cargar evidencia");
+
+                const iconoSubir = document.createElement("i");
+                iconoSubir.className = "bi bi-cloud-arrow-up";
+
+                botonSubir.appendChild(iconoSubir);
+
+                // Selector de archivos
+                const inputArchivo = document.createElement("input");
+                inputArchivo.type = "file";
+                inputArchivo.accept = ".jpg,.jpeg,.png,.webp";
+                inputArchivo.hidden = true;
+
+                inputArchivo.addEventListener("change", async () => {
+                    const archivo = inputArchivo.files[0];
+
+                    if (archivo) {
+                        await subirEvidenciaItem(
+                            itemId,
+                            archivo,
+                            botonSubir
+                        );
                     }
-                ];
 
-                accionesEvidencia.forEach(accion => {
-                    const boton = document.createElement("button");
-
-                    boton.type = "button";
-                    boton.className =
-                        `checklist-item-action technician-evidence-action ${accion.clase}`;
-
-                    boton.disabled = true;
-                    boton.title = accion.titulo;
-                    boton.setAttribute("aria-label", accion.titulo);
-
-                    const icono = document.createElement("i");
-                    icono.className = `bi ${accion.icono}`;
-
-                    boton.appendChild(icono);
-                    acciones.appendChild(boton);
+                    inputArchivo.value = "";
                 });
 
+                botonSubir.addEventListener("click", () => {
+                    inputArchivo.click();
+                });
+
+                // Botón consultar
+                const botonConsultar = document.createElement("button");
+                botonConsultar.type = "button";
+                botonConsultar.className =
+                    "checklist-item-action technician-evidence-action";
+                botonConsultar.title = "Consultar evidencias";
+                botonConsultar.setAttribute("aria-label", "Consultar evidencias");
+
+                const iconoConsultar = document.createElement("i");
+                iconoConsultar.className = "bi bi-eye";
+
+                botonConsultar.appendChild(iconoConsultar);
+
+                // Lista de fotografías
+                const listaEvidencias = document.createElement("div");
+                listaEvidencias.id = `evidencias-item-${itemId}`;
+                listaEvidencias.className = "technician-evidence-list";
+                listaEvidencias.hidden = true;
+
+                botonConsultar.addEventListener("click", async () => {
+                    listaEvidencias.hidden = !listaEvidencias.hidden;
+
+                    if (!listaEvidencias.hidden) {
+                        await cargarEvidenciasItem(itemId);
+                    }
+                });
+
+                // Cámara: se conserva como función futura
+                const botonCamara = document.createElement("button");
+                botonCamara.type = "button";
+                botonCamara.className =
+                    "checklist-item-action technician-evidence-action camera";
+                botonCamara.disabled = true;
+                botonCamara.title =
+                    "Disponible próximamente: integración con la APK Android";
+                botonCamara.setAttribute(
+                    "aria-label",
+                    "Disponible próximamente: integración con la APK Android"
+                );
+
+                const iconoCamara = document.createElement("i");
+                iconoCamara.className = "bi bi-camera";
+
+                botonCamara.appendChild(iconoCamara);
+
+                acciones.append(
+                    botonSubir,
+                    botonConsultar,
+                    botonCamara,
+                    inputArchivo
+                );
+
                 fila.append(contenido, acciones);
-                lista.appendChild(fila);
+
+                const contenedorItem = document.createElement("div");
+                contenedorItem.className = "technician-checklist-item-wrapper";
+
+                contenedorItem.append(fila, listaEvidencias);
+                lista.appendChild(contenedorItem);
+
+                // Consultar el estado real de las evidencias
+                cargarEvidenciasItem(itemId);
             });
 
         grupo.append(encabezado, lista);
         contenedor.appendChild(grupo);
     });
 }
-
-
 
 /* =========================================
    CARGAR ASIGNACIÓN

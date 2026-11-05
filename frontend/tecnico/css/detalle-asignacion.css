@@ -95,3 +95,666 @@
     }
 }
 
+
+/* =========================================
+   ESTADO DE LOS ÍTEMS DEL CHECKLIST
+   ========================================= */
+
+.technician-checklist-item-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.technician-item-status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-top: 8px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.technician-item-status.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.technician-item-status.completed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.technician-item-status.loading,
+.technician-item-status.unavailable {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+
+/* =========================================
+   LISTA DE EVIDENCIAS
+   ========================================= */
+
+.technician-evidence-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 15px;
+    border: 1px solid #e7ebf0;
+    border-radius: 9px;
+    background: #f8fafc;
+}
+
+.technician-evidence-list[hidden] {
+    display: none !important;
+}
+
+.technician-evidence-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 10px;
+    border: 1px solid #e7ebf0;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.technician-evidence-file-info {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    color: #475569;
+    font-size: 12px;
+}
+
+.technician-evidence-file-info i {
+    flex-shrink: 0;
+    color: #2563eb;
+    font-size: 15px;
+}
+
+.technician-evidence-file-info span {
+    overflow-wrap: anywhere;
+}
+
+.technician-evidence-file-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+.technician-evidence-view,
+.technician-evidence-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 31px;
+    height: 31px;
+    border: 0;
+    border-radius: 7px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.technician-evidence-view {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.technician-evidence-view:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.technician-evidence-delete {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.technician-evidence-delete:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.technician-evidence-empty {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+@media (max-width: 500px) {
+    .technician-evidence-file {
+        align-items: flex-start;
+    }
+
+    .technician-evidence-file-info {
+        flex: 1;
+    }
+}
+
+/* =========================================
+   ESTADO DEL CHECKLIST
+   ========================================= */
+
+.technician-checklist-item {
+    align-items: center;
+}
+
+.technician-checklist-item .generated-checklist-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.technician-evidence-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    gap: 7px;
+}
+
+.technician-item-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.technician-item-status.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.technician-item-status.completed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.technician-item-status.loading,
+.technician-item-status.unavailable {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+
+/* =========================================
+   VISTA PREVIA DE FOTOGRAFÍAS
+   ========================================= */
+
+.technician-evidence-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.technician-evidence-preview {
+    position: relative;
+    width: 115px;
+    height: 100px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    background: #f8fafc;
+}
+
+.technician-evidence-image-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.technician-evidence-image-link img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+}
+
+.technician-evidence-image-link:hover img {
+    transform: scale(1.06);
+}
+
+.technician-evidence-preview-delete {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 6px;
+    background: rgba(220, 38, 38, 0.95);
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.technician-evidence-preview-delete:hover {
+    background: #b91c1c;
+}
+
+.technician-evidence-no-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    color: #64748b;
+    text-align: center;
+    font-size: 10px;
+}
+
+.technician-evidence-no-preview i {
+    font-size: 22px;
+}
+
+@media (max-width: 700px) {
+    .technician-checklist-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .technician-evidence-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+
+/* =========================================
+   REDISEÑO DEL CHECKLIST DE EVIDENCIAS
+   ========================================= */
+
+/* Panel principal */
+.checklist-panel {
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f7f9fc;
+}
+
+/* Encabezado principal azul marino */
+.checklist-panel > .checklist-header {
+    padding: 20px 24px;
+    background: #172b4d;
+    border-bottom: 0;
+}
+
+.checklist-panel > .checklist-header h2 {
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.checklist-panel > .checklist-header p {
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+/* Indicador de checklist publicado */
+.checklist-panel .generated-checklist-status {
+    padding: 14px 24px 0;
+    background: #f7f9fc;
+}
+
+.checklist-panel .generated-checklist-status span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    background: #eff6ff;
+    color: #365a86;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Contenedor de los grupos */
+.checklist-panel #checklistItems {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px 24px 24px;
+    background: #f7f9fc;
+}
+
+/* Grupo de requisitos */
+.checklist-panel .generated-checklist-group {
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+/* Encabezado de cada grupo */
+.checklist-panel .generated-checklist-group-header {
+    padding: 15px 18px;
+    border-bottom: 1px solid #e8edf3;
+    border-left: 4px solid #365a86;
+    background: #ffffff;
+}
+
+.checklist-panel .generated-checklist-group-info h3 {
+    margin: 0;
+    color: #26364b;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.checklist-panel .generated-checklist-group-info p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Lista de ítems */
+.checklist-panel .generated-checklist-items {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 16px;
+}
+
+/* Cada requisito individual */
+.checklist-panel .generated-checklist-item.technician-checklist-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 17px 4px;
+    border-bottom: 1px solid #edf0f4;
+    background: #ffffff;
+}
+
+.checklist-panel .generated-checklist-item:last-child {
+    border-bottom: 0;
+}
+
+/* Información del requisito */
+.checklist-panel .generated-checklist-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.checklist-panel .generated-checklist-item-content > strong {
+    display: block;
+    color: #26364b;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.5;
+}
+
+.checklist-panel .generated-checklist-item-content > p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Indicador de evidencia obligatoria */
+.checklist-panel .generated-checklist-item-required {
+    display: inline-block;
+    margin-top: 7px;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* Acciones y estado */
+.checklist-panel .technician-evidence-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+/* Estados de los ítems */
+.checklist-panel .technician-item-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.checklist-panel .technician-item-status.pending {
+    border-color: #e2e8f0;
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.checklist-panel .technician-item-status.completed {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.checklist-panel .technician-item-status.loading,
+.checklist-panel .technician-item-status.unavailable {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+    color: #94a3b8;
+}
+
+/* Botones de evidencias */
+.checklist-panel .technician-evidence-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid #dbe2ea;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #52657d;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.checklist-panel .technician-evidence-action:not(:disabled):hover {
+    border-color: #365a86;
+    background: #eff4fa;
+    color: #24466f;
+}
+
+.checklist-panel .technician-evidence-action:disabled {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+    color: #cbd5e1;
+    opacity: 0.8;
+}
+
+/* Galería de fotografías */
+.checklist-panel .technician-evidence-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.checklist-panel .technician-evidence-preview {
+    width: 108px;
+    height: 94px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.checklist-panel .technician-evidence-preview-delete {
+    width: 27px;
+    height: 27px;
+    border-radius: 6px;
+    background: rgba(30, 41, 59, 0.88);
+}
+
+.checklist-panel .technician-evidence-preview-delete:hover {
+    background: #dc2626;
+}
+
+/* Mensaje cuando no hay fotografías */
+.checklist-panel .technician-evidence-empty {
+    margin: 10px 0 0;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* Vista adaptable */
+@media (max-width: 700px) {
+    .checklist-panel > .checklist-header {
+        padding: 17px;
+    }
+
+    .checklist-panel #checklistItems {
+        padding: 14px;
+    }
+
+    .checklist-panel .generated-checklist-item.technician-checklist-item {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .checklist-panel .technician-evidence-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .checklist-panel .generated-checklist-items {
+        padding: 5px 12px;
+    }
+}
+
+/* =========================================
+   ENCABEZADO Y PROGRESO DEL CHECKLIST
+   ========================================= */
+
+.checklist-panel .technician-checklist-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    padding: 24px;
+    background: #172b4d;
+    border-radius: 10px 10px 0 0;
+}
+
+.checklist-panel .technician-checklist-heading h2 {
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.checklist-panel .technician-checklist-heading p {
+    color: rgba(255, 255, 255, 0.72);
+    margin-bottom: 0;
+}
+
+/* Contenedor del progreso */
+
+.checklist-panel .technician-checklist-progress {
+    width: 100%;
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 9px;
+}
+
+/* Porcentaje */
+
+.checklist-panel .technician-checklist-progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.checklist-panel .technician-checklist-progress-header span {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.checklist-panel .technician-checklist-progress-header strong {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+/* Barra */
+
+.checklist-panel .technician-checklist-progress-track {
+    width: 100%;
+    height: 7px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 20px;
+}
+
+.checklist-panel .technician-checklist-progress-bar {
+    width: 0;
+    height: 100%;
+    background: #60a5fa;
+    border-radius: 20px;
+    transition: width 0.35s ease;
+}
+
+/* Cantidades */
+
+.checklist-panel .technician-checklist-progress-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 11px;
+}
+
+.checklist-panel .technician-checklist-progress-details span {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+@media (max-width: 576px) {
+
+    .checklist-panel .technician-checklist-header {
+        padding: 20px 16px;
+        gap: 17px;
+    }
+
+    .checklist-panel .technician-checklist-progress {
+        padding: 14px;
+    }
+
+    .checklist-panel .technician-checklist-progress-details {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
