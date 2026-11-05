@@ -663,7 +663,14 @@ function actualizarBotonEdicionEvidencias(asignacion) {
 }
 
 
-async function cambiarPermisoEdicionEvidencias() {
+let nuevaHabilitacionPendiente = null;
+
+const confirmarCambioEdicionModal = new bootstrap.Modal(
+    document.getElementById("confirmarCambioEdicionModal")
+);
+
+
+function solicitarCambioPermisoEdicionEvidencias() {
     const asignacion = window.asignacionDetalleActual;
 
     if (!asignacion) return;
@@ -679,20 +686,71 @@ async function cambiarPermisoEdicionEvidencias() {
         return;
     }
 
-    const nuevaHabilitacion = !Boolean(
+    nuevaHabilitacionPendiente = !Boolean(
         asignacion.edicion_evidencias_habilitada
     );
 
-    const confirmacion = window.confirm(
-        nuevaHabilitacion
-            ? "¿Deseas habilitar nuevamente la edición de evidencias para el técnico?"
-            : "¿Deseas deshabilitar la edición de evidencias para el técnico?"
+    const mensaje = document.getElementById(
+        "mensajeCambioEdicion"
     );
 
-    if (!confirmacion) return;
+    const detalle = document.getElementById(
+        "detalleCambioEdicion"
+    );
+
+    const icono = document.getElementById(
+        "iconoCambioEdicion"
+    );
 
     const boton = document.getElementById(
-        "btnEditarEvidencias"
+        "btnConfirmarCambioEdicion"
+    );
+
+    if (nuevaHabilitacionPendiente) {
+        mensaje.textContent =
+            "¿Deseas habilitar nuevamente la edición de evidencias?";
+
+        detalle.textContent =
+            "El técnico podrá agregar, eliminar y corregir las fotografías de esta asignación.";
+
+        icono.className = "bi bi-unlock";
+        icono.style.color = "#2563eb";
+
+        boton.innerHTML =
+            '<i class="bi bi-unlock"></i> Habilitar edición';
+
+    } else {
+        mensaje.textContent =
+            "¿Deseas deshabilitar la edición de evidencias?";
+
+        detalle.textContent =
+            "El técnico podrá consultar las fotografías, pero no podrá modificarlas hasta que vuelvas a habilitar la edición.";
+
+        icono.className = "bi bi-lock";
+        icono.style.color = "#dc2626";
+
+        boton.innerHTML =
+            '<i class="bi bi-lock"></i> Deshabilitar edición';
+    }
+
+    confirmarCambioEdicionModal.show();
+}
+
+
+async function cambiarPermisoEdicionEvidencias() {
+    const asignacion = window.asignacionDetalleActual;
+
+    if (
+        !asignacion ||
+        nuevaHabilitacionPendiente === null
+    ) {
+        return;
+    }
+
+    const nuevaHabilitacion = nuevaHabilitacionPendiente;
+
+    const boton = document.getElementById(
+        "btnConfirmarCambioEdicion"
     );
 
     const contenidoOriginal = boton.innerHTML;
@@ -734,7 +792,7 @@ async function cambiarPermisoEdicionEvidencias() {
         asignacion.edicion_evidencias_habilitada =
             datos.edicion_evidencias_habilitada;
 
-        actualizarBotonEdicionEvidencias(asignacion);
+        confirmarCambioEdicionModal.hide();
 
         mostrarNotificacion(
             datos.mensaje || "El permiso se actualizó correctamente.",
@@ -747,13 +805,19 @@ async function cambiarPermisoEdicionEvidencias() {
             error
         );
 
+        confirmarCambioEdicionModal.hide();
+
         mostrarNotificacion(
             error.message || "No se pudo actualizar el permiso.",
             "error"
         );
 
     } finally {
+        boton.disabled = false;
         boton.innerHTML = contenidoOriginal;
+
+        nuevaHabilitacionPendiente = null;
+
         actualizarBotonEdicionEvidencias(asignacion);
     }
 }
@@ -762,7 +826,23 @@ document.getElementById(
     "btnEditarEvidencias"
 )?.addEventListener(
     "click",
+    solicitarCambioPermisoEdicionEvidencias
+);
+
+document.getElementById(
+    "btnConfirmarCambioEdicion"
+)?.addEventListener(
+    "click",
     cambiarPermisoEdicionEvidencias
+);
+
+document.getElementById(
+    "confirmarCambioEdicionModal"
+)?.addEventListener(
+    "hidden.bs.modal",
+    () => {
+        nuevaHabilitacionPendiente = null;
+    }
 );
 
 
@@ -3791,9 +3871,10 @@ async function publicarChecklistAsignacion() {
             error
         );
 
-        mostrarMensajeChecklist(
+        mostrarNotificacion(
             error.message || "No se pudo publicar el checklist.",
-            true
+            "error",
+            "No se pudo publicar el checklist"
         );
 
     } finally {

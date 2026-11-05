@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from app.models.assignment import Assignment
 from app.models.generated_checklist import GeneratedChecklist
 from app.models.generated_checklist_item import GeneratedChecklistItem
+from app.models.evidence import Evidence
 from app.models.generated_checklist_draft import (
     GeneratedChecklistDraft,
     GeneratedChecklistDraftItem,
@@ -370,6 +371,23 @@ class GeneratedChecklistDraftService:
             )
 
         self._obtener_contexto(draft)
+
+        # Verificar si el ítem original tiene evidencias asociadas.
+        if item.item_origen_id is not None:
+            evidencia_existente = self.db.execute(
+                select(Evidence.id)
+                .where(
+                    Evidence.item_checklist_id == item.item_origen_id
+                )
+                .limit(1)
+            ).scalar_one_or_none()
+
+            if evidencia_existente is not None:
+                raise ValueError(
+                    "No se puede eliminar este ítem del borrador "
+                    "porque tiene evidencias fotográficas asociadas. "
+                    "Conserva el ítem para mantener sus evidencias."
+                )
 
         try:
             self.db.delete(item)

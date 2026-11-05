@@ -1144,25 +1144,25 @@ function renderizarChecklist(items) {
    ENVIAR CHECKLIST
    ========================================= */
 
+const confirmarEnvioChecklistModal = new bootstrap.Modal(
+    document.getElementById("confirmarEnvioChecklistModal")
+);
+
 async function enviarChecklistTecnico() {
     if (!edicionEvidenciasHabilitada || enviandoChecklist) {
         return;
     }
 
-    const confirmar = window.confirm(
-        "¿Deseas enviar el checklist? Después del envío no podrás modificar las fotografías hasta que el administrador habilite nuevamente la edición."
-    );
-
-    if (!confirmar) return;
-
     const boton = document.getElementById(
-        "btnEnviarChecklist"
+        "btnConfirmarEnvioChecklist"
     );
 
     const contenidoOriginal = boton.innerHTML;
 
     enviandoChecklist = true;
     actualizarEstadoEdicionEvidencias();
+
+    boton.disabled = true;
 
     boton.innerHTML = `
         <span class="spinner-border spinner-border-sm me-1"></span>
@@ -1190,6 +1190,8 @@ async function enviarChecklistTecnico() {
             );
         }
 
+        confirmarEnvioChecklistModal.hide();
+
         edicionEvidenciasHabilitada = false;
 
         actualizarEstadoEdicionEvidencias();
@@ -1199,7 +1201,6 @@ async function enviarChecklistTecnico() {
             "success"
         );
 
-        // Actualizar el estado visual de la asignación.
         if (datos.estado) {
             const asignacionesRespuesta = await apiFetch(
                 `${API_URL}/asignaciones/tecnico/mis-asignaciones`
@@ -1218,8 +1219,6 @@ async function enviarChecklistTecnico() {
             }
         }
 
-        // Actualizar la visualización de las evidencias
-        // sin perder la posibilidad de consultarlas.
         for (const itemId of evidenciasPorItem.keys()) {
             const lista = document.getElementById(
                 `evidencias-item-${itemId}`
@@ -1233,6 +1232,8 @@ async function enviarChecklistTecnico() {
     } catch (error) {
         console.error("Error al enviar el checklist:", error);
 
+        confirmarEnvioChecklistModal.hide();
+
         mostrarNotificacion(
             error.message || "No se pudo enviar el checklist.",
             "error"
@@ -1241,6 +1242,7 @@ async function enviarChecklistTecnico() {
     } finally {
         enviandoChecklist = false;
 
+        boton.disabled = false;
         boton.innerHTML = contenidoOriginal;
 
         actualizarEstadoEdicionEvidencias();
@@ -1249,6 +1251,16 @@ async function enviarChecklistTecnico() {
 
 document.getElementById(
     "btnEnviarChecklist"
+)?.addEventListener("click", function () {
+    if (!edicionEvidenciasHabilitada || enviandoChecklist) {
+        return;
+    }
+
+    confirmarEnvioChecklistModal.show();
+});
+
+document.getElementById(
+    "btnConfirmarEnvioChecklist"
 )?.addEventListener(
     "click",
     enviarChecklistTecnico
