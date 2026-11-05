@@ -61,6 +61,25 @@ def convertir_error(error: Exception):
 # =========================================================
 
 @router.post(
+    "/tecnico/asignaciones/{asignacion_id}/enviar",
+)
+def enviar_checklist_tecnico(
+    asignacion_id: int,
+    db: Session = Depends(get_db),
+    tecnico: User = Depends(require_roles("tecnico")),
+):
+    service = EvidenceService(db)
+
+    try:
+        return service.enviar_checklist_tecnico(
+            assignment_id=asignacion_id,
+            tecnico_id=tecnico.id,
+        )
+
+    except (ValueError, PermissionError, RuntimeError) as error:
+        convertir_error(error)
+
+@router.post(
     "/tecnico/asignaciones/{asignacion_id}/items/{item_id}",
     status_code=status.HTTP_201_CREATED,
 )

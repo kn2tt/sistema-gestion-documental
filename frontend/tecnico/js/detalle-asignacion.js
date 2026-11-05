@@ -7,6 +7,9 @@ const API_URL = "http://127.0.0.1:8000";
 const params = new URLSearchParams(window.location.search);
 const assignmentId = params.get("id");
 
+let edicionEvidenciasHabilitada = false;
+let enviandoChecklist = false;
+
 
 /* =========================================
    API
@@ -16,6 +19,44 @@ function apiFetch(url, opciones = {}) {
     return fetch(url, {
         ...opciones,
         credentials: "include"
+    });
+}
+
+
+function actualizarEstadoEdicionEvidencias() {
+    const botonEnviar = document.getElementById(
+        "btnEnviarChecklist"
+    );
+
+    const estado = document.getElementById(
+        "checklistEditingStatus"
+    );
+
+    const mensaje = document.getElementById(
+        "checklistEditingMessage"
+    );
+
+    if (botonEnviar) {
+        botonEnviar.hidden = !edicionEvidenciasHabilitada;
+        botonEnviar.disabled = enviandoChecklist;
+    }
+
+    if (estado) {
+        estado.textContent = edicionEvidenciasHabilitada
+            ? "Edición habilitada"
+            : "Edición deshabilitada";
+    }
+
+    if (mensaje) {
+        mensaje.textContent = edicionEvidenciasHabilitada
+            ? "Cuando termines de registrar las evidencias, envía el checklist."
+            : "El checklist fue enviado. Puedes consultar las fotografías, pero no modificarlas.";
+    }
+
+    document.querySelectorAll(
+        ".technician-evidence-upload"
+    ).forEach(boton => {
+        boton.disabled = !edicionEvidenciasHabilitada;
     });
 }
 
@@ -672,7 +713,10 @@ function renderizarEvidenciasItem(itemId, evidencias) {
             contenedor.appendChild(sinVista);
         }
 
-        if (evidencia.estado_almacenamiento === "pendiente") {
+        if (
+            edicionEvidenciasHabilitada &&
+            evidencia.estado_almacenamiento === "pendiente"
+        ) {
             const botonEliminar = document.createElement("button");
             botonEliminar.type = "button";
             botonEliminar.className = "technician-evidence-preview-delete";
@@ -742,7 +786,7 @@ async function subirEvidenciaItem(itemId, archivo, boton) {
 
         const datos = await respuesta.json().catch(() => ({}));
 
-        if (respuesta.status === 401 || respuesta.status === 403) {
+        if (respuesta.status === 401) {
             window.location.href = "../index.html";
             return;
         }
@@ -832,7 +876,7 @@ document.getElementById(
 
         const datos = await respuesta.json().catch(() => ({}));
 
-        if (respuesta.status === 401 || respuesta.status === 403) {
+        if (respuesta.status === 401) {
             window.location.href = "../index.html";
             return;
         }
@@ -989,6 +1033,11 @@ function renderizarChecklist(items) {
                 botonSubir.type = "button";
                 botonSubir.className =
                     "checklist-item-action technician-evidence-action";
+                botonSubir.classList.add(
+                    "technician-evidence-upload"
+                );
+
+                botonSubir.disabled = !edicionEvidenciasHabilitada;
                 botonSubir.title = "Cargar evidencia";
                 botonSubir.setAttribute("aria-label", "Cargar evidencia");
 
@@ -1090,6 +1139,122 @@ function renderizarChecklist(items) {
     });
 }
 
+
+/* =========================================
+   ENVIAR CHECKLIST
+   ========================================= */
+
+async function enviarChecklistTecnico() {
+    if (!edicionEvidenciasHabilitada || enviandoChecklist) {
+        return;
+    }
+
+    const confirmar = window.confirm(
+        "¿Deseas enviar el checklist? Después del envío no podrás modificar las fotografías hasta que el administrador habilite nuevamente la edición."
+    );
+
+    if (!confirmar) return;
+
+    const boton = document.getElementById(
+        "btnEnviarChecklist"
+    );
+
+    const contenidoOriginal = boton.innerHTML;
+
+    enviandoChecklist = true;
+    actualizarEstadoEdicionEvidencias();
+
+    boton.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Enviando...
+    `;
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/evidencias/tecnico/asignaciones/${assignmentId}/enviar`,
+            {
+                method: "POST"
+            }
+        );
+
+        const datos = await respuesta.json().catch(() => ({}));
+
+        if (respuesta.status === 401) {
+            window.location.href = "../index.html";
+            return;
+        }
+
+        if (!respuesta.ok) {
+            throw new Error(
+                datos.detail || "No se pudo enviar el checklist."
+            );
+        }
+
+        edicionEvidenciasHabilitada = false;
+
+        actualizarEstadoEdicionEvidencias();
+
+        mostrarNotificacion(
+            datos.mensaje || "El checklist fue enviado correctamente.",
+            "success"
+        );
+
+        // Actualizar el estado visual de la asignación.
+        if (datos.estado) {
+            const asignacionesRespuesta = await apiFetch(
+                `${API_URL}/asignaciones/tecnico/mis-asignaciones`
+            );
+
+            if (asignacionesRespuesta.ok) {
+                const asignaciones = await asignacionesRespuesta.json();
+
+                const asignacionActual = asignaciones.find(
+                    item => Number(item.id) === Number(assignmentId)
+                );
+
+                if (asignacionActual) {
+                    actualizarEncabezado(asignacionActual);
+                }
+            }
+        }
+
+        // Actualizar la visualización de las evidencias
+        // sin perder la posibilidad de consultarlas.
+        for (const itemId of evidenciasPorItem.keys()) {
+            const lista = document.getElementById(
+                `evidencias-item-${itemId}`
+            );
+
+            if (lista && !lista.hidden) {
+                await cargarEvidenciasItem(itemId);
+            }
+        }
+
+    } catch (error) {
+        console.error("Error al enviar el checklist:", error);
+
+        mostrarNotificacion(
+            error.message || "No se pudo enviar el checklist.",
+            "error"
+        );
+
+    } finally {
+        enviandoChecklist = false;
+
+        boton.innerHTML = contenidoOriginal;
+
+        actualizarEstadoEdicionEvidencias();
+    }
+}
+
+document.getElementById(
+    "btnEnviarChecklist"
+)?.addEventListener(
+    "click",
+    enviarChecklistTecnico
+);
+
+
 /* =========================================
    CARGAR ASIGNACIÓN
    ========================================= */
@@ -1131,6 +1296,10 @@ async function cargarAsignacion() {
             item => Number(item.id) === Number(assignmentId)
         );
 
+        edicionEvidenciasHabilitada = Boolean(
+            asignacion.edicion_evidencias_habilitada
+        );
+
         if (!asignacion) {
             mostrarNotificacion(
                 "La asignación no existe o no pertenece a tu usuario.",
@@ -1142,6 +1311,8 @@ async function cargarAsignacion() {
         actualizarInformacionGeneral(asignacion);
         actualizarTecnicos(asignacion);
         actualizarFechas(asignacion);
+
+        actualizarEstadoEdicionEvidencias();
 
         await cargarChecklistPublicado();
 

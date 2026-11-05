@@ -758,3 +758,48 @@
     }
 
 }
+
+/* =========================================
+   ENVÍO DEL CHECKLIST
+   ========================================= */
+
+.technician-checklist-submit {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 24px;
+    padding: 18px 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.technician-checklist-submit strong {
+    display: block;
+    color: #334155;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.technician-checklist-submit p {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.technician-checklist-submit button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .technician-checklist-submit {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .technician-checklist-submit button {
+        width: 100%;
+    }
+}

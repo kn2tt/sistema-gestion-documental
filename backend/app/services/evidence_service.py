@@ -76,6 +76,19 @@ class EvidenceService:
 
         return assignment
 
+
+    def _validar_edicion_tecnico(self, assignment):
+        if (
+            assignment.estado == "completado"
+            or not assignment.edicion_evidencias_habilitada
+        ):
+            raise PermissionError(
+                "La edición de evidencias está deshabilitada "
+                "para esta asignación. Solicita autorización "
+                "al administrador."
+            )
+
+
     def _validar_checklist_publicado(
         self,
         assignment_id: int,
@@ -200,6 +213,54 @@ class EvidenceService:
                 "El contenido del archivo no corresponde a una imagen válida."
             )
 
+
+    # =====================================================
+    # ENVIAR CHECKLIST DEL TÉCNICO
+    # =====================================================
+
+    def enviar_checklist_tecnico(
+        self,
+        assignment_id: int,
+        tecnico_id: int,
+    ):
+        assignment = self._validar_asignacion_tecnico(
+            assignment_id,
+            tecnico_id,
+        )
+
+        self._validar_edicion_tecnico(assignment)
+
+        self._validar_checklist_publicado(
+            assignment_id
+        )
+
+        # La primera entrega pasa a documentación.
+        # Si ya fue enviada anteriormente, se conserva
+        # el estado actual de la asignación.
+        if assignment.estado in ("pendiente", "en_proceso"):
+            assignment.estado = "pendiente_documentacion"
+
+        # Después del envío, el técnico ya no puede editar.
+        assignment.edicion_evidencias_habilitada = False
+
+        try:
+            self.db.commit()
+            self.db.refresh(assignment)
+
+        except Exception:
+            self.db.rollback()
+            raise
+
+        return {
+            "mensaje": "El checklist fue enviado correctamente.",
+            "asignacion_id": assignment.id,
+            "estado": assignment.estado,
+            "edicion_evidencias_habilitada": (
+                assignment.edicion_evidencias_habilitada
+            ),
+        }
+
+
     # =====================================================
     # SUBIR FOTOGRAFÍA
     # =====================================================
@@ -217,6 +278,8 @@ class EvidenceService:
             assignment_id,
             tecnico_id,
         )
+
+        self._validar_edicion_tecnico(assignment)
 
         checklist = self._validar_checklist_publicado(
             assignment_id
@@ -365,10 +428,12 @@ class EvidenceService:
         evidence_id: int,
         tecnico_id: int,
     ):
-        self._validar_asignacion_tecnico(
+        assignment = self._validar_asignacion_tecnico(
             assignment_id,
             tecnico_id,
         )
+
+        self._validar_edicion_tecnico(assignment)
 
         checklist = self._validar_checklist_publicado(
             assignment_id

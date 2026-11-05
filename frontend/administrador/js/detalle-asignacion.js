@@ -632,6 +632,141 @@ function actualizarDocumentador(asignacion) {
 
 
 /* =====================================================
+   CONTROL DE EDICIÓN DE EVIDENCIAS
+   ===================================================== */
+
+function actualizarBotonEdicionEvidencias(asignacion) {
+    const boton = document.getElementById(
+        "btnEditarEvidencias"
+    );
+
+    if (!boton || !asignacion) return;
+
+    const habilitada = Boolean(
+        asignacion.edicion_evidencias_habilitada
+    );
+
+    const completada = asignacion.estado === "completado";
+
+    boton.hidden = false;
+    boton.disabled = completada;
+
+    boton.innerHTML = habilitada
+        ? '<i class="bi bi-lock-fill"></i> Deshabilitar edición'
+        : '<i class="bi bi-unlock"></i> Habilitar edición';
+
+    boton.title = completada
+        ? "No se puede habilitar la edición de una asignación completada."
+        : habilitada
+            ? "Bloquear la edición de fotografías del técnico."
+            : "Permitir nuevamente la edición de fotografías del técnico.";
+}
+
+
+async function cambiarPermisoEdicionEvidencias() {
+    const asignacion = window.asignacionDetalleActual;
+
+    if (!asignacion) return;
+
+    if (
+        asignacion.estado === "completado" &&
+        !asignacion.edicion_evidencias_habilitada
+    ) {
+        mostrarNotificacion(
+            "No se puede habilitar la edición de una asignación completada.",
+            "warning"
+        );
+        return;
+    }
+
+    const nuevaHabilitacion = !Boolean(
+        asignacion.edicion_evidencias_habilitada
+    );
+
+    const confirmacion = window.confirm(
+        nuevaHabilitacion
+            ? "¿Deseas habilitar nuevamente la edición de evidencias para el técnico?"
+            : "¿Deseas deshabilitar la edición de evidencias para el técnico?"
+    );
+
+    if (!confirmacion) return;
+
+    const boton = document.getElementById(
+        "btnEditarEvidencias"
+    );
+
+    const contenidoOriginal = boton.innerHTML;
+
+    boton.disabled = true;
+
+    boton.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Actualizando...
+    `;
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/asignaciones/${assignmentId}/edicion-evidencias`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    habilitada: nuevaHabilitacion
+                })
+            }
+        );
+
+        const datos = await respuesta.json().catch(() => ({}));
+
+        if (respuesta.status === 401) {
+            window.location.href = "../index.html";
+            return;
+        }
+
+        if (!respuesta.ok) {
+            throw new Error(
+                datos.detail || "No se pudo actualizar el permiso de edición."
+            );
+        }
+
+        asignacion.edicion_evidencias_habilitada =
+            datos.edicion_evidencias_habilitada;
+
+        actualizarBotonEdicionEvidencias(asignacion);
+
+        mostrarNotificacion(
+            datos.mensaje || "El permiso se actualizó correctamente.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error(
+            "Error al cambiar el permiso de edición:",
+            error
+        );
+
+        mostrarNotificacion(
+            error.message || "No se pudo actualizar el permiso.",
+            "error"
+        );
+
+    } finally {
+        boton.innerHTML = contenidoOriginal;
+        actualizarBotonEdicionEvidencias(asignacion);
+    }
+}
+
+document.getElementById(
+    "btnEditarEvidencias"
+)?.addEventListener(
+    "click",
+    cambiarPermisoEdicionEvidencias
+);
+
+
+/* =====================================================
    CARGAR ASIGNACIÓN DESDE FASTAPI
    ===================================================== */
 
@@ -660,6 +795,7 @@ async function cargarAsignacion() {
 
         const asignacion = await respuesta.json();
         window.asignacionDetalleActual = asignacion;
+        actualizarBotonEdicionEvidencias(asignacion);
 
         console.log("Datos recibidos de la asignación:", asignacion);
 

@@ -8,6 +8,7 @@ from app.schemas.assignment import (
     AssignmentCreate,
     AssignmentResponse,
     AssignmentUpdate,
+    AssignmentEvidenceEditingUpdate,
 )
 from app.services.assignment_service import AssignmentService
 
@@ -141,6 +142,38 @@ def actualizar_asignacion(
             codigo = status.HTTP_404_NOT_FOUND
         else:
             codigo = status.HTTP_400_BAD_REQUEST
+
+        raise HTTPException(
+            status_code=codigo,
+            detail=mensaje,
+        )
+
+
+@router.patch(
+    "/{assignment_id}/edicion-evidencias",
+    dependencies=[Depends(require_roles("administrador"))],
+)
+def actualizar_edicion_evidencias(
+    assignment_id: int,
+    data: AssignmentEvidenceEditingUpdate,
+    db: Session = Depends(get_db),
+):
+    service = AssignmentService(db)
+
+    try:
+        return service.actualizar_edicion_evidencias(
+            assignment_id=assignment_id,
+            habilitada=data.habilitada,
+        )
+
+    except ValueError as error:
+        mensaje = str(error)
+
+        codigo = (
+            status.HTTP_404_NOT_FOUND
+            if mensaje == "La asignación no existe."
+            else status.HTTP_400_BAD_REQUEST
+        )
 
         raise HTTPException(
             status_code=codigo,

@@ -112,6 +112,7 @@ class AssignmentResponse(BaseModel):
     documentador_nombre: str | None
 
     estado: str
+    edicion_evidencias_habilitada: bool
     fecha_asignacion: date
     fecha_limite: date | None
 
@@ -120,3 +121,6 @@ class AssignmentResponse(BaseModel):
     )
 
     model_config = ConfigDict(from_attributes=True)
+
+class AssignmentEvidenceEditingUpdate(BaseModel):
+    habilitada: bool

@@ -267,6 +267,9 @@ class AssignmentService:
             ),
 
             "estado": assignment.estado,
+            "edicion_evidencias_habilitada": (
+                assignment.edicion_evidencias_habilitada
+            ),
             "fecha_asignacion": assignment.fecha_asignacion,
             "fecha_limite": assignment.fecha_limite,
 
@@ -449,6 +452,43 @@ class AssignmentService:
 
         updated = self.repository.update(assignment)
         return self._serialize(updated)
+
+    def actualizar_edicion_evidencias(
+        self,
+        assignment_id: int,
+        habilitada: bool,
+    ):
+        assignment = self.repository.get_by_id(assignment_id)
+
+        if assignment is None:
+            raise ValueError("La asignación no existe.")
+
+        if assignment.estado == "completado" and habilitada:
+            raise ValueError(
+                "No se puede habilitar la edición de una asignación completada."
+            )
+
+        assignment.edicion_evidencias_habilitada = habilitada
+
+        try:
+            self.db.commit()
+            self.db.refresh(assignment)
+
+        except Exception:
+            self.db.rollback()
+            raise
+
+        return {
+            "mensaje": (
+                "Edición de evidencias habilitada correctamente."
+                if habilitada
+                else "Edición de evidencias deshabilitada correctamente."
+            ),
+            "asignacion_id": assignment.id,
+            "edicion_evidencias_habilitada": (
+                assignment.edicion_evidencias_habilitada
+            ),
+        }
 
     def delete(self, assignment_id: int) -> None:
         assignment = self.repository.get_by_id(assignment_id)
