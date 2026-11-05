@@ -45,6 +45,12 @@ class Evidence(Base):
         nullable=True
     )
 
+    # Identificador interno del archivo almacenado en Backblaze.
+    storage_key: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True
+    )
+
     fecha_carga: Mapped[datetime | None] = mapped_column(
         DateTime,
         nullable=True
@@ -56,10 +62,41 @@ class Evidence(Base):
         index=True
     )
 
+    # Estado funcional de la evidencia.
     estado: Mapped[str] = mapped_column(
         String(30),
         nullable=False,
         default="pendiente"
+    )
+
+    # Estado independiente del almacenamiento físico.
+    estado_almacenamiento: Mapped[str] = mapped_column(
+        String(30),
+        nullable=False,
+        default="pendiente",
+        server_default="pendiente"
+    )
+
+    # Información del archivo archivado en Google Drive.
+    drive_file_id: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True
+    )
+
+    drive_web_view_link: Mapped[str | None] = mapped_column(
+        String(1000),
+        nullable=True
+    )
+
+    fecha_archivado: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
+    )
+
+    usuario_archivado_id: Mapped[int | None] = mapped_column(
+        ForeignKey("usuarios.id"),
+        nullable=True,
+        index=True
     )
 
     asignacion = relationship(
@@ -79,5 +116,11 @@ class Evidence(Base):
 
     usuario = relationship(
         "User",
+        foreign_keys=[usuario_id],
         backref="evidencias_cargadas"
+    )
+
+    usuario_archivado = relationship(
+        "User",
+        foreign_keys=[usuario_archivado_id]
     )

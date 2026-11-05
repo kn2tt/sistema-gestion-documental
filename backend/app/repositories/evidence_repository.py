@@ -69,6 +69,40 @@ class EvidenceRepository:
             self.db.execute(statement).scalars().all()
         )
 
+    def get_by_item_checklist(
+        self,
+        item_checklist_id: int
+    ) -> list[Evidence]:
+        statement = (
+            select(Evidence)
+            .where(
+                Evidence.item_checklist_id == item_checklist_id
+            )
+            .order_by(Evidence.id.desc())
+        )
+
+        return list(
+            self.db.execute(statement).scalars().all()
+        )
+
+    def get_by_item_and_assignment(
+        self,
+        item_checklist_id: int,
+        assignment_id: int
+    ) -> list[Evidence]:
+        statement = (
+            select(Evidence)
+            .where(
+                Evidence.item_checklist_id == item_checklist_id,
+                Evidence.asignacion_id == assignment_id
+            )
+            .order_by(Evidence.id.desc())
+        )
+
+        return list(
+            self.db.execute(statement).scalars().all()
+        )
+
     def get_by_status(
         self,
         status: str
@@ -89,24 +123,39 @@ class EvidenceRepository:
         self,
         evidence: Evidence
     ) -> Evidence:
-        self.db.add(evidence)
-        self.db.commit()
-        self.db.refresh(evidence)
+        try:
+            self.db.add(evidence)
+            self.db.commit()
+            self.db.refresh(evidence)
 
-        return evidence
+            return evidence
+
+        except Exception:
+            self.db.rollback()
+            raise
 
     def update(
         self,
         evidence: Evidence
     ) -> Evidence:
-        self.db.commit()
-        self.db.refresh(evidence)
+        try:
+            self.db.commit()
+            self.db.refresh(evidence)
 
-        return evidence
+            return evidence
+
+        except Exception:
+            self.db.rollback()
+            raise
 
     def delete(
         self,
         evidence: Evidence
     ) -> None:
-        self.db.delete(evidence)
-        self.db.commit()
+        try:
+            self.db.delete(evidence)
+            self.db.commit()
+
+        except Exception:
+            self.db.rollback()
+            raise

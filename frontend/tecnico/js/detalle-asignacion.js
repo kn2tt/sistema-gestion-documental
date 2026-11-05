@@ -471,6 +471,7 @@ async function cargarChecklistPublicado() {
     }
 }
 
+
 function renderizarChecklist(items) {
     const contenedor = document.getElementById("checklistItems");
 
@@ -535,8 +536,10 @@ function renderizarChecklist(items) {
             .sort((a, b) => Number(a.orden || 0) - Number(b.orden || 0))
             .forEach(item => {
                 const fila = document.createElement("div");
-                fila.className = "generated-checklist-item technician-checklist-item";
+                fila.className =
+                    "generated-checklist-item technician-checklist-item";
 
+                // Información del ítem
                 const contenido = document.createElement("div");
                 contenido.className = "generated-checklist-item-content";
 
@@ -550,12 +553,60 @@ function renderizarChecklist(items) {
 
                 if (item.obligatorio) {
                     const obligatorio = document.createElement("span");
-                    obligatorio.className = "generated-checklist-item-required";
+                    obligatorio.className =
+                        "generated-checklist-item-required";
                     obligatorio.textContent = "Evidencia obligatoria";
+
                     contenido.appendChild(obligatorio);
                 }
 
-                fila.appendChild(contenido);
+                // Acciones de evidencias
+                const acciones = document.createElement("div");
+                acciones.className =
+                    "generated-checklist-item-actions technician-evidence-actions";
+
+                const accionesEvidencia = [
+                    {
+                        icono: "bi-cloud-arrow-up",
+                        titulo: "Cargar evidencia",
+                        clase: ""
+                    },
+                    {
+                        icono: "bi-eye",
+                        titulo: "Consultar evidencia",
+                        clase: ""
+                    },
+                    {
+                        icono: "bi-trash3",
+                        titulo: "Eliminar evidencia",
+                        clase: "delete"
+                    },
+                    {
+                        icono: "bi-camera",
+                        titulo: "Disponible próximamente: integración con la APK Android",
+                        clase: "camera"
+                    }
+                ];
+
+                accionesEvidencia.forEach(accion => {
+                    const boton = document.createElement("button");
+
+                    boton.type = "button";
+                    boton.className =
+                        `checklist-item-action technician-evidence-action ${accion.clase}`;
+
+                    boton.disabled = true;
+                    boton.title = accion.titulo;
+                    boton.setAttribute("aria-label", accion.titulo);
+
+                    const icono = document.createElement("i");
+                    icono.className = `bi ${accion.icono}`;
+
+                    boton.appendChild(icono);
+                    acciones.appendChild(boton);
+                });
+
+                fila.append(contenido, acciones);
                 lista.appendChild(fila);
             });
 
@@ -563,6 +614,7 @@ function renderizarChecklist(items) {
         contenedor.appendChild(grupo);
     });
 }
+
 
 
 /* =========================================
