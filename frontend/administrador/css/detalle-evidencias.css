@@ -602,3 +602,13 @@
         min-height: 210px;
     }
 }
+
+/* =========================================
+   ESTADO OBSERVADO EN EL CHECKLIST
+   ========================================= */
+
+.checklist-panel .technician-item-status.observed {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+}

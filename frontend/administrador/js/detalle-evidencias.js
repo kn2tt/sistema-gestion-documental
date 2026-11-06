@@ -1,3 +1,4 @@
+
 /* =========================================
    CONFIGURACIÓN
    ========================================= */
@@ -16,29 +17,18 @@ const assignmentId = params.get("id");
 
 let evidenciasData = [];
 let asignacionData = null;
-let urlEvidenciaActual = null;
-let nombreEvidenciaActual = "evidencia";
+let itemsChecklistData = [];
+
+const urlsEvidenciaCache = new Map();
 
 
 /* =========================================
    ELEMENTOS
    ========================================= */
 
-const checklistContainer = document.getElementById(
-    "checklistContainer"
-);
-
-const checklistEmpty = document.getElementById(
-    "checklistEmpty"
-);
-
-const evidenceModalElement = document.getElementById(
-    "evidenceModal"
-);
-
-const evidenceModal = bootstrap.Modal.getOrCreateInstance(
-    evidenceModalElement
-);
+const checklistContainer = document.getElementById("checklistItems");
+const checklistContent = document.getElementById("checklistContent");
+const checklistEmpty = document.getElementById("checklistEmptyState");
 
 
 /* =========================================
@@ -71,11 +61,10 @@ function mostrarTexto(id, valor, alternativa = "No disponible") {
 function formatearFecha(fecha) {
     if (!fecha) return "Sin fecha";
 
-    const valor = String(fecha);
-    const fechaLocal = new Date(valor);
+    const fechaLocal = new Date(fecha);
 
     if (Number.isNaN(fechaLocal.getTime())) {
-        return valor;
+        return String(fecha);
     }
 
     return fechaLocal.toLocaleDateString("es-PE", {
@@ -86,18 +75,8 @@ function formatearFecha(fecha) {
 }
 
 
-function nombreTecnicoPorId(usuarioId) {
-    if (!asignacionData || !Array.isArray(asignacionData.tecnicos)) {
-        return "No disponible";
-    }
-
-    const tecnico = asignacionData.tecnicos.find(
-        persona => Number(persona.id) === Number(usuarioId)
-    );
-
-    if (!tecnico) return "No disponible";
-
-    return `${tecnico.nombre ?? ""} ${tecnico.apellido ?? ""}`.trim();
+function normalizarEstado(estado) {
+    return String(estado ?? "").trim().toLowerCase();
 }
 
 
@@ -161,39 +140,48 @@ function obtenerEstadoAsignacion(estado) {
 }
 
 
+function obtenerEvidenciasItem(itemId) {
+    return evidenciasData.filter(
+        evidencia =>
+            Number(evidencia.item_checklist_id) === Number(itemId)
+    );
+}
+
+
 function obtenerEstadoRequisito(evidencias) {
     if (!evidencias.length) {
-        return "pendiente";
+        return "pending";
     }
 
-    if (evidencias.some(evidencia => evidencia.estado === "observada")) {
-        return "observada";
+    if (evidencias.some(evidencia =>
+        ["observada", "observado"].includes(
+            normalizarEstado(evidencia.estado)
+        )
+    )) {
+        return "observed";
     }
 
-    return "completa";
+    return "completed";
 }
 
 
 function obtenerDatosEstado(estado) {
     const estados = {
-        completa: {
-            texto: "Completada",
-            clase: "complete",
-            icono: "bi-check-lg"
+        completed: {
+            texto: "Completado",
+            clase: "completed"
         },
-        pendiente: {
+        pending: {
             texto: "Pendiente",
-            clase: "pending",
-            icono: "bi-hourglass"
+            clase: "pending"
         },
-        observada: {
-            texto: "Observada",
-            clase: "observed",
-            icono: "bi-exclamation-lg"
+        observed: {
+            texto: "Observado",
+            clase: "observed"
         }
     };
 
-    return estados[estado] ?? estados.pendiente;
+    return estados[estado] ?? estados.pending;
 }
 
 
@@ -220,7 +208,7 @@ function renderizarAsignacion(asignacion) {
     const tecnicos = Array.isArray(asignacion.tecnicos)
         ? asignacion.tecnicos.map(tecnico => {
             return `${tecnico.nombre ?? ""} ${tecnico.apellido ?? ""}`.trim();
-        })
+        }).filter(Boolean)
         : [];
 
     mostrarTexto(
@@ -239,31 +227,194 @@ function renderizarAsignacion(asignacion) {
 
 
 /* =========================================
-   RESUMEN DEL CHECKLIST
+   PROGRESO DEL CHECKLIST
    ========================================= */
 
-function actualizarResumenChecklist(items) {
-    let pendientes = 0;
+function actualizarProgresoChecklist() {
+    const total = itemsChecklistData.length;
+
     let completados = 0;
+    let pendientes = 0;
     let observados = 0;
 
-    items.forEach(item => {
-        const evidencias = evidenciasData.filter(
-            evidencia =>
-                Number(evidencia.item_checklist_id) === Number(item.id)
-        );
-
+    itemsChecklistData.forEach(item => {
+        const evidencias = obtenerEvidenciasItem(item.id);
         const estado = obtenerEstadoRequisito(evidencias);
 
-        if (estado === "pendiente") pendientes++;
-        if (estado === "completa") completados++;
-        if (estado === "observada") observados++;
+        if (estado === "completed") completados++;
+        if (estado === "pending") pendientes++;
+        if (estado === "observed") observados++;
     });
 
-    mostrarTexto("totalRequisitos", items.length);
-    mostrarTexto("totalPendientes", pendientes);
-    mostrarTexto("totalCompletados", completados);
-    mostrarTexto("totalObservados", observados);
+    const progreso = total > 0
+        ? Math.round((completados + observados) / total * 100)
+        : 0;
+
+    mostrarTexto(
+        "checklistProgressPercentage",
+        `${progreso}%`
+    );
+
+    mostrarTexto(
+        "checklistCompletedCount",
+        `${completados + observados} de ${total} ${
+            total === 1 ? "ítem con evidencia" : "ítems con evidencia"
+        }`
+    );
+
+    mostrarTexto(
+        "checklistPendingCount",
+        `${pendientes} pendientes · ${observados} observados`
+    );
+
+    const barra = document.getElementById("checklistProgressBar");
+    const contenedorBarra = document.getElementById(
+        "checklistProgressBarContainer"
+    );
+
+    if (barra) {
+        barra.style.width = `${progreso}%`;
+    }
+
+    if (contenedorBarra) {
+        contenedorBarra.setAttribute("aria-valuenow", progreso);
+    }
+}
+
+
+function actualizarEstadoItem(itemId) {
+    const elemento = document.getElementById(`estado-item-${itemId}`);
+
+    if (!elemento) return;
+
+    const evidencias = obtenerEvidenciasItem(itemId);
+    const estado = obtenerEstadoRequisito(evidencias);
+    const datosEstado = obtenerDatosEstado(estado);
+
+    elemento.className = `technician-item-status ${datosEstado.clase}`;
+    elemento.textContent = datosEstado.texto;
+}
+
+
+/* =========================================
+   CONSULTAR URL DE FOTOGRAFÍA
+   ========================================= */
+
+async function obtenerUrlEvidencia(evidencia) {
+    if (urlsEvidenciaCache.has(Number(evidencia.id))) {
+        return urlsEvidenciaCache.get(Number(evidencia.id));
+    }
+
+    const respuesta = await apiFetch(
+        `${API_URL}/evidencias/${evidencia.id}/url`
+    );
+
+    const datos = await respuesta.json().catch(() => ({}));
+
+    if (!respuesta.ok) {
+        throw new Error(
+            datos.detail || "No se pudo obtener la fotografía."
+        );
+    }
+
+    if (!datos.url) {
+        throw new Error("El servidor no devolvió la URL de la fotografía.");
+    }
+
+    urlsEvidenciaCache.set(Number(evidencia.id), datos.url);
+
+    return datos.url;
+}
+
+
+/* =========================================
+   RENDERIZAR GALERÍA DE FOTOGRAFÍAS
+   ========================================= */
+
+async function renderizarEvidenciasItem(itemId) {
+    const lista = document.getElementById(`evidencias-item-${itemId}`);
+
+    if (!lista) return;
+
+    lista.replaceChildren();
+
+    const evidencias = obtenerEvidenciasItem(itemId);
+
+    if (!evidencias.length) {
+        const mensaje = document.createElement("p");
+
+        mensaje.className = "technician-evidence-empty";
+        mensaje.textContent =
+            "Todavía no se han cargado fotografías para este ítem.";
+
+        lista.appendChild(mensaje);
+        return;
+    }
+
+    const galeria = document.createElement("div");
+    galeria.className = "technician-evidence-gallery";
+
+    const vistas = await Promise.all(
+        evidencias.map(async evidencia => {
+            try {
+                return {
+                    evidencia,
+                    url: await obtenerUrlEvidencia(evidencia)
+                };
+            } catch (error) {
+                console.error(
+                    `No se pudo consultar la fotografía ${evidencia.id}:`,
+                    error
+                );
+
+                return {
+                    evidencia,
+                    url: null
+                };
+            }
+        })
+    );
+
+    vistas.forEach(({ evidencia, url }) => {
+        const contenedor = document.createElement("div");
+        contenedor.className = "technician-evidence-preview";
+
+        if (url) {
+            const enlace = document.createElement("a");
+
+            enlace.className = "technician-evidence-image-link";
+            enlace.href = url;
+            enlace.target = "_blank";
+            enlace.rel = "noopener noreferrer";
+            enlace.title = "Ver fotografía en tamaño completo";
+
+            const imagen = document.createElement("img");
+
+            imagen.src = url;
+            imagen.alt = evidencia.nombre_archivo || "Fotografía de evidencia";
+            imagen.loading = "lazy";
+
+            enlace.appendChild(imagen);
+            contenedor.appendChild(enlace);
+
+        } else {
+            const sinVista = document.createElement("div");
+            sinVista.className = "technician-evidence-no-preview";
+
+            const icono = document.createElement("i");
+            icono.className = "bi bi-image";
+
+            const texto = document.createElement("span");
+            texto.textContent = "Vista previa no disponible";
+
+            sinVista.append(icono, texto);
+            contenedor.appendChild(sinVista);
+        }
+
+        galeria.appendChild(contenedor);
+    });
+
+    lista.appendChild(galeria);
 }
 
 
@@ -271,289 +422,214 @@ function actualizarResumenChecklist(items) {
    RENDERIZAR CHECKLIST
    ========================================= */
 
-function renderizarChecklist(checklist) {
-    if (!checklist || !Array.isArray(checklist.items)) {
-        checklistContainer.innerHTML = "";
-        checklistContainer.setAttribute("aria-busy", "false");
-        checklistEmpty.hidden = false;
+function renderizarChecklist(items) {
+    checklistContainer.replaceChildren();
 
-        mostrarTexto(
-            "estadoChecklist",
-            "Sin checklist publicado"
-        );
-
-        return;
-    }
-
-    const items = [...checklist.items].sort(
-        (a, b) => Number(a.orden ?? 0) - Number(b.orden ?? 0)
+    itemsChecklistData = [...items].sort(
+        (a, b) => Number(a.orden || 0) - Number(b.orden || 0)
     );
 
-    if (!items.length) {
-        checklistContainer.innerHTML = "";
-        checklistContainer.setAttribute("aria-busy", "false");
-        checklistEmpty.hidden = false;
+    if (!itemsChecklistData.length) {
+        checklistContainer.innerHTML = `
+            <div class="checklist-template-empty">
+                El checklist publicado no contiene ítems.
+            </div>
+        `;
+
+        actualizarProgresoChecklist();
         return;
     }
-
-    checklistEmpty.hidden = true;
 
     const grupos = new Map();
 
-    items.forEach(item => {
-        const nombreAlcance = item.alcance_nombre || "Otros requisitos";
+    itemsChecklistData.forEach(item => {
+        const requisitoId =
+            item.requisito_fotografico_id ??
+            item.requisito_nombre ??
+            "otros";
 
-        if (!grupos.has(nombreAlcance)) {
-            grupos.set(nombreAlcance, []);
+        if (!grupos.has(requisitoId)) {
+            grupos.set(requisitoId, []);
         }
 
-        grupos.get(nombreAlcance).push(item);
+        grupos.get(requisitoId).push(item);
     });
 
-    let html = "";
+    grupos.forEach((itemsGrupo, requisitoId) => {
+        const primerItem = itemsGrupo[0];
 
-    grupos.forEach((itemsGrupo, nombreAlcance) => {
-        html += `
-            <div class="checklist-group">
+        const grupo = document.createElement("section");
+        grupo.className = "generated-checklist-group";
 
-                <div class="checklist-group-title">
-                    <i class="bi bi-folder2-open"></i>
-                    ${escaparHTML(nombreAlcance)}
-                </div>
-        `;
+        const encabezado = document.createElement("div");
+        encabezado.className = "generated-checklist-group-header";
 
-        itemsGrupo.forEach(item => {
-            const evidencias = evidenciasData.filter(
-                evidencia =>
-                    Number(evidencia.item_checklist_id) === Number(item.id)
-            );
+        const informacion = document.createElement("div");
+        informacion.className = "generated-checklist-group-info";
 
-            const estado = obtenerEstadoRequisito(evidencias);
-            const datosEstado = obtenerDatosEstado(estado);
+        const titulo = document.createElement("h3");
+        titulo.textContent =
+            primerItem.requisito_nombre ||
+            `Requerimiento ${requisitoId}`;
 
-            const descripcion =
-                item.descripcion ||
-                item.requisito_descripcion ||
-                "Sin descripción adicional";
+        const descripcion = document.createElement("p");
+        descripcion.textContent =
+            primerItem.requisito_descripcion || "";
 
-            const archivosHTML = evidencias.map(evidencia => `
-                <span class="evidence-file">
-                    <i class="bi bi-image"></i>
-                    ${escaparHTML(evidencia.nombre_archivo || "Fotografía")}
-                    <span>· ${escaparHTML(formatearFecha(evidencia.fecha_carga))}</span>
-                </span>
-            `).join("");
+        informacion.appendChild(titulo);
 
-            const botonesHTML = evidencias.length
-                ? evidencias.map((evidencia, index) => `
-                    <button
-                        type="button"
-                        class="evidence-photo-button"
-                        data-evidence-id="${evidencia.id}"
-                        title="Consultar fotografía ${index + 1}"
-                        aria-label="Consultar fotografía ${index + 1}"
-                    >
-                        <i class="bi bi-eye"></i>
-                    </button>
-                `).join("")
-                : `
-                    <button
-                        type="button"
-                        class="evidence-photo-button"
-                        disabled
-                        title="No hay fotografía disponible"
-                    >
-                        <i class="bi bi-image"></i>
-                    </button>
-                `;
+        if (descripcion.textContent) {
+            informacion.appendChild(descripcion);
+        }
 
-            html += `
-                <div class="checklist-item">
+        encabezado.appendChild(informacion);
 
-                    <div class="checklist-item-icon ${datosEstado.clase}">
-                        <i class="bi ${datosEstado.icono}"></i>
-                    </div>
+        const lista = document.createElement("div");
+        lista.className = "generated-checklist-items";
 
-                    <div class="checklist-item-info">
+        itemsGrupo
+            .sort((a, b) => Number(a.orden || 0) - Number(b.orden || 0))
+            .forEach(item => {
+                const itemId = Number(item.id);
 
-                        <strong>
-                            ${escaparHTML(item.titulo || item.requisito_nombre)}
-                            ${item.obligatorio ? '<span class="text-danger">*</span>' : ""}
-                        </strong>
+                const fila = document.createElement("div");
+                fila.className =
+                    "generated-checklist-item technician-checklist-item";
 
-                        <span>
-                            ${escaparHTML(descripcion)}
-                        </span>
+                // Información del ítem
+                const contenido = document.createElement("div");
+                contenido.className = "generated-checklist-item-content";
 
-                        ${
-                            evidencias.length
-                                ? `<div class="evidence-files">${archivosHTML}</div>`
-                                : ""
-                        }
+                const nombre = document.createElement("strong");
+                nombre.textContent = item.titulo || "Ítem sin título";
 
-                    </div>
+                const detalle = document.createElement("p");
+                detalle.textContent = item.descripcion || "Sin descripción";
 
-                    <div class="checklist-item-actions">
+                contenido.append(nombre, detalle);
 
-                        <span class="status-badge status-${datosEstado.clase}">
-                            ${datosEstado.texto}
-                        </span>
+                if (item.obligatorio) {
+                    const obligatorio = document.createElement("span");
 
-                        ${botonesHTML}
+                    obligatorio.className =
+                        "generated-checklist-item-required";
 
-                    </div>
+                    obligatorio.textContent = "Evidencia obligatoria";
 
-                </div>
-            `;
-        });
+                    contenido.appendChild(obligatorio);
+                }
 
-        html += "</div>";
+                // Acciones y estado
+                const acciones = document.createElement("div");
+
+                acciones.className =
+                    "generated-checklist-item-actions technician-evidence-actions";
+
+                const estado = document.createElement("span");
+                estado.id = `estado-item-${itemId}`;
+
+                const datosEstado = obtenerDatosEstado(
+                    obtenerEstadoRequisito(obtenerEvidenciasItem(itemId))
+                );
+
+                estado.className =
+                    `technician-item-status ${datosEstado.clase}`;
+
+                estado.textContent = datosEstado.texto;
+
+                acciones.appendChild(estado);
+
+                // Botón consultar evidencias
+                const botonConsultar = document.createElement("button");
+
+                botonConsultar.type = "button";
+                botonConsultar.className =
+                    "checklist-item-action technician-evidence-action";
+
+                botonConsultar.title = "Consultar evidencias";
+                botonConsultar.setAttribute(
+                    "aria-label",
+                    "Consultar evidencias"
+                );
+
+                botonConsultar.setAttribute("aria-expanded", "false");
+                botonConsultar.setAttribute(
+                    "aria-controls",
+                    `evidencias-item-${itemId}`
+                );
+
+                botonConsultar.dataset.itemId = itemId;
+
+                const iconoConsultar = document.createElement("i");
+                iconoConsultar.className = "bi bi-eye";
+
+                botonConsultar.appendChild(iconoConsultar);
+
+                acciones.appendChild(botonConsultar);
+
+                fila.append(contenido, acciones);
+
+                // Lista desplegable de fotografías
+                const listaEvidencias = document.createElement("div");
+
+                listaEvidencias.id = `evidencias-item-${itemId}`;
+                listaEvidencias.className = "technician-evidence-list";
+                listaEvidencias.hidden = true;
+
+                const contenedorItem = document.createElement("div");
+                contenedorItem.className =
+                    "technician-checklist-item-wrapper";
+
+                contenedorItem.append(fila, listaEvidencias);
+                lista.appendChild(contenedorItem);
+            });
+
+        grupo.append(encabezado, lista);
+        checklistContainer.appendChild(grupo);
     });
 
-    checklistContainer.innerHTML = html;
     checklistContainer.setAttribute("aria-busy", "false");
 
-    actualizarResumenChecklist(items);
-
-    mostrarTexto(
-        "estadoChecklist",
-        checklist.estado === "publicado" ? "Publicado" : checklist.estado
-    );
+    actualizarProgresoChecklist();
 }
 
 
 /* =========================================
-   CONSULTAR FOTOGRAFÍA
+   EVENTO DEL BOTÓN OJITO
    ========================================= */
 
-async function abrirFotografia(evidenceId) {
-    const evidencia = evidenciasData.find(
-        item => Number(item.id) === Number(evidenceId)
+checklistContainer.addEventListener("click", async function (event) {
+    const boton = event.target.closest(
+        "button[data-item-id]"
     );
 
-    if (!evidencia) {
-        mostrarError("No se encontró la evidencia seleccionada.");
-        return;
+    if (!boton) return;
+
+    const itemId = Number(boton.dataset.itemId);
+
+    const lista = document.getElementById(
+        `evidencias-item-${itemId}`
+    );
+
+    if (!lista) return;
+
+    const mostrar = lista.hidden;
+
+    lista.hidden = !mostrar;
+
+    boton.setAttribute("aria-expanded", String(mostrar));
+
+    const icono = boton.querySelector("i");
+
+    if (icono) {
+        icono.className = mostrar
+            ? "bi bi-eye-slash"
+            : "bi bi-eye";
     }
 
-    urlEvidenciaActual = null;
-    nombreEvidenciaActual = evidencia.nombre_archivo || "evidencia";
-
-    const modalImage = document.getElementById("modalImage");
-    const modalPlaceholder = document.getElementById("modalPlaceholder");
-    const downloadButton = document.getElementById("downloadEvidence");
-
-    modalImage.hidden = true;
-    modalImage.removeAttribute("src");
-
-    modalPlaceholder.hidden = false;
-    modalPlaceholder.innerHTML = `
-        <div class="spinner-border" role="status"></div>
-        <span>Cargando fotografía...</span>
-    `;
-
-    downloadButton.disabled = true;
-
-    const item = document.querySelector(
-        `.evidence-photo-button[data-evidence-id="${evidenceId}"]`
-    );
-
-    const checklistItem = item?.closest(".checklist-item");
-    const requirementName = checklistItem
-        ?.querySelector(".checklist-item-info strong")
-        ?.textContent.trim();
-
-    mostrarTexto("modalTitle", requirementName || "Fotografía");
-    mostrarTexto("modalProject", asignacionData.proyecto_nombre);
-    mostrarTexto("modalSite", asignacionData.site_nombre);
-    mostrarTexto(
-        "modalTechnician",
-        nombreTecnicoPorId(evidencia.usuario_id)
-    );
-    mostrarTexto("modalDate", formatearFecha(evidencia.fecha_carga));
-
-    evidenceModal.show();
-
-    try {
-        const response = await apiFetch(
-            `${API_URL}/evidencias/${evidenceId}/url`
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                data.detail || "No se pudo obtener la fotografía."
-            );
-        }
-
-        if (!data.url) {
-            throw new Error("El servidor no devolvió la URL de la fotografía.");
-        }
-
-        urlEvidenciaActual = data.url;
-
-        modalImage.onload = function () {
-            modalPlaceholder.hidden = true;
-            modalImage.hidden = false;
-        };
-
-        modalImage.onerror = function () {
-            modalImage.hidden = true;
-            modalPlaceholder.hidden = false;
-            modalPlaceholder.innerHTML = `
-                <i class="bi bi-image-alt fs-2"></i>
-                <span>No se pudo visualizar la fotografía.</span>
-            `;
-        };
-
-        modalImage.src = data.url;
-        downloadButton.disabled = false;
-
-    } catch (error) {
-        modalPlaceholder.hidden = false;
-        modalPlaceholder.innerHTML = `
-            <i class="bi bi-exclamation-circle fs-2"></i>
-            <span>${escaparHTML(error.message)}</span>
-        `;
+    if (mostrar) {
+        await renderizarEvidenciasItem(itemId);
     }
-}
-
-
-/* =========================================
-   DESCARGAR FOTOGRAFÍA
-   ========================================= */
-
-document
-    .getElementById("downloadEvidence")
-    .addEventListener("click", function () {
-        if (!urlEvidenciaActual) return;
-
-        const enlace = document.createElement("a");
-
-        enlace.href = urlEvidenciaActual;
-        enlace.download = nombreEvidenciaActual;
-        enlace.target = "_blank";
-        enlace.rel = "noopener";
-
-        document.body.appendChild(enlace);
-        enlace.click();
-        enlace.remove();
-    });
-
-
-/* =========================================
-   EVENTOS DEL CHECKLIST
-   ========================================= */
-
-checklistContainer.addEventListener("click", function (event) {
-    const button = event.target.closest(
-        ".evidence-photo-button[data-evidence-id]"
-    );
-
-    if (!button) return;
-
-    abrirFotografia(button.dataset.evidenceId);
 });
 
 
@@ -603,7 +679,8 @@ async function cargarDetalleEvidencias() {
             apiFetch(`${API_URL}/evidencias/asignacion/${assignmentId}`)
         ]);
 
-        const assignmentDataResponse = await assignmentResponse.json();
+        const assignmentDataResponse =
+            await assignmentResponse.json().catch(() => ({}));
 
         if (!assignmentResponse.ok) {
             throw new Error(
@@ -613,7 +690,7 @@ async function cargarDetalleEvidencias() {
         }
 
         if (!evidenceResponse.ok) {
-            const error = await evidenceResponse.json();
+            const error = await evidenceResponse.json().catch(() => ({}));
 
             throw new Error(
                 error.detail || "No se pudieron consultar las evidencias."
@@ -621,23 +698,52 @@ async function cargarDetalleEvidencias() {
         }
 
         asignacionData = assignmentDataResponse;
-        evidenciasData = await evidenceResponse.json();
+
+        const evidencias = await evidenceResponse.json();
+
+        evidenciasData = Array.isArray(evidencias)
+            ? evidencias
+            : [];
 
         renderizarAsignacion(asignacionData);
 
         if (!checklistResponse.ok) {
-            renderizarChecklist(null);
+            checklistContent.hidden = true;
+            checklistEmpty.hidden = false;
+
+            mostrarTexto(
+                "generatedChecklistStatus",
+                "Sin checklist publicado"
+            );
+
             return;
         }
 
         const checklist = await checklistResponse.json();
 
-        if (checklist.estado !== "publicado") {
-            renderizarChecklist(null);
+        if (
+            !checklist ||
+            String(checklist.estado).toLowerCase() !== "publicado"
+        ) {
+            checklistContent.hidden = true;
+            checklistEmpty.hidden = false;
+
+            mostrarTexto(
+                "generatedChecklistStatus",
+                "Sin checklist publicado"
+            );
+
             return;
         }
 
-        renderizarChecklist(checklist);
+        renderizarChecklist(checklist.items || []);
+
+        checklistEmpty.hidden = false;
+        checklistContent.hidden = false;
+
+        checklistEmpty.hidden = true;
+
+        mostrarTexto("generatedChecklistStatus", "Publicado");
 
     } catch (error) {
         checklistContainer.innerHTML = "";
