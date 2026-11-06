@@ -197,19 +197,25 @@ function renderizarAsignacion(asignacion) {
 
     const listaTecnicos = document.getElementById("infoTecnicos");
 
-    listaTecnicos.innerHTML = tecnicos.length
-        ? tecnicos.map(nombre => `
-            <div class="technician-detail-list-item">
-                <i class="bi bi-person"></i>
-                <strong>${escaparHTML(nombre)}</strong>
-            </div>
-        `).join("")
-        : `
-            <div class="technician-detail-list-item">
-                <i class="bi bi-person"></i>
-                <strong>Sin técnicos registrados</strong>
-            </div>
-        `;
+    if (listaTecnicos) {
+        if (tecnicos.length === 0) {
+            listaTecnicos.innerHTML = `
+                <span class="scope-empty">
+                    No hay técnicos asociados
+                </span>
+            `;
+        } else {
+            listaTecnicos.innerHTML = tecnicos.map((nombre, indice) => `
+                <div class="scope-item">
+                    <span class="scope-number">${indice + 1}</span>
+
+                    <div class="scope-text">
+                        <strong>${escaparHTML(nombre)}</strong>
+                    </div>
+                </div>
+            `).join("");
+        }
+    }
 
     const estado = obtenerEstadoAsignacion(asignacion.estado);
     const badge = document.getElementById("estadoAsignacion");
