@@ -149,19 +149,7 @@ function obtenerEvidenciasItem(itemId) {
 
 
 function obtenerEstadoRequisito(evidencias) {
-    if (!evidencias.length) {
-        return "pending";
-    }
-
-    if (evidencias.some(evidencia =>
-        ["observada", "observado"].includes(
-            normalizarEstado(evidencia.estado)
-        )
-    )) {
-        return "observed";
-    }
-
-    return "completed";
+    return evidencias.length ? "completed" : "pending";
 }
 
 
@@ -174,10 +162,6 @@ function obtenerDatosEstado(estado) {
         pending: {
             texto: "Pendiente",
             clase: "pending"
-        },
-        observed: {
-            texto: "Observado",
-            clase: "observed"
         }
     };
 
@@ -211,11 +195,21 @@ function renderizarAsignacion(asignacion) {
         }).filter(Boolean)
         : [];
 
-    mostrarTexto(
-        "infoTecnicos",
-        tecnicos.join(", "),
-        "Sin técnicos registrados"
-    );
+    const listaTecnicos = document.getElementById("infoTecnicos");
+
+    listaTecnicos.innerHTML = tecnicos.length
+        ? tecnicos.map(nombre => `
+            <div class="technician-detail-list-item">
+                <i class="bi bi-person"></i>
+                <strong>${escaparHTML(nombre)}</strong>
+            </div>
+        `).join("")
+        : `
+            <div class="technician-detail-list-item">
+                <i class="bi bi-person"></i>
+                <strong>Sin técnicos registrados</strong>
+            </div>
+        `;
 
     const estado = obtenerEstadoAsignacion(asignacion.estado);
     const badge = document.getElementById("estadoAsignacion");
@@ -235,7 +229,6 @@ function actualizarProgresoChecklist() {
 
     let completados = 0;
     let pendientes = 0;
-    let observados = 0;
 
     itemsChecklistData.forEach(item => {
         const evidencias = obtenerEvidenciasItem(item.id);
@@ -243,31 +236,34 @@ function actualizarProgresoChecklist() {
 
         if (estado === "completed") completados++;
         if (estado === "pending") pendientes++;
-        if (estado === "observed") observados++;
     });
 
     const progreso = total > 0
-        ? Math.round((completados + observados) / total * 100)
+        ? Math.round(completados / total * 100)
         : 0;
 
-    mostrarTexto(
-        "checklistProgressPercentage",
-        `${progreso}%`
-    );
+    // Mini dashboard
+    mostrarTexto("totalRequisitos", total);
+    mostrarTexto("totalPendientes", pendientes);
+    mostrarTexto("totalCompletados", completados);
+
+    // Barra de progreso
+    mostrarTexto("checklistProgressPercentage", `${progreso}%`);
 
     mostrarTexto(
         "checklistCompletedCount",
-        `${completados + observados} de ${total} ${
+        `${completados} de ${total} ${
             total === 1 ? "ítem con evidencia" : "ítems con evidencia"
         }`
     );
 
     mostrarTexto(
         "checklistPendingCount",
-        `${pendientes} pendientes · ${observados} observados`
+        `${pendientes} pendientes`
     );
 
     const barra = document.getElementById("checklistProgressBar");
+
     const contenedorBarra = document.getElementById(
         "checklistProgressBarContainer"
     );
@@ -324,6 +320,46 @@ async function obtenerUrlEvidencia(evidencia) {
     urlsEvidenciaCache.set(Number(evidencia.id), datos.url);
 
     return datos.url;
+}
+
+
+async function eliminarFotografiaAdmin(evidenciaId, itemId) {
+    const confirmar = confirm(
+        "¿Deseas eliminar esta fotografía? El técnico tendrá que volver a cargarla."
+    );
+
+    if (!confirmar) return;
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/evidencias/${evidenciaId}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        if (!respuesta.ok) {
+            const datos = await respuesta.json().catch(() => ({}));
+
+            throw new Error(
+                datos.detail || "No se pudo eliminar la fotografía."
+            );
+        }
+
+        evidenciasData = evidenciasData.filter(
+            evidencia => Number(evidencia.id) !== Number(evidenciaId)
+        );
+
+        urlsEvidenciaCache.delete(Number(evidenciaId));
+
+        actualizarProgresoChecklist();
+
+        await renderizarEvidenciasItem(itemId);
+
+    } catch (error) {
+        console.error("Error al eliminar fotografía:", error);
+        alert(error.message);
+    }
 }
 
 
@@ -410,6 +446,20 @@ async function renderizarEvidenciasItem(itemId) {
             sinVista.append(icono, texto);
             contenedor.appendChild(sinVista);
         }
+
+        const botonEliminar = document.createElement("button");
+
+        botonEliminar.type = "button";
+        botonEliminar.className = "admin-evidence-delete";
+        botonEliminar.innerHTML = `
+            <i class="bi bi-trash"></i>
+            Eliminar fotografía
+        `;
+
+        botonEliminar.dataset.evidenceId = evidencia.id;
+        botonEliminar.dataset.itemId = itemId;
+
+        contenedor.appendChild(botonEliminar);
 
         galeria.appendChild(contenedor);
     });
@@ -599,6 +649,20 @@ function renderizarChecklist(items) {
    ========================================= */
 
 checklistContainer.addEventListener("click", async function (event) {
+
+    const botonEliminar = event.target.closest(
+        "button[data-evidence-id]"
+    );
+
+    if (botonEliminar) {
+        await eliminarFotografiaAdmin(
+            Number(botonEliminar.dataset.evidenceId),
+            Number(botonEliminar.dataset.itemId)
+        );
+
+        return;
+    }
+
     const boton = event.target.closest(
         "button[data-item-id]"
     );

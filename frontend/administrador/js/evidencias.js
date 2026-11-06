@@ -107,22 +107,13 @@ async function obtenerJSON(url, mensaje) {
    ========================================= */
 
 function estadoRequisito(evidencias) {
-    if (!evidencias.length) return "pendiente";
-
-    if (evidencias.some(e =>
-        ["observada", "observado"].includes(normalizar(e.estado))
-    )) {
-        return "observada";
-    }
-
-    return "completa";
+    return evidencias.length ? "completa" : "pendiente";
 }
 
 function estadoGeneral(estados) {
-    if (estados.includes("observada")) return "observada";
-    if (estados.includes("pendiente")) return "pendiente";
-
-    return "completa";
+    return estados.includes("pendiente")
+        ? "pendiente"
+        : "completa";
 }
 
 function datosEstadoAsignacion(estado) {
@@ -213,10 +204,6 @@ async function consultarAsignacion(asignacion) {
         estado => estado === "pendiente"
     ).length;
 
-    const observados = estados.filter(
-        estado => estado === "observada"
-    ).length;
-
     const fechas = fotos
         .map(evidencia => evidencia.fecha_carga)
         .filter(Boolean)
@@ -231,7 +218,6 @@ async function consultarAsignacion(asignacion) {
         fotos,
         completados,
         pendientes,
-        observados,
         estadoGeneral: estadoGeneral(estados),
         fechaActualizacion,
         fechaFiltro: fechaISO(fechaActualizacion)
@@ -312,14 +298,9 @@ function actualizarResumen(datos = asignacionesData) {
         (suma, dato) => suma + dato.completados, 0
     );
 
-    const observadas = datos.reduce(
-        (suma, dato) => suma + dato.observados, 0
-    );
-
     document.getElementById("totalEvidenceCount").textContent = total;
     document.getElementById("pendingEvidenceCount").textContent = pendientes;
     document.getElementById("completeEvidenceCount").textContent = completas;
-    document.getElementById("observedEvidenceCount").textContent = observadas;
 }
 
 /* =========================================
@@ -455,14 +436,13 @@ function htmlTarjeta(dato) {
 
                     <div class="evidence-progress-track">
                         <div
-                            class="evidence-progress-fill ${dato.observados ? "observed-fill" : ""}"
+                            class="evidence-progress-fill"
                             style="width:${avance}%"
                         ></div>
                     </div>
 
                     <span class="evidence-progress-caption">
                         ${avance}% completado
-                        ${dato.observados ? ` · ${dato.observados} observado(s)` : ""}
                     </span>
                 </div>
             </div>
