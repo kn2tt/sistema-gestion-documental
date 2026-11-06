@@ -395,16 +395,58 @@ function assignmentDocumentKey(name) {
     return document;
 }
 
+
+
+function actualizarResumenAsignaciones() {
+    const total = assignmentsData.length;
+
+    const enProceso = assignmentsData.filter(assignment => [
+        "en_proceso",
+        "en_documentacion",
+        "en_revision"
+    ].includes(assignment.estado)).length;
+
+    const completadas = assignmentsData.filter(
+        assignment => assignment.estado === "completado"
+    ).length;
+
+    const pendientes = assignmentsData.filter(assignment => [
+        "pendiente",
+        "pendiente_documentacion"
+    ].includes(assignment.estado)).length;
+
+    document.getElementById("summaryTotal").textContent = total;
+    document.getElementById("summaryProcess").textContent = enProceso;
+    document.getElementById("summaryComplete").textContent = completadas;
+    document.getElementById("summaryPending").textContent = pendientes;
+
+    document.querySelectorAll(".skeleton-value").forEach(element => {
+        element.classList.remove("skeleton-value");
+    });
+}
+
+
+
 async function cargarAsignaciones() {
     if (!assignmentTableBody) return;
 
-    assignmentTableBody.innerHTML = `
-        <tr>
-            <td colspan="9" class="text-center py-4">
-                Cargando asignaciones...
-            </td>
-        </tr>
-    `;
+    assignmentTableBody.setAttribute("aria-busy", "true");
+
+    assignmentTableBody.innerHTML = Array.from(
+        { length: 4 },
+        () => `
+            <tr class="skeleton-row">
+                ${Array.from(
+                    { length: 9 },
+                    () => `
+                        <td>
+                            <div class="skeleton-cell"></div>
+                        </td>
+                    `
+                ).join("")}
+            </tr>
+        `
+    ).join("");
 
     try {
         const response = await apiFetch(`${API_URL}/asignaciones/`);
@@ -421,20 +463,28 @@ async function cargarAsignaciones() {
 
         assignmentsData = data;
 
+        actualizarResumenAsignaciones();
+
+        assignmentTableBody.setAttribute("aria-busy", "false");
+
         actualizarFiltroTiposDocumento();
         actualizarFiltroTecnicos();
         renderizarAsignaciones();
     } catch (error) {
         console.error("Error al cargar asignaciones:", error);
 
-        assignmentTableBody.innerHTML = `
-            <tr>
-                <td colspan="9" class="text-center py-4">
-                    No se pudieron cargar las asignaciones. Verifica que el backend
-                    esté ejecutándose y que permita solicitudes desde este origen.
-                </td>
-            </tr>
-        `;
+        assignmentTableBody.setAttribute("aria-busy", "false");
+
+        document.querySelectorAll(".skeleton-value").forEach(element => {
+            element.classList.remove("skeleton-value");
+            element.textContent = "—";
+        });
+
+        const contador = document.getElementById("totalAsignacionesTexto");
+
+        if (contador) {
+            contador.textContent = "No se pudieron cargar las asignaciones";
+        }
     }
 }
 
@@ -536,6 +586,8 @@ async function actualizarFiltroTiposDocumento() {
 
 function renderizarAsignaciones() {
     if (!assignmentTableBody) return;
+
+    assignmentTableBody.setAttribute("aria-busy", "false");
 
     const filteredAssignments = filtrarAsignaciones();
     const totalAsignaciones = filteredAssignments.length;

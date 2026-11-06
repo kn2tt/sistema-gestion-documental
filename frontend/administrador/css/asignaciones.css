@@ -1809,3 +1809,75 @@
 #paginacionAsignaciones .pagination-button i {
     font-size: 12px;
 }
+
+
+/* =========================================
+   SKELETON SCREEN
+   ========================================= */
+
+.skeleton-value {
+    display: block;
+    width: 48px;
+    height: 25px;
+    border-radius: 5px;
+    background: #e9edf2;
+    color: transparent !important;
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-line-text {
+    display: inline-block;
+    min-width: 175px;
+    color: transparent !important;
+    background: #e9edf2;
+    border-radius: 5px;
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-cell {
+    position: relative;
+    overflow: hidden;
+    width: 85%;
+    height: 15px;
+    min-width: 55px;
+    border-radius: 5px;
+    background: #e9edf2;
+}
+
+.skeleton-cell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.7),
+        transparent
+    );
+    animation: skeleton-shimmer 1.4s infinite;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% {
+        opacity: 0.55;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes skeleton-shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-value,
+    .skeleton-line-text,
+    .skeleton-cell::after {
+        animation: none;
+    }
+}

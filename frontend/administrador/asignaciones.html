@@ -208,65 +208,50 @@
 
 
             <!-- SUMMARY -->
-
             <div class="assignment-summary">
 
                 <div class="summary-card">
-
                     <div class="summary-icon total">
                         <i class="bi bi-clipboard-check"></i>
                     </div>
-
                     <div>
                         <span>Total asignaciones</span>
-                        <strong>12</strong>
+                        <strong id="summaryTotal" class="skeleton-value"></strong>
                     </div>
-
                 </div>
 
-
                 <div class="summary-card">
-
                     <div class="summary-icon process">
                         <i class="bi bi-arrow-repeat"></i>
                     </div>
-
                     <div>
                         <span>En proceso</span>
-                        <strong>4</strong>
+                        <strong id="summaryProcess" class="skeleton-value"></strong>
                     </div>
-
                 </div>
 
-
                 <div class="summary-card">
-
                     <div class="summary-icon complete">
                         <i class="bi bi-check-circle"></i>
                     </div>
-
                     <div>
                         <span>Completadas</span>
-                        <strong>6</strong>
+                        <strong id="summaryComplete" class="skeleton-value"></strong>
                     </div>
-
                 </div>
 
-
                 <div class="summary-card">
-
                     <div class="summary-icon pending">
                         <i class="bi bi-clock"></i>
                     </div>
-
                     <div>
                         <span>Pendientes</span>
-                        <strong>2</strong>
+                        <strong id="summaryPending" class="skeleton-value"></strong>
                     </div>
-
                 </div>
 
             </div>
+
 
 
             <!-- CLIENTE SELECCIONADO -->
@@ -507,7 +492,9 @@
 
                     <div>
                         <h2>Asignaciones registradas</h2>
-                        <span>12 asignaciones encontradas</span>
+                        <span id="totalAsignacionesTexto" class="skeleton-line-text">
+                            Cargando asignaciones...
+                        </span>
                     </div>
 
                 </div>
@@ -530,7 +517,52 @@
                             </tr>
                         </thead>
 
-                        <tbody id="assignmentTableBody"></tbody>
+                        <tbody id="assignmentTableBody" aria-busy="true">
+                            <tr class="skeleton-row">
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                            </tr>
+                        </tbody>
                     </table>
 
                 </div>
