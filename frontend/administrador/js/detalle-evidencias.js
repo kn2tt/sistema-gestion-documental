@@ -632,6 +632,11 @@ async function cargarDetalleEvidencias() {
 
         const checklist = await checklistResponse.json();
 
+        if (checklist.estado !== "publicado") {
+            renderizarChecklist(null);
+            return;
+        }
+
         renderizarChecklist(checklist);
 
     } catch (error) {
