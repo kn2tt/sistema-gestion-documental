@@ -243,6 +243,27 @@ def listar_evidencias_por_estado(
 
 
 @router.get(
+    "/{evidence_id}/url",
+    dependencies=[Depends(require_roles("administrador"))],
+)
+def obtener_url_evidencia(
+    evidence_id: int,
+    db: Session = Depends(get_db),
+):
+    service = EvidenceService(db)
+
+    try:
+        url = service.get_url_by_id(evidence_id)
+
+        return {
+            "url": url
+        }
+
+    except (ValueError, RuntimeError) as error:
+        convertir_error(error)
+
+
+@router.get(
     "/{evidence_id}",
     response_model=EvidenceResponse,
     dependencies=[Depends(require_roles("administrador"))],

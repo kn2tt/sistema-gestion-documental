@@ -210,7 +210,7 @@
             <!-- SUMMARY -->
             <div class="assignment-summary">
 
-                <div class="summary-card">
+                <div class="summary-card is-loading">
                     <div class="summary-icon total">
                         <i class="bi bi-clipboard-check"></i>
                     </div>
@@ -220,7 +220,7 @@
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card is-loading">
                     <div class="summary-icon process">
                         <i class="bi bi-arrow-repeat"></i>
                     </div>
@@ -230,7 +230,7 @@
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card is-loading">
                     <div class="summary-icon complete">
                         <i class="bi bi-check-circle"></i>
                     </div>
@@ -240,7 +240,7 @@
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card is-loading">
                     <div class="summary-icon pending">
                         <i class="bi bi-clock"></i>
                     </div>
@@ -255,7 +255,11 @@
 
 
             <!-- CLIENTE SELECCIONADO -->
-            <div class="assignment-client-card" id="assignmentClientCard">
+            <div
+                class="assignment-client-card is-loading"
+                id="assignmentClientCard"
+                aria-busy="true"
+            >
 
                 <div class="assignment-client-icon">
                     <i class="bi bi-building"></i>

@@ -327,6 +327,11 @@ let assignmentsData = [];
 let currentAssignmentView = "activas";
 let proyectosIdsClienteSeleccionado = new Set();
 
+let asignacionesInicialesCargadas = false;
+let clientesInicialesCargados = false;
+let cargandoAsignaciones = false;
+let errorCargaAsignaciones = false;
+
 function normalizeText(value) {
     return String(value ?? "")
         .normalize("NFD")
@@ -395,8 +400,6 @@ function assignmentDocumentKey(name) {
     return document;
 }
 
-
-
 function actualizarResumenAsignaciones() {
     const total = assignmentsData.length;
 
@@ -415,21 +418,70 @@ function actualizarResumenAsignaciones() {
         "pendiente_documentacion"
     ].includes(assignment.estado)).length;
 
-    document.getElementById("summaryTotal").textContent = total;
-    document.getElementById("summaryProcess").textContent = enProceso;
-    document.getElementById("summaryComplete").textContent = completadas;
-    document.getElementById("summaryPending").textContent = pendientes;
+    const resumen = {
+        summaryTotal: total,
+        summaryProcess: enProceso,
+        summaryComplete: completadas,
+        summaryPending: pendientes
+    };
 
-    document.querySelectorAll(".skeleton-value").forEach(element => {
-        element.classList.remove("skeleton-value");
+    Object.entries(resumen).forEach(([id, valor]) => {
+        const elemento = document.getElementById(id);
+
+        if (elemento) {
+            elemento.textContent = valor;
+            elemento.classList.remove("skeleton-value");
+        }
     });
 }
 
+function finalizarCargaInicialAsignaciones() {
+    if (
+        !asignacionesInicialesCargadas ||
+        !clientesInicialesCargados
+    ) {
+        return;
+    }
+
+    // Retirar el estado de carga de las tarjetas.
+    document.querySelectorAll(".summary-card").forEach(card => {
+        card.classList.remove("is-loading");
+    });
+
+    const clienteCard = document.getElementById(
+        "assignmentClientCard"
+    );
+
+    if (clienteCard) {
+        clienteCard.classList.remove("is-loading");
+        clienteCard.setAttribute("aria-busy", "false");
+    }
+
+    const contador = document.getElementById(
+        "totalAsignacionesTexto"
+    );
+
+    contador?.classList.remove("skeleton-line-text");
+
+    assignmentTableBody?.setAttribute("aria-busy", "false");
+
+    // Si falló la consulta, conservar el mensaje de error.
+    if (errorCargaAsignaciones) {
+        return;
+    }
+
+    // Actualizar los valores cuando todos los datos iniciales estén listos.
+    actualizarResumenAsignaciones();
+
+    // Renderizar la tabla una sola vez con los filtros preparados.
+    renderizarAsignaciones();
+}
 
 
 async function cargarAsignaciones() {
     if (!assignmentTableBody) return;
 
+    cargandoAsignaciones = true;
     assignmentTableBody.setAttribute("aria-busy", "true");
 
     assignmentTableBody.innerHTML = Array.from(
@@ -452,41 +504,67 @@ async function cargarAsignaciones() {
         const response = await apiFetch(`${API_URL}/asignaciones/`);
 
         if (!response.ok) {
-            throw new Error(`Error al consultar asignaciones: HTTP ${response.status}`);
+            throw new Error(
+                `Error al consultar asignaciones: HTTP ${response.status}`
+            );
         }
 
         const data = await response.json();
 
         if (!Array.isArray(data)) {
-            throw new Error("El backend no devolvió una lista de asignaciones.");
+            throw new Error(
+                "El backend no devolvió una lista de asignaciones."
+            );
         }
 
         assignmentsData = data;
+        errorCargaAsignaciones = false;
 
-        actualizarResumenAsignaciones();
-
-        assignmentTableBody.setAttribute("aria-busy", "false");
-
-        actualizarFiltroTiposDocumento();
+        await actualizarFiltroTiposDocumento();
         actualizarFiltroTecnicos();
-        renderizarAsignaciones();
+
+        cargandoAsignaciones = false;
+        asignacionesInicialesCargadas = true;
+
+        finalizarCargaInicialAsignaciones();
+
     } catch (error) {
         console.error("Error al cargar asignaciones:", error);
 
+        cargandoAsignaciones = false;
+        asignacionesInicialesCargadas = true;
+        errorCargaAsignaciones = true;
+
         assignmentTableBody.setAttribute("aria-busy", "false");
+
+        assignmentTableBody.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center py-4">
+                    No se pudieron cargar las asignaciones.
+                    Verifica que el backend esté ejecutándose
+                    y que permita solicitudes desde este origen.
+                </td>
+            </tr>
+        `;
 
         document.querySelectorAll(".skeleton-value").forEach(element => {
             element.classList.remove("skeleton-value");
             element.textContent = "—";
         });
 
-        const contador = document.getElementById("totalAsignacionesTexto");
+        const contador = document.getElementById(
+            "totalAsignacionesTexto"
+        );
 
         if (contador) {
-            contador.textContent = "No se pudieron cargar las asignaciones";
+            contador.textContent =
+                "No se pudieron cargar las asignaciones";
         }
+
+        finalizarCargaInicialAsignaciones();
     }
 }
+
 
 function actualizarFiltroTecnicos() {
     if (!technicianFilter) return;
@@ -586,6 +664,15 @@ async function actualizarFiltroTiposDocumento() {
 
 function renderizarAsignaciones() {
     if (!assignmentTableBody) return;
+
+    if (
+        !asignacionesInicialesCargadas ||
+        !clientesInicialesCargados ||
+        cargandoAsignaciones ||
+        errorCargaAsignaciones
+    ) {
+        return;
+    }
 
     assignmentTableBody.setAttribute("aria-busy", "false");
 
@@ -1343,11 +1430,17 @@ function actualizarOpcionesSeleccionadas() {
         });
 }
 
-async function aplicarFiltroClienteAsignaciones(clienteId) {
+async function aplicarFiltroClienteAsignaciones(
+    clienteId,
+    renderizar = true
+) {
     proyectosIdsClienteSeleccionado.clear();
 
     if (!clienteId) {
-        renderizarAsignaciones();
+        if (renderizar) {
+            renderizarAsignaciones();
+        }
+
         return;
     }
 
@@ -1379,7 +1472,10 @@ async function aplicarFiltroClienteAsignaciones(clienteId) {
         });
 
         actualizarFiltroTecnicos();
-        renderizarAsignaciones();
+
+        if (renderizar) {
+            renderizarAsignaciones();
+        }
 
     } catch (error) {
         console.error(
@@ -1387,10 +1483,13 @@ async function aplicarFiltroClienteAsignaciones(clienteId) {
             error
         );
 
-        renderizarAsignaciones();
+        if (renderizar) {
+            renderizarAsignaciones();
+        }
 
         mostrarNotificacion(
-            error.message || "No se pudieron filtrar las asignaciones por cliente.",
+            error.message ||
+                "No se pudieron filtrar las asignaciones por cliente.",
             "error"
         );
     }
@@ -1463,13 +1562,17 @@ async function cargarClientesAsignaciones() {
         const response = await apiFetch(`${API_URL}/clientes/activos`);
 
         if (!response.ok) {
-            throw new Error(`Error al consultar clientes: HTTP ${response.status}`);
+            throw new Error(
+                `Error al consultar clientes: HTTP ${response.status}`
+            );
         }
 
         const clientes = await response.json();
 
         if (!Array.isArray(clientes)) {
-            throw new Error("El backend no devolvió una lista de clientes.");
+            throw new Error(
+                "El backend no devolvió una lista de clientes."
+            );
         }
 
         if (clienteAsignacionesSelect) {
@@ -1494,20 +1597,27 @@ async function cargarClientesAsignaciones() {
 
         if (clienteAsignacionesSelect?.value) {
             await aplicarFiltroClienteAsignaciones(
-                clienteAsignacionesSelect.value
+                clienteAsignacionesSelect.value,
+                false
             );
         } else {
             proyectosIdsClienteSeleccionado.clear();
-            renderizarAsignaciones();
         }
+
     } catch (error) {
         console.error("No se pudieron cargar los clientes:", error);
+
+        proyectosIdsClienteSeleccionado.clear();
 
         if (mensajeClientesVacios) {
             mensajeClientesVacios.hidden = false;
             mensajeClientesVacios.textContent =
                 "No se pudieron cargar los clientes. Verifica la conexión con el servidor.";
         }
+
+    } finally {
+        clientesInicialesCargados = true;
+        finalizarCargaInicialAsignaciones();
     }
 }
 

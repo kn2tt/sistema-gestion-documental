@@ -492,6 +492,30 @@ class EvidenceService:
     def get_by_id(self, evidence_id: int):
         return self.repository.get_by_id(evidence_id)
 
+    def get_url_by_id(self, evidence_id: int):
+        evidencia = self.repository.get_by_id(evidence_id)
+
+        if evidencia is None:
+            raise ValueError("La evidencia no existe.")
+
+        # Evidencias almacenadas en Backblaze.
+        if (
+            evidencia.storage_key
+            and evidencia.estado_almacenamiento == "pendiente"
+        ):
+            return generar_url_evidencia(
+                evidencia.storage_key,
+                expiracion=3600,
+            )
+
+        # Evidencias que ya tienen una URL disponible.
+        if evidencia.archivo_url:
+            return evidencia.archivo_url
+
+        raise ValueError(
+            "No se encontró una ubicación disponible para la fotografía."
+        )
+
     def get_by_assignment(self, assignment_id: int):
         return self.repository.get_by_assignment(assignment_id)
 

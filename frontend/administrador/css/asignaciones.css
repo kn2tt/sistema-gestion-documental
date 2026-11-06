@@ -1881,3 +1881,97 @@
         animation: none;
     }
 }
+
+/* =========================================
+   SKELETON - TARJETAS Y CLIENTE
+========================================= */
+
+.summary-card.is-loading,
+.assignment-client-card.is-loading {
+    background: #f7f8fa;
+}
+
+/* Iconos de las tarjetas */
+
+.summary-card.is-loading .summary-icon,
+.assignment-client-card.is-loading .assignment-client-icon {
+    background: linear-gradient(
+        100deg,
+        #e9edf2 25%,
+        #dfe4ea 45%,
+        #e9edf2 65%
+    ) !important;
+    background-size: 200% 100% !important;
+    animation: skeleton-surface 1.4s ease-in-out infinite;
+    color: transparent !important;
+}
+
+.summary-card.is-loading .summary-icon i,
+.assignment-client-card.is-loading .assignment-client-icon i {
+    visibility: hidden;
+}
+
+/* Valores numéricos */
+
+.summary-card.is-loading .skeleton-value {
+    position: relative;
+    background: linear-gradient(
+        100deg,
+        #e9edf2 25%,
+        #dfe4ea 45%,
+        #e9edf2 65%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-surface 1.4s ease-in-out infinite;
+}
+
+/* Información del cliente */
+
+.assignment-client-card.is-loading .assignment-client-info h2,
+.assignment-client-card.is-loading .assignment-client-info p {
+    color: transparent !important;
+    border-radius: 5px;
+    background: linear-gradient(
+        100deg,
+        #e9edf2 25%,
+        #dfe4ea 45%,
+        #e9edf2 65%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-surface 1.4s ease-in-out infinite;
+}
+
+.assignment-client-card.is-loading .assignment-client-info h2 {
+    width: 210px;
+    height: 22px;
+    margin-bottom: 6px;
+}
+
+.assignment-client-card.is-loading .assignment-client-info p {
+    width: 125px;
+    height: 14px;
+}
+
+.assignment-client-card.is-loading .assignment-client-toggle {
+    visibility: hidden;
+}
+
+@keyframes skeleton-surface {
+    from {
+        background-position: 100% 0;
+    }
+
+    to {
+        background-position: -100% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .summary-card.is-loading .summary-icon,
+    .assignment-client-card.is-loading .assignment-client-icon,
+    .summary-card.is-loading .skeleton-value,
+    .assignment-client-card.is-loading .assignment-client-info h2,
+    .assignment-client-card.is-loading .assignment-client-info p {
+        animation: none;
+    }
+}
