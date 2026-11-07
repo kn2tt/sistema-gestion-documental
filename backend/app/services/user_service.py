@@ -1,7 +1,12 @@
+
+from datetime import datetime, timedelta
+
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from pwdlib import PasswordHash
 
 from app.models.user import User
+from app.models.user_session import UserSession
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate, UserUpdate
 
@@ -12,6 +17,7 @@ password_hash = PasswordHash.recommended()
 class UserService:
 
     def __init__(self, db: Session):
+        self.db = db
         self.repository = UserRepository(db)
 
     def get_by_id(self, user_id: int) -> User | None:
@@ -21,9 +27,57 @@ class UserService:
         return self.repository.get_by_email(correo)
 
     def get_all(self) -> list[User]:
-        return self.repository.get_all()
+
+        usuarios = self.repository.get_all()
+
+        if not usuarios:
+            return []
+
+        ahora = datetime.utcnow()
+        limite_actividad = ahora - timedelta(minutes=2)
+
+        ids_usuarios = [usuario.id for usuario in usuarios]
+
+        # Obtener la fecha de la última conexión de cada usuario.
+        resultados_acceso = self.db.execute(
+            select(
+                UserSession.user_id,
+                func.max(UserSession.created_at).label("ultimo_acceso"),
+            )
+            .where(UserSession.user_id.in_(ids_usuarios))
+            .group_by(UserSession.user_id)
+        ).all()
+
+        accesos = {
+            resultado.user_id: resultado.ultimo_acceso
+            for resultado in resultados_acceso
+        }
+
+        # Identificar usuarios con sesiones vigentes y actividad reciente.
+        usuarios_conectados = self.db.execute(
+            select(UserSession.user_id)
+            .where(
+                UserSession.user_id.in_(ids_usuarios),
+                UserSession.revoked_at.is_(None),
+                UserSession.expires_at > ahora,
+                UserSession.last_activity_at >= limite_actividad,
+            )
+            .distinct()
+        ).scalars().all()
+
+        ids_conectados = set(usuarios_conectados)
+
+        for usuario in usuarios:
+            usuario.online = (
+                usuario.activo
+                and usuario.id in ids_conectados
+            )
+            usuario.ultimo_acceso = accesos.get(usuario.id)
+
+        return usuarios
 
     def create(self, data: UserCreate) -> User:
+
         existing_user = self.repository.get_by_email(data.correo)
 
         if existing_user:
@@ -98,10 +152,7 @@ class UserService:
             )
 
         self.repository.delete(user)
-        
-        
-        
-        
+
     def actualizar_password(
         self,
         user_id: int,

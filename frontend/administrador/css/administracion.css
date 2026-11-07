@@ -360,6 +360,46 @@
 
 
 /* =========================================
+   ESTADO DE CONEXIÓN DE USUARIOS
+   ========================================= */
+
+.connection-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.connection-badge.online {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.connection-dot {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: #059669;
+}
+
+.connection-time {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.connection-badge + .connection-time {
+    margin-top: 4px;
+}
+
+
+/* =========================================
    ACCIONES
    ========================================= */
 

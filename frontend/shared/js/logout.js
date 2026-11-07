@@ -14,6 +14,57 @@
 
     const LOGIN_URL = logoutButton.dataset.loginUrl || "../index.html";
 
+    
+    // =========================================
+    // REGISTRO AUTOMÁTICO DE ACTIVIDAD
+    // =========================================
+
+    let cerrandoSesion = false;
+    let intervaloActividad = null;
+
+    async function registrarActividad() {
+
+        if (cerrandoSesion) {
+            return;
+        }
+
+        try {
+
+            const respuesta = await fetch(`${API_URL}/auth/me`, {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store"
+            });
+
+            // Si la sesión expiró, detener las señales.
+            if (respuesta.status === 401) {
+                clearInterval(intervaloActividad);
+            }
+
+        } catch (error) {
+            // No mostrar notificaciones por fallos temporales.
+        }
+    }
+
+    // Registrar actividad al ingresar a una página.
+    registrarActividad();
+
+    // Mantener actualizada la última actividad cada 30 segundos.
+    intervaloActividad = setInterval(
+        registrarActividad,
+        30000
+    );
+
+    // Registrar actividad cuando se vuelve a la pestaña.
+    document.addEventListener("visibilitychange", function () {
+
+        if (!document.hidden) {
+            registrarActividad();
+        }
+
+    });
+
+
     // =========================================
     // CREAR MODAL AUTOMÁTICAMENTE
     // =========================================
@@ -113,8 +164,6 @@
     const cancelButton = document.getElementById("logoutCancelButton");
 
     const logoutModal = bootstrap.Modal.getOrCreateInstance(modalElement);
-
-    let cerrandoSesion = false;
 
     // =========================================
     // ABRIR MODAL

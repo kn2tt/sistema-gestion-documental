@@ -537,6 +537,148 @@ function limpiarCampos(ids) {
    8. USUARIOS
    ========================================================= */
 
+
+/* FORMATEAR FECHA DEL ÚLTIMO ACCESO */
+
+function formatearUltimoAcceso(valor) {
+
+    if (!valor) {
+        return "—";
+    }
+
+    // Las fechas del backend se almacenan en UTC.
+    const fecha = new Date(
+        /(?:Z|[+-]\d{2}:\d{2})$/i.test(valor)
+            ? valor
+            : `${valor}Z`
+    );
+
+    if (isNaN(fecha.getTime())) {
+        return "—";
+    }
+
+    const opcionesFecha = {
+        timeZone: "America/Lima",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    };
+
+    const partesFecha = new Intl.DateTimeFormat(
+        "en-CA",
+        opcionesFecha
+    ).formatToParts(fecha);
+
+    const partes = Object.fromEntries(
+        partesFecha.map(parte => [parte.type, parte.value])
+    );
+
+    const fechaAcceso =
+        `${partes.year}-${partes.month}-${partes.day}`;
+
+    const hoyPartes = new Intl.DateTimeFormat(
+        "en-CA",
+        opcionesFecha
+    ).formatToParts(new Date());
+
+    const hoyValores = Object.fromEntries(
+        hoyPartes.map(parte => [parte.type, parte.value])
+    );
+
+    const hoy =
+        `${hoyValores.year}-${hoyValores.month}-${hoyValores.day}`;
+
+    // Si la conexión fue hoy, mostrar únicamente la hora.
+    if (fechaAcceso === hoy) {
+
+        return new Intl.DateTimeFormat("es-PE", {
+            timeZone: "America/Lima",
+            hour: "2-digit",
+            minute: "2-digit"
+        }).format(fecha);
+
+    }
+
+    // Si fue otro día, mostrar fecha y hora.
+    return new Intl.DateTimeFormat("es-PE", {
+        timeZone: "America/Lima",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).format(fecha);
+}
+
+
+/* MOSTRAR ESTADO DE CONEXIÓN */
+
+function renderizarAccesoUsuario(celda, usuario) {
+    celda.innerHTML = "";
+
+    if (usuario.online) {
+        const etiqueta = document.createElement("span");
+        etiqueta.className = "connection-badge online";
+
+        const indicador = document.createElement("span");
+        indicador.className = "connection-dot";
+
+        etiqueta.appendChild(indicador);
+        etiqueta.appendChild(document.createTextNode("Conectado"));
+
+        celda.appendChild(etiqueta);
+    } else {
+        const ultimoAcceso = document.createElement("span");
+        ultimoAcceso.className = "connection-time";
+        ultimoAcceso.textContent = formatearUltimoAcceso(
+            usuario.ultimo_acceso
+        );
+
+        celda.appendChild(ultimoAcceso);
+    }
+}
+
+
+/* ACTUALIZAR ESTADOS SIN RECARGAR LA TABLA */
+
+async function actualizarEstadosConexion() {
+
+    const tabla = document.getElementById("usuariosTablaBody");
+
+    if (!tabla) {
+        return;
+    }
+
+    try {
+
+        const respuesta = await apiFetch(
+            `${API_URL}/usuarios/`
+        );
+
+        if (!respuesta.ok) {
+            return;
+        }
+
+        const usuarios = await respuesta.json();
+
+        usuarios.forEach(function (usuario) {
+
+            const celda = tabla.querySelector(
+                `.user-last-access[data-user-id="${usuario.id}"]`
+            );
+
+            if (celda) {
+                renderizarAccesoUsuario(celda, usuario);
+            }
+
+        });
+
+    } catch (error) {
+        // La actualización periódica no debe interrumpir el módulo.
+    }
+}
+
+
 /* CARGAR USUARIOS */
 
 async function cargarUsuarios() {
@@ -781,9 +923,14 @@ async function cargarUsuarios() {
                 const celdaAcceso =
                     document.createElement("td");
 
+                celdaAcceso.className = "user-last-access";
 
-                celdaAcceso.textContent =
-                    "—";
+                celdaAcceso.dataset.userId = usuario.id;
+
+                renderizarAccesoUsuario(
+                    celdaAcceso,
+                    usuario
+                );
 
 
                 /*
@@ -13496,3 +13643,6 @@ cargarTiposDocumento();
 cargarAlcances();
 cargarRequisitos();
 cargarPlantillas();
+
+// Actualizar los estados de conexión cada 30 segundos.
+setInterval(actualizarEstadosConexion, 30000);
