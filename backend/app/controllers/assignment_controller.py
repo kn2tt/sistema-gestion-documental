@@ -30,6 +30,22 @@ def listar_mis_asignaciones(
     return service.get_by_tecnico(tecnico.id)
 
 @router.get(
+    "/documentador/mis-asignaciones",
+    response_model=list[AssignmentResponse],
+)
+def listar_asignaciones_documentador(
+    db: Session = Depends(get_db),
+    documentador: User = Depends(
+        require_roles("documentador")
+    ),
+):
+    service = AssignmentService(db)
+
+    return service.get_by_documentador(
+        documentador.id
+    )
+
+@router.get(
     "/",
     response_model=list[AssignmentResponse],
 )
@@ -87,6 +103,7 @@ def listar_asignaciones_por_proyecto(
 def obtener_asignacion(
     assignment_id: int,
     db: Session = Depends(get_db),
+    usuario: User = Depends(get_current_user),
 ):
     service = AssignmentService(db)
     assignment = service.get_by_id(assignment_id)
@@ -95,6 +112,15 @@ def obtener_asignacion(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="La asignación no existe.",
+        )
+
+    if (
+        usuario.rol.strip().lower() == "documentador"
+        and assignment["documentador_id"] != usuario.id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes acceso a esta asignación.",
         )
 
     return assignment

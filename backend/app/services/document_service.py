@@ -17,6 +17,8 @@ from app.models.template import Template
 from app.models.evidence import Evidence
 from app.models.user import User
 
+from app.services.template_storage import obtener_archivo
+
 from app.services.document_storage import (
     guardar_documento,
     obtener_documento,
@@ -463,6 +465,7 @@ class DocumentService:
                 select(DocumentOperation.id)
                 .where(
                     DocumentOperation.documento_id == document.id,
+                    DocumentOperation.usuario_id == user.id,
                     DocumentOperation.tipo_operacion == "descarga",
                 )
                 .limit(1)
@@ -478,6 +481,12 @@ class DocumentService:
                 )
 
         clave_archivo = document.storage_key
+
+        if clave_archivo:
+            self._validar_clave(
+                clave_archivo,
+                document.asignacion_id,
+            )
 
         if not document.eliminado:
             try:
@@ -501,14 +510,6 @@ class DocumentService:
             except Exception:
                 self.db.rollback()
                 raise
-
-        # Si la limpieza de B2 falla, el registro permanece eliminado
-        # y conserva la clave para permitir reintentar la limpieza.
-        if clave_archivo:
-            self._validar_clave(
-                clave_archivo,
-                document.asignacion_id,
-            )
 
             eliminar_documento(clave_archivo)
 
@@ -750,3 +751,96 @@ class DocumentService:
             "usuario_id": progress.usuario_id,
             "fecha_actualizacion": progress.fecha_actualizacion,
         }
+
+    # =====================================================
+    # CONTEXTO DOCUMENTAL DE LA ASIGNACIÓN
+    # =====================================================
+
+    def obtener_contexto_asignacion(
+        self,
+        asignacion_id: int,
+        user: User,
+    ) -> dict:
+
+        assignment = self._obtener_asignacion(
+            asignacion_id,
+            user,
+        )
+
+        enlace_drive = self.db.execute(
+            select(Evidence.drive_web_view_link)
+            .where(
+                Evidence.asignacion_id == assignment.id,
+                Evidence.drive_web_view_link.is_not(None),
+                Evidence.drive_web_view_link != "",
+            )
+            .order_by(
+                Evidence.fecha_archivado.desc(),
+                Evidence.id.desc(),
+            )
+            .limit(1)
+        ).scalar_one_or_none()
+
+        plantilla = self.db.get(
+            Template,
+            assignment.plantilla_id,
+        )
+
+        return {
+            "asignacion_id": assignment.id,
+            "documentador_id": assignment.documentador_id,
+            "estado": assignment.estado,
+            "drive_web_view_link": enlace_drive,
+            "plantilla_id": assignment.plantilla_id,
+            "plantilla_nombre": (
+                plantilla.nombre if plantilla else None
+            ),
+        }
+
+    # =====================================================
+    # DESCARGAR PLANTILLA ASIGNADA
+    # =====================================================
+
+    def descargar_plantilla_asignada(
+        self,
+        asignacion_id: int,
+        user: User,
+    ) -> tuple[bytes, str]:
+
+        assignment = self._obtener_asignacion(
+            asignacion_id,
+            user,
+        )
+
+        template = self.db.get(
+            Template,
+            assignment.plantilla_id,
+        )
+
+        if template is None or not template.archivo_url:
+            raise HTTPException(
+                status_code=404,
+                detail="No se encontró la plantilla asignada.",
+            )
+
+        nombre_archivo = Path(
+            template.archivo_url
+        ).name
+
+        version_actual = next(
+            (
+                version
+                for version in template.versiones
+                if version.numero_version == template.version
+            ),
+            None,
+        )
+
+        if version_actual:
+            nombre_archivo = version_actual.nombre_archivo
+
+        contenido = obtener_archivo(
+            template.archivo_url
+        )
+
+        return contenido, nombre_archivo

@@ -504,3 +504,11 @@ class AssignmentService:
             raise ValueError("La asignación no existe.")
 
         self.repository.delete(assignment)
+
+    def get_by_documentador(self, documentador_id: int):
+        return [
+            self._serialize(assignment)
+            for assignment in self.repository.get_by_documentador(
+                documentador_id
+            )
+        ]

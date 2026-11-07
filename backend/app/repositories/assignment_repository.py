@@ -107,3 +107,20 @@ class AssignmentRepository:
         except Exception:
             self.db.rollback()
             raise
+
+    def get_by_documentador(
+        self,
+        documentador_id: int,
+    ) -> list[Assignment]:
+
+        statement = (
+            self._query()
+            .where(
+                Assignment.documentador_id == documentador_id
+            )
+            .order_by(Assignment.id.desc())
+        )
+
+        return list(
+            self.db.execute(statement).scalars().unique().all()
+        )

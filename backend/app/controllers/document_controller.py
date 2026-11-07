@@ -140,6 +140,63 @@ async def cargar_documento(
 
 
 # =====================================================
+# CONTEXTO DE LA ASIGNACIÓN
+# =====================================================
+
+@router.get("/asignacion/{asignacion_id}/contexto")
+def obtener_contexto_asignacion(
+    asignacion_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_roles("administrador", "documentador")
+    ),
+):
+    service = DocumentService(db)
+
+    return service.obtener_contexto_asignacion(
+        asignacion_id,
+        user,
+    )
+
+
+# =====================================================
+# DESCARGAR PLANTILLA ASIGNADA
+# =====================================================
+
+@router.get("/asignacion/{asignacion_id}/plantilla")
+def descargar_plantilla_asignada(
+    asignacion_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_roles("documentador")
+    ),
+):
+    service = DocumentService(db)
+
+    contenido, nombre_archivo = (
+        service.descargar_plantilla_asignada(
+            asignacion_id,
+            user,
+        )
+    )
+
+    nombre_codificado = quote(
+        nombre_archivo,
+        safe="",
+    )
+
+    return StreamingResponse(
+        BytesIO(contenido),
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": (
+                f"attachment; filename*=UTF-8''{nombre_codificado}"
+            )
+        },
+    )
+
+
+# =====================================================
 # DESCARGAR DOCUMENTO
 # Administrador o documentador asignado.
 # =====================================================
