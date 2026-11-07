@@ -5,8 +5,12 @@ from fastapi import (
     UploadFile,
     File,
     status,
+    Body,
 )
 from sqlalchemy.orm import Session
+
+from fastapi.responses import StreamingResponse
+from io import BytesIO
 
 from app.core.database import get_db
 from app.core.auth import require_roles
@@ -192,6 +196,58 @@ def listar_evidencias_por_asignacion(
     return service.get_by_assignment(
         asignacion_id
     )
+
+
+@router.post(
+    "/asignacion/{asignacion_id}/exportar",
+    dependencies=[Depends(require_roles("administrador"))],
+)
+def exportar_evidencias_asignacion(
+    asignacion_id: int,
+    db: Session = Depends(get_db),
+):
+    service = EvidenceService(db)
+
+    try:
+        contenido = service.exportar_evidencias_asignacion(
+            asignacion_id
+        )
+
+        return StreamingResponse(
+            BytesIO(contenido),
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": (
+                    f'attachment; filename="evidencias_asignacion_{asignacion_id}.zip"'
+                )
+            },
+        )
+
+    except (ValueError, PermissionError, RuntimeError) as error:
+        convertir_error(error)
+
+
+@router.post(
+    "/asignacion/{asignacion_id}/archivar",
+    dependencies=[Depends(require_roles("administrador"))],
+)
+def archivar_evidencias_asignacion(
+    asignacion_id: int,
+    drive_web_view_link: str = Body(..., embed=True),
+    db: Session = Depends(get_db),
+    administrador: User = Depends(require_roles("administrador")),
+):
+    service = EvidenceService(db)
+
+    try:
+        return service.archivar_evidencias_asignacion(
+            assignment_id=asignacion_id,
+            drive_web_view_link=drive_web_view_link,
+            usuario_id=administrador.id,
+        )
+
+    except (ValueError, PermissionError, RuntimeError) as error:
+        convertir_error(error)
 
 
 @router.get(

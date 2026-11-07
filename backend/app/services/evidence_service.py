@@ -1,7 +1,13 @@
+
 from datetime import datetime
-from io import BytesIO
+from io import BytesIO, StringIO
 from pathlib import Path
 from uuid import uuid4
+from urllib.parse import parse_qs, urlparse
+
+import csv
+import re
+import zipfile
 
 from sqlalchemy import select, or_
 from sqlalchemy.orm import Session, selectinload
@@ -26,6 +32,7 @@ from app.core.storage import (
     subir_evidencia,
     eliminar_evidencia,
     generar_url_evidencia,
+    descargar_evidencia_contenido,
 )
 
 
@@ -76,7 +83,6 @@ class EvidenceService:
 
         return assignment
 
-
     def _validar_edicion_tecnico(self, assignment):
         if (
             assignment.estado == "completado"
@@ -87,7 +93,6 @@ class EvidenceService:
                 "para esta asignación. Solicita autorización "
                 "al administrador."
             )
-
 
     def _validar_checklist_publicado(
         self,
@@ -213,7 +218,6 @@ class EvidenceService:
                 "El contenido del archivo no corresponde a una imagen válida."
             )
 
-
     # =====================================================
     # ENVIAR CHECKLIST DEL TÉCNICO
     # =====================================================
@@ -259,7 +263,6 @@ class EvidenceService:
                 assignment.edicion_evidencias_habilitada
             ),
         }
-
 
     # =====================================================
     # SUBIR FOTOGRAFÍA
@@ -396,7 +399,7 @@ class EvidenceService:
             # Los archivos archivados ya no deben consultarse en B2.
             if (
                 evidencia.storage_key
-                and evidencia.estado_almacenamiento == "pendiente"
+                and evidencia.estado_almacenamiento in ("pendiente", "exportada")
             ):
                 url = generar_url_evidencia(
                     evidencia.storage_key,
@@ -485,6 +488,330 @@ class EvidenceService:
         }
 
     # =====================================================
+    # EXPORTAR EVIDENCIAS A ZIP
+    # =====================================================
+
+    @staticmethod
+    def _nombre_seguro_carpeta(nombre: str) -> str:
+        nombre = str(nombre or "Sin nombre").strip()
+
+        nombre = re.sub(
+            r'[<>:"/\\|?*\x00-\x1F]',
+            "-",
+            nombre,
+        )
+
+        nombre = nombre.rstrip(". ")
+
+        return nombre[:100] or "Sin nombre"
+
+    def exportar_evidencias_asignacion(
+        self,
+        assignment_id: int,
+    ) -> bytes:
+
+        assignment = self.assignment_repository.get_by_id(
+            assignment_id
+        )
+
+        if assignment is None:
+            raise ValueError("La asignación no existe.")
+
+        statement = (
+            select(Evidence)
+            .where(
+                Evidence.asignacion_id == assignment_id,
+                Evidence.estado_almacenamiento.in_(
+                    ["pendiente", "exportada"]
+                ),
+            )
+            .options(
+                selectinload(Evidence.item_checklist),
+                selectinload(Evidence.requisito),
+                selectinload(Evidence.usuario),
+            )
+            .order_by(Evidence.id)
+            .with_for_update()
+        )
+
+        registros = list(
+            self.db.execute(statement).scalars().all()
+        )
+
+        # Si existe una exportación sin confirmar,
+        # se vuelve a generar ese mismo conjunto.
+        exportadas = [
+            evidencia
+            for evidencia in registros
+            if evidencia.estado_almacenamiento == "exportada"
+        ]
+
+        if exportadas:
+            evidencias_exportar = exportadas
+
+        else:
+            evidencias_exportar = [
+                evidencia
+                for evidencia in registros
+                if (
+                    evidencia.estado_almacenamiento == "pendiente"
+                    and evidencia.storage_key
+                )
+            ]
+
+        if not evidencias_exportar:
+            raise ValueError(
+                "No existen fotografías nuevas disponibles para exportar."
+            )
+
+        if any(
+            not evidencia.storage_key
+            for evidencia in evidencias_exportar
+        ):
+            raise RuntimeError(
+                "Una de las evidencias exportadas no tiene una "
+                "ubicación válida en Backblaze."
+            )
+
+        # Ordenar por encabezado, ítem y registro.
+        evidencias_exportar.sort(
+            key=lambda evidencia: (
+                evidencia.requisito.orden or 0,
+                evidencia.item_checklist.orden or 0,
+                evidencia.id,
+            )
+        )
+
+        archivo_memoria = BytesIO()
+        manifiesto = StringIO(newline="")
+
+        escritor = csv.writer(
+            manifiesto,
+            delimiter=";",
+        )
+
+        escritor.writerow([
+            "ID evidencia",
+            "Encabezado",
+            "Ítem",
+            "Nombre original",
+            "Fecha de carga",
+            "Técnico",
+        ])
+
+        with zipfile.ZipFile(
+            archivo_memoria,
+            mode="w",
+            compression=zipfile.ZIP_DEFLATED,
+        ) as archivo_zip:
+
+            for evidencia in evidencias_exportar:
+
+                requisito = evidencia.requisito
+                item = evidencia.item_checklist
+
+                encabezado = self._nombre_seguro_carpeta(
+                    requisito.nombre
+                )
+
+                nombre_item = self._nombre_seguro_carpeta(
+                    item.titulo
+                )
+
+                carpeta_encabezado = (
+                    f"{int(requisito.orden or 0):02d} - {encabezado}"
+                )
+
+                carpeta_item = (
+                    f"{int(item.orden or 0):02d} - {nombre_item}"
+                )
+
+                nombre_original = self._nombre_seguro_carpeta(
+                    Path(evidencia.nombre_archivo or "fotografia").name
+                )
+
+                ruta_zip = (
+                    f"{carpeta_encabezado}/"
+                    f"{carpeta_item}/"
+                    f"EVID-{evidencia.id}_{nombre_original}"
+                )
+
+                contenido = descargar_evidencia_contenido(
+                    evidencia.storage_key
+                )
+
+                archivo_zip.writestr(
+                    ruta_zip,
+                    contenido,
+                )
+
+                tecnico = ""
+
+                if evidencia.usuario:
+                    tecnico = (
+                        f"{evidencia.usuario.nombre} "
+                        f"{evidencia.usuario.apellido}"
+                    ).strip()
+
+                escritor.writerow([
+                    evidencia.id,
+                    requisito.nombre,
+                    item.titulo,
+                    evidencia.nombre_archivo or "",
+                    (
+                        evidencia.fecha_carga.isoformat()
+                        if evidencia.fecha_carga
+                        else ""
+                    ),
+                    tecnico,
+                ])
+
+            archivo_zip.writestr(
+                "manifiesto.csv",
+                manifiesto.getvalue().encode("utf-8-sig"),
+            )
+
+        # Solo después de generar correctamente el ZIP
+        # se marcan los registros como exportados.
+        for evidencia in evidencias_exportar:
+            if evidencia.estado_almacenamiento == "pendiente":
+                evidencia.estado_almacenamiento = "exportada"
+
+        try:
+            self.db.commit()
+
+        except Exception:
+            self.db.rollback()
+            raise
+
+        archivo_memoria.seek(0)
+
+        return archivo_memoria.getvalue()
+
+    # =====================================================
+    # CONFIRMAR ARCHIVADO EN GOOGLE DRIVE
+    # =====================================================
+
+    def archivar_evidencias_asignacion(
+        self,
+        assignment_id: int,
+        drive_web_view_link: str,
+        usuario_id: int,
+    ):
+
+        assignment = self.assignment_repository.get_by_id(
+            assignment_id
+        )
+
+        if assignment is None:
+            raise ValueError("La asignación no existe.")
+
+        enlace = str(drive_web_view_link or "").strip()
+        parsed = urlparse(enlace)
+
+        if (
+            parsed.scheme != "https"
+            or parsed.netloc not in (
+                "drive.google.com",
+                "docs.google.com",
+            )
+        ):
+            raise ValueError(
+                "Ingresa un enlace válido de Google Drive."
+            )
+
+        drive_file_id = (
+            parse_qs(parsed.query).get("id", [None])[0]
+        )
+
+        if not drive_file_id:
+            coincidencia = re.search(
+                r"/d/([^/]+)",
+                parsed.path,
+            )
+
+            if coincidencia:
+                drive_file_id = coincidencia.group(1)
+
+        statement = (
+            select(Evidence.id)
+            .where(
+                Evidence.asignacion_id == assignment_id,
+                Evidence.estado_almacenamiento == "exportada",
+            )
+            .order_by(Evidence.id)
+        )
+
+        ids_exportados = list(
+            self.db.execute(statement).scalars().all()
+        )
+
+        if not ids_exportados:
+            raise ValueError(
+                "No hay una exportación pendiente de archivado."
+            )
+
+        archivadas = 0
+        fallidas = []
+
+        for evidence_id in ids_exportados:
+
+            evidencia = self.db.execute(
+                select(Evidence)
+                .where(Evidence.id == evidence_id)
+                .with_for_update()
+            ).scalar_one_or_none()
+
+            if evidencia is None:
+                fallidas.append({
+                    "evidencia_id": evidence_id,
+                    "detalle": "No se encontró el registro.",
+                })
+                continue
+
+            try:
+                if not evidencia.storage_key:
+                    raise RuntimeError(
+                        "No se encontró la ubicación física en Backblaze."
+                    )
+
+                # Primero se elimina el archivo físico.
+                eliminar_evidencia(
+                    evidencia.storage_key
+                )
+
+                # Después se conserva el registro y sus metadatos.
+                evidencia.storage_key = None
+                evidencia.estado_almacenamiento = "archivada"
+                evidencia.drive_file_id = drive_file_id
+                evidencia.drive_web_view_link = enlace
+                evidencia.fecha_archivado = datetime.utcnow()
+                evidencia.usuario_archivado_id = usuario_id
+
+                self.db.commit()
+
+                archivadas += 1
+
+            except Exception as error:
+                self.db.rollback()
+
+                fallidas.append({
+                    "evidencia_id": evidence_id,
+                    "detalle": str(error),
+                })
+
+        return {
+            "mensaje": (
+                "El proceso de archivado finalizó."
+                if not fallidas
+                else "El archivado finalizó parcialmente."
+            ),
+            "archivadas": archivadas,
+            "fallidas": len(fallidas),
+            "errores": fallidas,
+        }
+
+    # =====================================================
     # MÉTODOS CRUD EXISTENTES
     # Se conservan para compatibilidad con el módulo actual.
     # =====================================================
@@ -501,7 +828,7 @@ class EvidenceService:
         # Evidencias almacenadas en Backblaze.
         if (
             evidencia.storage_key
-            and evidencia.estado_almacenamiento == "pendiente"
+            and evidencia.estado_almacenamiento in ("pendiente", "exportada")
         ):
             return generar_url_evidencia(
                 evidencia.storage_key,
@@ -614,6 +941,15 @@ class EvidenceService:
 
         if evidence is None:
             raise ValueError("La evidencia no existe.")
+
+        if (
+            evidence.estado_almacenamiento != "pendiente"
+            or evidence.drive_file_id
+            or evidence.fecha_archivado is not None
+        ):
+            raise ValueError(
+                "No se puede eliminar una evidencia que ya fue exportada o archivada."
+            )
 
         if evidence.storage_key:
             eliminar_evidencia(evidence.storage_key)

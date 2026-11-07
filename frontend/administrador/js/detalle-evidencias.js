@@ -98,6 +98,197 @@ function mostrarError(mensaje) {
 
 
 /* =========================================
+   EXPORTAR Y ARCHIVAR EVIDENCIAS
+   ========================================= */
+
+function actualizarBotonExportacion() {
+    const boton = document.getElementById(
+        "btnDescargarEvidencias"
+    );
+
+    if (!boton) return;
+
+    const pendientes = evidenciasData.filter(
+        evidencia =>
+            evidencia.estado_almacenamiento === "pendiente"
+    ).length;
+
+    const exportadas = evidenciasData.filter(
+        evidencia =>
+            evidencia.estado_almacenamiento === "exportada"
+    ).length;
+
+    const disponibles = pendientes + exportadas;
+
+    boton.disabled = disponibles === 0;
+
+    boton.innerHTML = exportadas > 0
+        ? `
+            <i class="bi bi-arrow-repeat"></i>
+            Volver a descargar ZIP pendiente
+        `
+        : `
+            <i class="bi bi-file-earmark-zip"></i>
+            Descargar evidencias nuevas
+        `;
+}
+
+
+async function descargarZipEvidencias() {
+    const boton = document.getElementById(
+        "btnDescargarEvidencias"
+    );
+
+    if (!boton) return;
+
+    // Evita varios clics mientras se genera el ZIP.
+    boton.disabled = true;
+    boton.setAttribute("aria-busy", "true");
+
+    boton.innerHTML = `
+        <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+        ></span>
+        Generando ZIP...
+    `;
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/evidencias/asignacion/${assignmentId}/exportar`,
+            {
+                method: "POST"
+            }
+        );
+
+        if (!respuesta.ok) {
+            const datos = await respuesta.json().catch(() => ({}));
+
+            throw new Error(
+                datos.detail ||
+                "No se pudo generar el archivo ZIP."
+            );
+        }
+
+        const archivo = await respuesta.blob();
+
+        if (!archivo.size) {
+            throw new Error(
+                "El archivo ZIP generado está vacío."
+            );
+        }
+
+        const url = URL.createObjectURL(archivo);
+        const enlace = document.createElement("a");
+
+        enlace.href = url;
+        enlace.download =
+            `evidencias_asignacion_${assignmentId}.zip`;
+
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+
+        window.setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 1000);
+
+        await cargarDetalleEvidencias();
+
+        bootstrap.Modal
+            .getOrCreateInstance(
+                document.getElementById("modalArchivarEvidencias")
+            )
+            .show();
+
+    } catch (error) {
+        console.error("Error al exportar evidencias:", error);
+        alert(error.message);
+
+    } finally {
+        boton.setAttribute("aria-busy", "false");
+        actualizarBotonExportacion();
+    }
+}
+
+
+async function confirmarArchivadoEvidencias() {
+    const boton = document.getElementById(
+        "btnConfirmarArchivado"
+    );
+
+    const campoEnlace = document.getElementById(
+        "enlaceDriveEvidencias"
+    );
+
+    const enlace = campoEnlace.value.trim();
+
+    if (!enlace) {
+        alert("Ingresa el enlace de Google Drive.");
+        campoEnlace.focus();
+        return;
+    }
+
+    boton.disabled = true;
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/evidencias/asignacion/${assignmentId}/archivar`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    drive_web_view_link: enlace
+                })
+            }
+        );
+
+        const datos = await respuesta.json().catch(() => ({}));
+
+        if (!respuesta.ok) {
+            throw new Error(
+                datos.detail ||
+                "No se pudo confirmar el archivado."
+            );
+        }
+
+        await cargarDetalleEvidencias();
+
+        if (datos.fallidas > 0) {
+            alert(
+                `Se archivaron ${datos.archivadas} fotografías, ` +
+                `pero ${datos.fallidas} no pudieron eliminarse de Backblaze. ` +
+                "Puedes volver a confirmar el archivado para reintentar."
+            );
+
+        } else {
+            alert(
+                `Se archivaron correctamente ${datos.archivadas} fotografías.`
+            );
+
+            bootstrap.Modal
+                .getOrCreateInstance(
+                    document.getElementById("modalArchivarEvidencias")
+                )
+                .hide();
+
+            campoEnlace.value = "";
+        }
+
+    } catch (error) {
+        console.error("Error al archivar evidencias:", error);
+        alert(error.message);
+
+    } finally {
+        boton.disabled = false;
+    }
+}
+
+
+/* =========================================
    ESTADOS
    ========================================= */
 
@@ -421,7 +612,23 @@ async function renderizarEvidenciasItem(itemId) {
         const contenedor = document.createElement("div");
         contenedor.className = "technician-evidence-preview";
 
-        if (url) {
+        if (evidencia.estado_almacenamiento === "archivada") {
+
+            const archivada = document.createElement("div");
+
+            archivada.className = "technician-evidence-no-preview";
+
+            const icono = document.createElement("i");
+            icono.className = "bi bi-cloud-check";
+
+            const texto = document.createElement("span");
+            texto.textContent = "Archivada en Google Drive";
+
+            archivada.append(icono, texto);
+            contenedor.appendChild(archivada);
+
+        } else if (url) {
+
             const enlace = document.createElement("a");
 
             enlace.className = "technician-evidence-image-link";
@@ -440,6 +647,7 @@ async function renderizarEvidenciasItem(itemId) {
             contenedor.appendChild(enlace);
 
         } else {
+
             const sinVista = document.createElement("div");
             sinVista.className = "technician-evidence-no-preview";
 
@@ -453,21 +661,22 @@ async function renderizarEvidenciasItem(itemId) {
             contenedor.appendChild(sinVista);
         }
 
-        const botonEliminar = document.createElement("button");
+        if (evidencia.estado_almacenamiento === "pendiente") {
 
-        botonEliminar.type = "button";
-        botonEliminar.className = "admin-evidence-delete";
-        botonEliminar.innerHTML = `
-            <i class="bi bi-trash"></i>
-            Eliminar fotografía
-        `;
+            const botonEliminar = document.createElement("button");
 
-        botonEliminar.dataset.evidenceId = evidencia.id;
-        botonEliminar.dataset.itemId = itemId;
+            botonEliminar.type = "button";
+            botonEliminar.className = "admin-evidence-delete";
+            botonEliminar.innerHTML = `
+                <i class="bi bi-trash"></i>
+                Eliminar fotografía
+            `;
 
-        contenedor.appendChild(botonEliminar);
+            botonEliminar.dataset.evidenceId = evidencia.id;
+            botonEliminar.dataset.itemId = itemId;
 
-        galeria.appendChild(contenedor);
+            contenedor.appendChild(botonEliminar);
+        }
     });
 
     lista.appendChild(galeria);
@@ -775,6 +984,8 @@ async function cargarDetalleEvidencias() {
             ? evidencias
             : [];
 
+        actualizarBotonExportacion();
+
         renderizarAsignacion(asignacionData);
 
         if (!checklistResponse.ok) {
@@ -829,5 +1040,14 @@ async function cargarDetalleEvidencias() {
    ========================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
+
+    document.getElementById(
+        "btnDescargarEvidencias"
+    )?.addEventListener("click", descargarZipEvidencias);
+
+    document.getElementById(
+        "btnConfirmarArchivado"
+    )?.addEventListener("click", confirmarArchivadoEvidencias);
+
     cargarDetalleEvidencias();
 });

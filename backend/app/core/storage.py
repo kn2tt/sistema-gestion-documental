@@ -250,6 +250,26 @@ def eliminar_evidencia(
         ) from None
 
 
+def descargar_evidencia_contenido(clave_archivo: str) -> bytes:
+    try:
+        cliente = obtener_cliente_evidencias()
+
+        respuesta = cliente.get_object(
+            Bucket=evidence_storage_settings.B2_EVIDENCE_BUCKET_NAME,
+            Key=clave_archivo,
+        )
+
+        return respuesta["Body"].read()
+
+    except RuntimeError:
+        raise
+
+    except (ClientError, BotoCoreError, OSError):
+        raise RuntimeError(
+            "No se pudo descargar la fotografía desde Backblaze B2."
+        ) from None
+
+
 def generar_url_evidencia(
     clave_archivo: str,
     expiracion: int = 3600,

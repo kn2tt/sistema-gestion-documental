@@ -734,3 +734,35 @@
     font-weight: 400;
 }
 
+/* =========================================
+   ACCIONES FINALES DEL CHECKLIST
+   ========================================= */
+
+.checklist-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 16px 22px;
+    border-top: 1px solid #edf0f4;
+}
+
+.checklist-footer-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.checklist-footer-actions .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+    .checklist-footer-actions {
+        padding: 14px 16px;
+    }
+}
