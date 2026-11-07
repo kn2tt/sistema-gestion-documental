@@ -196,34 +196,13 @@
             closeButton.disabled = false;
             cancelButton.disabled = false;
 
-            mostrarError(error.message);
+            window.mostrarNotificacion(
+                error.message,
+                "error",
+                "No se pudo cerrar sesión"
+            );
         }
     });
-
-    // =========================================
-    // MOSTRAR ERROR DENTRO DEL MODAL
-    // =========================================
-
-    function mostrarError(mensaje) {
-        const mensajeAnterior = modalElement.querySelector(
-            ".logout-error-message"
-        );
-
-        if (mensajeAnterior) {
-            mensajeAnterior.remove();
-        }
-
-        const mensajeError = document.createElement("div");
-
-        mensajeError.className =
-            "alert alert-danger logout-error-message mt-3 mb-0";
-
-        mensajeError.textContent = mensaje;
-
-        modalElement
-            .querySelector(".modal-body")
-            .appendChild(mensajeError);
-    }
 
     // Limpiar errores al cerrar el modal
     modalElement.addEventListener("hidden.bs.modal", function () {

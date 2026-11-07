@@ -78,169 +78,11 @@ function formatearFecha(fecha) {
 }
 
 function mostrarError(mensaje) {
-    let alerta = document.getElementById("detalleError");
-
-    if (!alerta) {
-        alerta = document.createElement("div");
-        alerta.id = "detalleError";
-        alerta.className = "alert alert-danger";
-        alerta.setAttribute("role", "alert");
-
-        const contenido = document.querySelector(".page-content");
-
-        if (contenido) {
-            contenido.prepend(alerta);
-        }
-    }
-
-    alerta.textContent = mensaje;
-    alerta.classList.remove("d-none");
+    mostrarNotificacion(mensaje, "error");
 }
 
 function ocultarError() {
-    const alerta = document.getElementById("detalleError");
-
-    if (alerta) {
-        alerta.classList.add("d-none");
-    }
-}
-
-/* =====================================================
-   NOTIFICACIONES DEL SISTEMA
-   ===================================================== */
-
-function mostrarNotificacion(
-    mensaje,
-    tipo = "success",
-    titulo = ""
-) {
-    const contenedor = document.getElementById(
-        "notificationContainer"
-    );
-
-    if (!contenedor) {
-        console.error(
-            "No se encontró el contenedor de notificaciones."
-        );
-        return;
-    }
-
-    const configuracion = {
-        success: {
-            titulo: "Operación completada",
-            icono: "bi-check-circle-fill"
-        },
-
-        warning: {
-            titulo: "Atención",
-            icono: "bi-exclamation-triangle-fill"
-        },
-
-        error: {
-            titulo: "No se pudo completar",
-            icono: "bi-x-circle-fill"
-        }
-    };
-
-    const opciones =
-        configuracion[tipo] ||
-        configuracion.success;
-
-    const notificacion = document.createElement("div");
-
-    notificacion.className =
-        `system-notification ${tipo}`;
-
-    notificacion.setAttribute(
-        "role",
-        tipo === "error" ? "alert" : "status"
-    );
-
-    const icono = document.createElement("i");
-
-    icono.className =
-        `bi ${opciones.icono} notification-icon`;
-
-    icono.setAttribute("aria-hidden", "true");
-
-    const contenido = document.createElement("div");
-
-    contenido.className = "notification-content";
-
-    const encabezado = document.createElement("strong");
-
-    encabezado.className = "notification-title";
-    encabezado.textContent = titulo || opciones.titulo;
-
-    const texto = document.createElement("p");
-
-    texto.className = "notification-message";
-    texto.textContent = mensaje;
-
-    const cerrar = document.createElement("button");
-
-    cerrar.type = "button";
-    cerrar.className = "notification-close";
-
-    cerrar.setAttribute(
-        "aria-label",
-        "Cerrar notificación"
-    );
-
-    cerrar.innerHTML =
-        '<i class="bi bi-x-lg" aria-hidden="true"></i>';
-
-    contenido.append(encabezado, texto);
-
-    notificacion.append(
-        icono,
-        contenido,
-        cerrar
-    );
-
-    contenedor.appendChild(notificacion);
-
-    let temporizador;
-
-    function cerrarNotificacion() {
-        if (
-            notificacion.classList.contains(
-                "notification-leaving"
-            )
-        ) {
-            return;
-        }
-
-        clearTimeout(temporizador);
-
-        notificacion.classList.add(
-            "notification-leaving"
-        );
-
-        notificacion.addEventListener(
-            "animationend",
-            function () {
-                notificacion.remove();
-            },
-            {
-                once: true
-            }
-        );
-
-        setTimeout(function () {
-            notificacion.remove();
-        }, 250);
-    }
-
-    cerrar.addEventListener(
-        "click",
-        cerrarNotificacion
-    );
-
-    temporizador = setTimeout(
-        cerrarNotificacion,
-        4500
-    );
+    // Los errores ahora se muestran mediante notificaciones temporales.
 }
 
 /* =====================================================
@@ -960,24 +802,34 @@ evidenceFile?.addEventListener("change", function () {
 
 confirmUpload?.addEventListener("click", function () {
     if (!evidenceFile?.files.length) {
-        alert("Selecciona una fotografía antes de continuar.");
+        mostrarNotificacion(
+            "Selecciona una fotografía antes de continuar.",
+            "warning"
+        );
         return;
     }
 
     const archivo = evidenceFile.files[0];
 
     if (!["image/jpeg", "image/png"].includes(archivo.type)) {
-        alert("El archivo debe ser JPG, JPEG o PNG.");
+        mostrarNotificacion(
+            "El archivo debe ser JPG, JPEG o PNG.",
+            "warning"
+        );
         return;
     }
 
     if (archivo.size > 10 * 1024 * 1024) {
-        alert("La fotografía no debe superar los 10 MB.");
+        mostrarNotificacion(
+            "La fotografía no debe superar los 10 MB.",
+            "warning"
+        );
         return;
     }
 
-    alert(
-        "El archivo cumple las validaciones, pero la carga todavía no está conectada al endpoint de evidencias."
+    mostrarNotificacion(
+        "El archivo cumple las validaciones, pero la carga todavía no está conectada al endpoint de evidencias.",
+        "info"
     );
 });
 
@@ -1637,20 +1489,31 @@ function mostrarMensajeAdministracionChecklist(
     tipo = "info",
     formulario = false
 ) {
-    const elemento = formulario
-        ? checklistTemplateFormMessage
-        : manageChecklistTemplatesMessage;
+    mostrarNotificacion(
+        mensaje,
+        tipo === "danger" ? "error" : tipo
+    );
+}
 
-    if (!elemento) return;
+function mostrarMensajeChecklist(mensaje, esError = false) {
+    mostrarNotificacion(
+        mensaje,
+        esError ? "error" : "info"
+    );
+}
 
-    elemento.className = "checklist-template-message";
+function mostrarMensajeSeleccionChecklist(mensaje, esError = false) {
+    mostrarNotificacion(
+        mensaje,
+        esError ? "error" : "info"
+    );
+}
 
-    if (tipo === "danger") {
-        elemento.classList.add("error");
-    }
-
-    elemento.textContent = mensaje;
-    elemento.hidden = false;
+function mostrarMensajeItemGenerado(mensaje, esError = false) {
+    mostrarNotificacion(
+        mensaje,
+        esError ? "error" : "info"
+    );
 }
 
 function ocultarMensajeAdministracionChecklist(formulario = false) {

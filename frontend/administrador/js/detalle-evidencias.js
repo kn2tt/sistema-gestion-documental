@@ -80,22 +80,102 @@ function normalizarEstado(estado) {
 }
 
 
-function mostrarError(mensaje) {
-    let alerta = document.getElementById("detalleError");
+async function confirmarEliminacionFotografia() {
+    let modalElement = document.getElementById(
+        "confirmacionEliminarFotografiaModal"
+    );
 
-    if (!alerta) {
-        alerta = document.createElement("div");
-        alerta.id = "detalleError";
-        alerta.className = "alert alert-danger";
-        alerta.setAttribute("role", "alert");
+    if (!modalElement) {
+        const contenedor = document.createElement("div");
 
-        document.querySelector(".page-content").prepend(alerta);
+        contenedor.innerHTML = `
+            <div
+                class="modal fade"
+                id="confirmacionEliminarFotografiaModal"
+                tabindex="-1"
+                aria-labelledby="confirmacionEliminarFotografiaTitulo"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5
+                                class="modal-title"
+                                id="confirmacionEliminarFotografiaTitulo"
+                            >
+                                Eliminar fotografía
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Cerrar"
+                            ></button>
+                        </div>
+                        <div class="modal-body">
+                            ¿Deseas eliminar esta fotografía? El técnico tendrá que volver a cargarla.
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                type="button"
+                                class="btn btn-light"
+                                data-bs-dismiss="modal"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-danger"
+                                id="confirmarEliminarFotografiaBtn"
+                            >
+                                <i class="bi bi-trash"></i>
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(contenedor.firstElementChild);
+
+        modalElement = document.getElementById(
+            "confirmacionEliminarFotografiaModal"
+        );
     }
 
-    alerta.textContent = mensaje;
-    alerta.classList.remove("d-none");
-}
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    const botonConfirmar = document.getElementById(
+        "confirmarEliminarFotografiaBtn"
+    );
 
+    return new Promise(resolve => {
+        let finalizado = false;
+
+        function finalizar(resultado) {
+            if (finalizado) return;
+
+            finalizado = true;
+            modalElement.removeEventListener("hidden.bs.modal", alCerrar);
+            botonConfirmar.removeEventListener("click", alConfirmar);
+            resolve(resultado);
+        }
+
+        function alCerrar() {
+            finalizar(false);
+        }
+
+        function alConfirmar() {
+            finalizar(true);
+            modal.hide();
+        }
+
+        modalElement.addEventListener("hidden.bs.modal", alCerrar);
+        botonConfirmar.addEventListener("click", alConfirmar);
+
+        modal.show();
+    });
+}
 
 /* =========================================
    EXPORTAR Y ARCHIVAR EVIDENCIAS
@@ -203,8 +283,7 @@ async function descargarZipEvidencias() {
             .show();
 
     } catch (error) {
-        console.error("Error al exportar evidencias:", error);
-        alert(error.message);
+        mostrarNotificacion(error.message, "error");
 
     } finally {
         boton.setAttribute("aria-busy", "false");
@@ -225,7 +304,10 @@ async function confirmarArchivadoEvidencias() {
     const enlace = campoEnlace.value.trim();
 
     if (!enlace) {
-        alert("Ingresa el enlace de Google Drive.");
+        mostrarNotificacion(
+            "Ingresa el enlace de Google Drive.",
+            "warning"
+        );
         campoEnlace.focus();
         return;
     }
@@ -258,15 +340,14 @@ async function confirmarArchivadoEvidencias() {
         await cargarDetalleEvidencias();
 
         if (datos.fallidas > 0) {
-            alert(
-                `Se archivaron ${datos.archivadas} fotografías, ` +
-                `pero ${datos.fallidas} no pudieron eliminarse de Backblaze. ` +
-                "Puedes volver a confirmar el archivado para reintentar."
+            mostrarNotificacion(
+                `Se archivaron ${datos.archivadas} fotografías, pero ${datos.fallidas} no pudieron eliminarse de Backblaze. Puedes volver a confirmar el archivado para reintentar.`,
+                "warning"
             );
-
         } else {
-            alert(
-                `Se archivaron correctamente ${datos.archivadas} fotografías.`
+            mostrarNotificacion(
+                `Se archivaron correctamente ${datos.archivadas} fotografías.`,
+                "success"
             );
 
             bootstrap.Modal
@@ -279,8 +360,7 @@ async function confirmarArchivadoEvidencias() {
         }
 
     } catch (error) {
-        console.error("Error al archivar evidencias:", error);
-        alert(error.message);
+        mostrarNotificacion(error.message, "error");
 
     } finally {
         boton.disabled = false;
@@ -521,9 +601,7 @@ async function obtenerUrlEvidencia(evidencia) {
 
 
 async function eliminarFotografiaAdmin(evidenciaId, itemId) {
-    const confirmar = confirm(
-        "¿Deseas eliminar esta fotografía? El técnico tendrá que volver a cargarla."
-    );
+    const confirmar = await confirmarEliminacionFotografia();
 
     if (!confirmar) return;
 
@@ -553,9 +631,14 @@ async function eliminarFotografiaAdmin(evidenciaId, itemId) {
 
         await renderizarEvidenciasItem(itemId);
 
+        mostrarNotificacion(
+            "La fotografía se eliminó correctamente.",
+            "success"
+        );
+
     } catch (error) {
         console.error("Error al eliminar fotografía:", error);
-        alert(error.message);
+        mostrarNotificacion(error.message, "error");
     }
 }
 
