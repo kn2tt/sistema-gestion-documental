@@ -53,6 +53,15 @@ def upgrade() -> None:
         ),
     )
 
+    op.add_column(
+        "documentos",
+        sa.Column(
+            "storage_key_pendiente_eliminacion",
+            sa.String(length=500),
+            nullable=True,
+        ),
+    )
+
     op.alter_column(
         "documentos",
         "archivo_url",
@@ -280,6 +289,7 @@ def downgrade() -> None:
     op.drop_column("documentos", "fecha_eliminacion")
     op.drop_column("documentos", "eliminado")
     op.drop_column("documentos", "storage_key")
+    op.drop_column("documentos", "storage_key_pendiente_eliminacion")
 
     op.alter_column(
         "documentos",

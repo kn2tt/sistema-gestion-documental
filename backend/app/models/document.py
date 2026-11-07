@@ -57,6 +57,11 @@ class Document(Base):
         nullable=True,
     )
 
+    storage_key_pendiente_eliminacion: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+    )
+
     version: Mapped[int] = mapped_column(
         Integer,
         nullable=False,

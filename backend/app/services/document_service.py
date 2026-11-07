@@ -243,6 +243,7 @@ class DocumentService:
     # CARGAR O REEMPLAZAR DOCUMENTO
     # =====================================================
 
+
     async def cargar_documento(
         self,
         asignacion_id: int,
@@ -284,19 +285,55 @@ class DocumentService:
                 detail="La plantilla no corresponde al tipo de documento.",
             )
 
-        nombre_archivo, nueva_clave = await guardar_documento(
-            asignacion_id,
-            archivo,
-        )
-
         document = self.db.execute(
             select(Document)
             .where(Document.asignacion_id == asignacion_id)
             .with_for_update()
         ).scalar_one_or_none()
 
+        # Primero intentamos completar cualquier limpieza anterior.
+        # Si falla, no iniciamos otro reemplazo para no perder referencias.
+        if (
+            document
+            and document.storage_key_pendiente_eliminacion
+        ):
+            clave_pendiente = (
+                document.storage_key_pendiente_eliminacion
+            )
+
+            try:
+                self._validar_clave(
+                    clave_pendiente,
+                    asignacion_id,
+                )
+                eliminar_documento(clave_pendiente)
+
+                document.storage_key_pendiente_eliminacion = None
+
+            except Exception as error:
+                self.db.rollback()
+
+                raise HTTPException(
+                    status_code=502,
+                    detail=(
+                        "No se pudo completar la eliminación del "
+                        "documento anterior en Backblaze. "
+                        "Inténtalo nuevamente antes de reemplazarlo."
+                    ),
+                ) from error
+
+        nombre_archivo, nueva_clave = await guardar_documento(
+            asignacion_id,
+            archivo,
+        )
+
         clave_anterior = None
-        es_reemplazo = False
+
+        es_reemplazo = (
+            document is not None
+            and not document.eliminado
+            and bool(document.storage_key)
+        )
 
         try:
             if document is None:
@@ -306,6 +343,7 @@ class DocumentService:
                     nombre_archivo=nombre_archivo,
                     archivo_url=None,
                     storage_key=nueva_clave,
+                    storage_key_pendiente_eliminacion=None,
                     version=1,
                     estado="en_proceso",
                     usuario_id=user.id,
@@ -319,18 +357,15 @@ class DocumentService:
                 tipo_operacion = "subida"
 
             else:
-                es_reemplazo = (
-                    not document.eliminado
-                    and bool(document.storage_key)
-                )
-
-                if document.storage_key:
-                    clave_anterior = document.storage_key
+                clave_anterior = document.storage_key
 
                 document.plantilla_id = assignment.plantilla_id
                 document.nombre_archivo = nombre_archivo
                 document.archivo_url = None
                 document.storage_key = nueva_clave
+                document.storage_key_pendiente_eliminacion = (
+                    clave_anterior
+                )
                 document.version = 1
                 document.estado = "en_proceso"
                 document.usuario_id = user.id
@@ -368,28 +403,28 @@ class DocumentService:
 
             raise
 
-        # El archivo anterior se elimina únicamente después
-        # de confirmar el registro del nuevo documento.
-        if clave_anterior and clave_anterior != nueva_clave:
+        # La nueva versión ya está registrada.
+        # Ahora intentamos eliminar físicamente la anterior.
+        limpieza_pendiente = False
+
+        if document.storage_key_pendiente_eliminacion:
             try:
-                self._validar_clave(
-                    clave_anterior,
-                    asignacion_id,
+                eliminar_documento(
+                    document.storage_key_pendiente_eliminacion
                 )
-                eliminar_documento(clave_anterior)
 
-            except Exception as error:
-                raise HTTPException(
-                    status_code=502,
-                    detail=(
-                        "El documento nuevo quedó guardado, pero no se "
-                        "pudo retirar el archivo anterior de B2. "
-                        "Se requiere revisar la limpieza del almacenamiento. "
-                        f"Detalle: {str(error)}"
-                    ),
-                ) from error
+                document.storage_key_pendiente_eliminacion = None
+                self.db.commit()
+                self.db.refresh(document)
 
-        return self._serializar_documento(document)
+            except Exception:
+                self.db.rollback()
+                limpieza_pendiente = True
+
+        resultado = self._serializar_documento(document)
+        resultado["limpieza_pendiente"] = limpieza_pendiente
+
+        return resultado
 
     # =====================================================
     # DESCARGAR DOCUMENTO
@@ -436,6 +471,7 @@ class DocumentService:
     # ELIMINAR DOCUMENTO (ADMINISTRADOR)
     # =====================================================
 
+
     def eliminar_documento(
         self,
         documento_id: int,
@@ -454,12 +490,18 @@ class DocumentService:
             incluir_eliminados=True,
         )
 
-        if document.eliminado and not document.storage_key:
+        if (
+            document.eliminado
+            and not document.storage_key
+            and not document.storage_key_pendiente_eliminacion
+        ):
             raise HTTPException(
                 status_code=404,
                 detail="El documento ya fue eliminado.",
             )
 
+        # La descarga previa se exige únicamente al iniciar
+        # la eliminación, no cuando se reintenta.
         if not document.eliminado:
             descarga_previa = self.db.execute(
                 select(DocumentOperation.id)
@@ -480,15 +522,6 @@ class DocumentService:
                     ),
                 )
 
-        clave_archivo = document.storage_key
-
-        if clave_archivo:
-            self._validar_clave(
-                clave_archivo,
-                document.asignacion_id,
-            )
-
-        if not document.eliminado:
             try:
                 document.eliminado = True
                 document.fecha_eliminacion = datetime.utcnow()
@@ -511,10 +544,35 @@ class DocumentService:
                 self.db.rollback()
                 raise
 
-            eliminar_documento(clave_archivo)
+        # Se eliminan tanto el archivo vigente como cualquier
+        # archivo anterior cuya limpieza haya quedado pendiente.
+        claves = [
+            (
+                "storage_key_pendiente_eliminacion",
+                document.storage_key_pendiente_eliminacion,
+            ),
+            (
+                "storage_key",
+                document.storage_key,
+            ),
+        ]
+
+        for atributo, clave in claves:
+
+            if not clave:
+                continue
+
+            self._validar_clave(
+                clave,
+                document.asignacion_id,
+            )
+
+            # Si B2 falla, la clave permanece en PostgreSQL.
+            # Así el administrador podrá volver a intentarlo.
+            eliminar_documento(clave)
 
             try:
-                document.storage_key = None
+                setattr(document, atributo, None)
                 self.db.commit()
 
             except Exception:
