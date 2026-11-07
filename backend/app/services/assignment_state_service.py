@@ -10,7 +10,7 @@ def actualizar_estado_documentacion(
     assignment: Assignment,
 ) -> None:
 
-    if assignment.documentador_id is None:
+    if assignment.estado == "completado":
         return
 
     evidencia_archivada = db.execute(
@@ -19,12 +19,15 @@ def actualizar_estado_documentacion(
             Evidence.asignacion_id == assignment.id,
             Evidence.drive_web_view_link.is_not(None),
             Evidence.drive_web_view_link != "",
+            Evidence.fecha_archivado.is_not(None),
         )
         .limit(1)
     ).scalar_one_or_none()
 
-    if evidencia_archivada is None:
-        return
+    condiciones_cumplidas = (
+        assignment.documentador_id is not None
+        and evidencia_archivada is not None
+    )
 
-    if assignment.estado != "completado":
+    if condiciones_cumplidas:
         assignment.estado = "en_documentacion"

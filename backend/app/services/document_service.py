@@ -773,6 +773,7 @@ class DocumentService:
                 Evidence.asignacion_id == assignment.id,
                 Evidence.drive_web_view_link.is_not(None),
                 Evidence.drive_web_view_link != "",
+                Evidence.fecha_archivado.is_not(None),
             )
             .order_by(
                 Evidence.fecha_archivado.desc(),

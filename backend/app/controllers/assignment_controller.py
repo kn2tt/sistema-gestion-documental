@@ -48,6 +48,7 @@ def listar_asignaciones_documentador(
 @router.get(
     "/",
     response_model=list[AssignmentResponse],
+    dependencies=[Depends(require_roles("administrador"))],
 )
 def listar_asignaciones(
     db: Session = Depends(get_db),
@@ -59,6 +60,7 @@ def listar_asignaciones(
 @router.get(
     "/estado/{estado}",
     response_model=list[AssignmentResponse],
+    dependencies=[Depends(require_roles("administrador"))],
 )
 def listar_asignaciones_por_estado(
     estado: str,
@@ -79,6 +81,7 @@ def listar_asignaciones_por_estado(
 @router.get(
     "/proyecto/{proyecto_id}",
     response_model=list[AssignmentResponse],
+    dependencies=[Depends(require_roles("administrador"))],
 )
 def listar_asignaciones_por_proyecto(
     proyecto_id: int,
@@ -103,7 +106,9 @@ def listar_asignaciones_por_proyecto(
 def obtener_asignacion(
     assignment_id: int,
     db: Session = Depends(get_db),
-    usuario: User = Depends(get_current_user),
+    usuario: User = Depends(
+        require_roles("administrador", "tecnico", "documentador")
+    ),
 ):
     service = AssignmentService(db)
     assignment = service.get_by_id(assignment_id)
@@ -114,13 +119,27 @@ def obtener_asignacion(
             detail="La asignación no existe.",
         )
 
+    rol = usuario.rol.strip().lower()
+
+    # El documentador solo puede consultar sus asignaciones.
     if (
-        usuario.rol.strip().lower() == "documentador"
+        rol == "documentador"
         and assignment["documentador_id"] != usuario.id
     ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes acceso a esta asignación.",
+        )
+
+    # El técnico solo puede consultar las asignaciones en las que participa.
+    if (
+        rol == "tecnico"
+        and usuario.id not in (assignment.get("tecnicos_ids") or [])
+        and usuario.id != assignment.get("tecnico_id")
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para acceder a esta asignación.",
         )
 
     return assignment
@@ -130,6 +149,7 @@ def obtener_asignacion(
     "/",
     response_model=AssignmentResponse,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_roles("administrador"))],
 )
 def crear_asignacion(
     data: AssignmentCreate,
@@ -150,6 +170,7 @@ def crear_asignacion(
 @router.put(
     "/{assignment_id}",
     response_model=AssignmentResponse,
+    dependencies=[Depends(require_roles("administrador"))],
 )
 def actualizar_asignacion(
     assignment_id: int,
@@ -210,6 +231,7 @@ def actualizar_edicion_evidencias(
 @router.delete(
     "/{assignment_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_roles("administrador"))],
 )
 def eliminar_asignacion(
     assignment_id: int,
