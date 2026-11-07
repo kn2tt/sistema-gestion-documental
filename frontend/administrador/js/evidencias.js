@@ -286,17 +286,15 @@ async function cargarEvidencias() {
    ========================================= */
 
 function actualizarResumen(datos = asignacionesData) {
-    const total = datos.reduce(
-        (suma, dato) => suma + dato.items.length, 0
-    );
+    const total = datos.length;
 
-    const pendientes = datos.reduce(
-        (suma, dato) => suma + dato.pendientes, 0
-    );
+    const pendientes = datos.filter(
+        dato => dato.estadoGeneral === "pendiente"
+    ).length;
 
-    const completas = datos.reduce(
-        (suma, dato) => suma + dato.completados, 0
-    );
+    const completas = datos.filter(
+        dato => dato.estadoGeneral === "completa"
+    ).length;
 
     document.getElementById("totalEvidenceCount").textContent = total;
     document.getElementById("pendingEvidenceCount").textContent = pendientes;
