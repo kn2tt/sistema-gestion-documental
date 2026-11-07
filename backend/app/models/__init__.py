@@ -22,3 +22,5 @@ from app.models.generated_checklist_draft import (
     GeneratedChecklistDraftItem,
 )
 from app.models.user_session import UserSession
+from app.models.document_operation import DocumentOperation
+from app.models.document_checklist_progress import DocumentChecklistProgress
