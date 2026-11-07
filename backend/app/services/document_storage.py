@@ -113,6 +113,7 @@ def obtener_documento(clave_archivo: str) -> bytes:
         ) from None
 
 
+
 def eliminar_documento(clave_archivo: str) -> None:
     if (
         not clave_archivo
@@ -148,20 +149,16 @@ def eliminar_documento(clave_archivo: str) -> None:
                         "VersionId": marcador["VersionId"],
                     })
 
-        if versiones_a_eliminar:
-            for objeto in versiones_a_eliminar:
-                s3_client.delete_object(
-                    Bucket=storage_settings.B2_BUCKET_NAME,
-                    Key=objeto["Key"],
-                    VersionId=objeto["VersionId"],
-                )
-        else:
-            # Si no hay versiones listadas, intentamos eliminar
-            # el objeto directamente.
+        # Eliminar todas las versiones y marcadores encontrados.
+        for objeto in versiones_a_eliminar:
             s3_client.delete_object(
                 Bucket=storage_settings.B2_BUCKET_NAME,
-                Key=clave_archivo,
+                Key=objeto["Key"],
+                VersionId=objeto["VersionId"],
             )
+
+        # Si no hay versiones ni marcadores, no se ejecuta
+        # un borrado normal que pueda crear otro marcador.
 
     except (ClientError, BotoCoreError):
         raise HTTPException(
@@ -171,3 +168,4 @@ def eliminar_documento(clave_archivo: str) -> None:
                 "del documento en Backblaze B2."
             ),
         ) from None
+
