@@ -94,12 +94,6 @@ class Assignment(Base):
         nullable=False,
     )
 
-    edicion_evidencias_habilitada: Mapped[bool] = mapped_column(
-        Boolean,
-        default=True,
-        nullable=False,
-    )
-
     fecha_asignacion: Mapped[date] = mapped_column(
         Date,
         default=date.today,

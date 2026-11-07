@@ -35,6 +35,9 @@ from app.core.storage import (
     descargar_evidencia_contenido,
 )
 
+from app.services.assignment_state_service import (
+    actualizar_estado_documentacion,
+)
 
 MAX_IMAGE_SIZE = 10 * 1024 * 1024
 
@@ -799,6 +802,18 @@ class EvidenceService:
                     "evidencia_id": evidence_id,
                     "detalle": str(error),
                 })
+
+        actualizar_estado_documentacion(
+            self.db,
+            assignment,
+        )
+
+        try:
+            self.db.commit()
+
+        except Exception:
+            self.db.rollback()
+            raise
 
         return {
             "mensaje": (

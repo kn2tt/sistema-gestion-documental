@@ -1,191 +1,217 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from io import BytesIO
+from urllib.parse import quote
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    UploadFile,
+    File,
+    status,
+)
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.document import (
-    DocumentCreate,
-    DocumentResponse,
-    DocumentUpdate,
-)
+from app.core.auth import require_roles
+from app.models.user import User
 from app.services.document_service import DocumentService
 
 
 router = APIRouter(
     prefix="/documentos",
-    tags=["Documentos"]
+    tags=["Documentos"],
 )
 
 
-@router.get(
-    "/",
-    response_model=list[DocumentResponse]
-)
+class DocumentChecklistProgressUpdate(BaseModel):
+    completado: bool
+
+
+# =====================================================
+# LISTAR DOCUMENTOS
+# Administrador: todos.
+# Documentador: solo sus asignaciones.
+# =====================================================
+
+@router.get("/")
 def listar_documentos(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_roles("administrador", "documentador")
+    ),
 ):
     service = DocumentService(db)
 
-    return service.get_all()
+    return service.listar_documentos(user)
 
 
-@router.get(
-    "/asignacion/{asignacion_id}",
-    response_model=list[DocumentResponse]
-)
-def listar_documentos_por_asignacion(
+# =====================================================
+# CONSULTAR DOCUMENTO DE UNA ASIGNACIÓN
+# =====================================================
+
+@router.get("/asignacion/{asignacion_id}")
+def obtener_documento_por_asignacion(
     asignacion_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_roles("administrador", "documentador")
+    ),
 ):
     service = DocumentService(db)
 
-    return service.get_by_assignment(
-        asignacion_id
+    return service.obtener_por_asignacion(
+        asignacion_id,
+        user,
     )
 
 
-@router.get(
-    "/usuario/{usuario_id}",
-    response_model=list[DocumentResponse]
-)
-def listar_documentos_por_usuario(
-    usuario_id: int,
-    db: Session = Depends(get_db)
-):
-    service = DocumentService(db)
-
-    return service.get_by_user(
-        usuario_id
-    )
-
+# =====================================================
+# CHECKLIST DOCUMENTAL
+# =====================================================
 
 @router.get(
-    "/estado/{estado}",
-    response_model=list[DocumentResponse]
+    "/asignacion/{asignacion_id}/checklist-documental"
 )
-def listar_documentos_por_estado(
-    estado: str,
-    db: Session = Depends(get_db)
-):
-    service = DocumentService(db)
-
-    return service.get_by_status(
-        estado
-    )
-
-
-@router.get(
-    "/asignacion/{asignacion_id}/ultimo",
-    response_model=DocumentResponse
-)
-def obtener_ultimo_documento(
+def obtener_checklist_documental(
     asignacion_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_roles("administrador", "documentador")
+    ),
 ):
     service = DocumentService(db)
 
-    document = service.get_latest_by_assignment(
-        asignacion_id
+    return service.obtener_checklist_documental(
+        asignacion_id,
+        user,
     )
 
-    if not document:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No existe ningún documento para esta asignación."
-        )
 
-    return document
-
-
-@router.get(
-    "/{document_id}",
-    response_model=DocumentResponse
+@router.patch(
+    "/checklist-documental/items/{item_id}/progreso"
 )
-def obtener_documento(
-    document_id: int,
-    db: Session = Depends(get_db)
+def actualizar_progreso_checklist(
+    item_id: int,
+    data: DocumentChecklistProgressUpdate,
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_roles("documentador")
+    ),
 ):
     service = DocumentService(db)
 
-    document = service.get_by_id(document_id)
+    return service.actualizar_progreso_checklist(
+        item_id=item_id,
+        completado=data.completado,
+        user=user,
+    )
 
-    if not document:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="El documento no existe."
-        )
 
-    return document
-
+# =====================================================
+# CARGAR O REEMPLAZAR DOCUMENTO
+# Solo el documentador asignado.
+# =====================================================
 
 @router.post(
-    "/",
-    response_model=DocumentResponse,
-    status_code=status.HTTP_201_CREATED
+    "/asignacion/{asignacion_id}/archivo",
+    status_code=status.HTTP_201_CREATED,
 )
-def crear_documento(
-    data: DocumentCreate,
-    db: Session = Depends(get_db)
+async def cargar_documento(
+    asignacion_id: int,
+    archivo: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_roles("documentador")
+    ),
 ):
     service = DocumentService(db)
 
     try:
-        return service.create(data)
-
-    except ValueError as error:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(error)
+        return await service.cargar_documento(
+            asignacion_id=asignacion_id,
+            archivo=archivo,
+            user=user,
         )
 
+    finally:
+        await archivo.close()
 
-@router.put(
-    "/{document_id}",
-    response_model=DocumentResponse
-)
-def actualizar_documento(
-    document_id: int,
-    data: DocumentUpdate,
-    db: Session = Depends(get_db)
+
+# =====================================================
+# DESCARGAR DOCUMENTO
+# Administrador o documentador asignado.
+# =====================================================
+
+@router.get("/{documento_id}/descargar")
+def descargar_documento(
+    documento_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_roles("administrador", "documentador")
+    ),
 ):
     service = DocumentService(db)
 
-    try:
-        return service.update(
-            document_id,
-            data
-        )
+    contenido, nombre_archivo = service.descargar_documento(
+        documento_id,
+        user,
+    )
 
-    except ValueError as error:
+    nombre_codificado = quote(
+        nombre_archivo,
+        safe="",
+    )
 
-        if str(error) == "El documento no existe.":
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=str(error)
+    return StreamingResponse(
+        BytesIO(contenido),
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": (
+                f"attachment; filename*=UTF-8''{nombre_codificado}"
             )
-
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(error)
-        )
+        },
+    )
 
 
-@router.delete(
-    "/{document_id}",
-    status_code=status.HTTP_204_NO_CONTENT
-)
-def eliminar_documento(
-    document_id: int,
-    db: Session = Depends(get_db)
+# =====================================================
+# CONSULTAR BITÁCORA
+# Administrador o documentador asignado.
+# =====================================================
+
+@router.get("/{documento_id}/operaciones")
+def obtener_operaciones_documento(
+    documento_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_roles("administrador", "documentador")
+    ),
 ):
     service = DocumentService(db)
 
-    try:
-        service.delete(document_id)
+    return service.obtener_operaciones(
+        documento_id,
+        user,
+    )
 
-    except ValueError as error:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(error)
-        )
 
-    return None
+# =====================================================
+# ELIMINAR DOCUMENTO
+# Solo el administrador.
+# =====================================================
+
+@router.delete("/{documento_id}")
+def eliminar_documento(
+    documento_id: int,
+    db: Session = Depends(get_db),
+    administrador: User = Depends(
+        require_roles("administrador")
+    ),
+):
+    service = DocumentService(db)
+
+    return service.eliminar_documento(
+        documento_id,
+        administrador,
+    )

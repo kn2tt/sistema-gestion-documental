@@ -14,7 +14,9 @@ from app.models.photo_requirement import PhotoRequirement
 
 from app.repositories.assignment_repository import AssignmentRepository
 from app.schemas.assignment import AssignmentCreate, AssignmentUpdate
-
+from app.services.assignment_state_service import (
+    actualizar_estado_documentacion,
+)
 
 ESTADOS_ASIGNACION = {
     "pendiente",
@@ -449,6 +451,11 @@ class AssignmentService:
                 assignment,
                 data.especificaciones,
             )
+
+        actualizar_estado_documentacion(
+            self.db,
+            assignment,
+        )
 
         updated = self.repository.update(assignment)
         return self._serialize(updated)
