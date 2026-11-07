@@ -1,3 +1,4 @@
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -11,18 +12,34 @@ class DocumentRepository:
 
     def get_by_id(
         self,
-        document_id: int
+        document_id: int,
+        include_deleted: bool = False,
     ) -> Document | None:
         statement = select(Document).where(
             Document.id == document_id
         )
 
-        return self.db.execute(statement).scalar_one_or_none()
+        if not include_deleted:
+            statement = statement.where(
+                Document.eliminado.is_(False)
+            )
 
-    def get_all(self) -> list[Document]:
-        statement = select(Document).order_by(
-            Document.id.desc()
-        )
+        return self.db.execute(
+            statement
+        ).scalar_one_or_none()
+
+    def get_all(
+        self,
+        include_deleted: bool = False,
+    ) -> list[Document]:
+        statement = select(Document)
+
+        if not include_deleted:
+            statement = statement.where(
+                Document.eliminado.is_(False)
+            )
+
+        statement = statement.order_by(Document.id.desc())
 
         return list(
             self.db.execute(statement).scalars().all()
@@ -30,17 +47,20 @@ class DocumentRepository:
 
     def get_by_assignment(
         self,
-        assignment_id: int
+        assignment_id: int,
+        include_deleted: bool = False,
     ) -> list[Document]:
-        statement = (
-            select(Document)
-            .where(
-                Document.asignacion_id == assignment_id
+        statement = select(Document).where(
+            Document.asignacion_id == assignment_id
+        )
+
+        if not include_deleted:
+            statement = statement.where(
+                Document.eliminado.is_(False)
             )
-            .order_by(
-                Document.version.desc(),
-                Document.fecha_carga.desc()
-            )
+
+        statement = statement.order_by(
+            Document.fecha_carga.desc()
         )
 
         return list(
@@ -49,16 +69,20 @@ class DocumentRepository:
 
     def get_by_user(
         self,
-        user_id: int
+        user_id: int,
+        include_deleted: bool = False,
     ) -> list[Document]:
-        statement = (
-            select(Document)
-            .where(
-                Document.usuario_id == user_id
+        statement = select(Document).where(
+            Document.usuario_id == user_id
+        )
+
+        if not include_deleted:
+            statement = statement.where(
+                Document.eliminado.is_(False)
             )
-            .order_by(
-                Document.fecha_carga.desc()
-            )
+
+        statement = statement.order_by(
+            Document.fecha_carga.desc()
         )
 
         return list(
@@ -67,16 +91,20 @@ class DocumentRepository:
 
     def get_by_status(
         self,
-        status: str
+        status: str,
+        include_deleted: bool = False,
     ) -> list[Document]:
-        statement = (
-            select(Document)
-            .where(
-                Document.estado == status
+        statement = select(Document).where(
+            Document.estado == status
+        )
+
+        if not include_deleted:
+            statement = statement.where(
+                Document.eliminado.is_(False)
             )
-            .order_by(
-                Document.fecha_carga.desc()
-            )
+
+        statement = statement.order_by(
+            Document.fecha_carga.desc()
         )
 
         return list(
@@ -85,44 +113,59 @@ class DocumentRepository:
 
     def get_latest_by_assignment(
         self,
-        assignment_id: int
+        assignment_id: int,
+        include_deleted: bool = False,
     ) -> Document | None:
-        statement = (
-            select(Document)
-            .where(
-                Document.asignacion_id == assignment_id
-            )
-            .order_by(
-                Document.version.desc(),
-                Document.fecha_carga.desc()
-            )
-            .limit(1)
+        statement = select(Document).where(
+            Document.asignacion_id == assignment_id
         )
 
-        return self.db.execute(statement).scalar_one_or_none()
+        if not include_deleted:
+            statement = statement.where(
+                Document.eliminado.is_(False)
+            )
+
+        statement = statement.limit(1)
+
+        return self.db.execute(
+            statement
+        ).scalar_one_or_none()
 
     def create(
         self,
-        document: Document
+        document: Document,
     ) -> Document:
-        self.db.add(document)
-        self.db.commit()
-        self.db.refresh(document)
+        try:
+            self.db.add(document)
+            self.db.commit()
+            self.db.refresh(document)
+            return document
 
-        return document
+        except Exception:
+            self.db.rollback()
+            raise
 
     def update(
         self,
-        document: Document
+        document: Document,
     ) -> Document:
-        self.db.commit()
-        self.db.refresh(document)
+        try:
+            self.db.commit()
+            self.db.refresh(document)
+            return document
 
-        return document
+        except Exception:
+            self.db.rollback()
+            raise
 
     def delete(
         self,
-        document: Document
+        document: Document,
     ) -> None:
-        self.db.delete(document)
-        self.db.commit()
+        try:
+            self.db.delete(document)
+            self.db.commit()
+
+        except Exception:
+            self.db.rollback()
+            raise

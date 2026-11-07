@@ -7,7 +7,7 @@ from fastapi import HTTPException, UploadFile
 from app.core.storage import s3_client, storage_settings
 
 
-EXTENSIONES_PERMITIDAS = {
+EXTENSIONES_DOCUMENTOS = {
     ".xlsx",
     ".xls",
     ".docx",
@@ -20,10 +20,10 @@ EXTENSIONES_PERMITIDAS = {
 }
 
 
-def validar_archivo(nombre_archivo: str) -> str:
+def validar_documento(nombre_archivo: str) -> str:
     extension = Path(nombre_archivo).suffix.lower()
 
-    if extension not in EXTENSIONES_PERMITIDAS:
+    if extension not in EXTENSIONES_DOCUMENTOS:
         raise HTTPException(
             status_code=400,
             detail=(
@@ -39,6 +39,7 @@ async def guardar_documento(
     asignacion_id: int,
     archivo: UploadFile,
 ) -> tuple[str, str]:
+
     nombre_original = Path(
         archivo.filename or ""
     ).name.strip()
@@ -46,16 +47,17 @@ async def guardar_documento(
     if not nombre_original:
         raise HTTPException(
             status_code=400,
-            detail="Debes seleccionar un archivo.",
+            detail="Debes seleccionar un documento.",
         )
 
-    extension = validar_archivo(nombre_original)
+    extension = validar_documento(nombre_original)
+
     contenido = await archivo.read()
 
     if not contenido:
         raise HTTPException(
             status_code=400,
-            detail="El archivo seleccionado está vacío.",
+            detail="El documento seleccionado está vacío.",
         )
 
     clave_archivo = (
@@ -87,6 +89,12 @@ async def guardar_documento(
 
 
 def obtener_documento(clave_archivo: str) -> bytes:
+    if not clave_archivo or not clave_archivo.startswith("documentos/"):
+        raise HTTPException(
+            status_code=400,
+            detail="La ubicación del documento no es válida.",
+        )
+
     try:
         respuesta = s3_client.get_object(
             Bucket=storage_settings.B2_BUCKET_NAME,
@@ -106,7 +114,10 @@ def obtener_documento(clave_archivo: str) -> bytes:
 
 
 def eliminar_documento(clave_archivo: str) -> None:
-    if not clave_archivo.startswith("documentos/"):
+    if (
+        not clave_archivo
+        or not clave_archivo.startswith("documentos/")
+    ):
         raise HTTPException(
             status_code=400,
             detail="La ubicación del documento no es válida.",
@@ -117,7 +128,7 @@ def eliminar_documento(clave_archivo: str) -> None:
             "list_object_versions"
         )
 
-        objetos_a_eliminar = []
+        versiones_a_eliminar = []
 
         for pagina in paginador.paginate(
             Bucket=storage_settings.B2_BUCKET_NAME,
@@ -125,51 +136,32 @@ def eliminar_documento(clave_archivo: str) -> None:
         ):
             for version in pagina.get("Versions", []):
                 if version.get("Key") == clave_archivo:
-                    objetos_a_eliminar.append({
+                    versiones_a_eliminar.append({
                         "Key": clave_archivo,
                         "VersionId": version["VersionId"],
                     })
 
             for marcador in pagina.get("DeleteMarkers", []):
                 if marcador.get("Key") == clave_archivo:
-                    objetos_a_eliminar.append({
+                    versiones_a_eliminar.append({
                         "Key": clave_archivo,
                         "VersionId": marcador["VersionId"],
                     })
 
-        # Eliminar todas las versiones y marcadores.
-        for objeto in objetos_a_eliminar:
-            s3_client.delete_object(
-                Bucket=storage_settings.B2_BUCKET_NAME,
-                Key=objeto["Key"],
-                VersionId=objeto["VersionId"],
-            )
-
-        # Si no se encontraron versiones, comprobar si existe
-        # un objeto actual que deba eliminarse.
-        if not objetos_a_eliminar:
-            try:
-                s3_client.head_object(
-                    Bucket=storage_settings.B2_BUCKET_NAME,
-                    Key=clave_archivo,
-                )
-
+        if versiones_a_eliminar:
+            for objeto in versiones_a_eliminar:
                 s3_client.delete_object(
                     Bucket=storage_settings.B2_BUCKET_NAME,
-                    Key=clave_archivo,
+                    Key=objeto["Key"],
+                    VersionId=objeto["VersionId"],
                 )
-
-            except ClientError as error:
-                codigo = error.response.get(
-                    "Error", {}
-                ).get("Code", "")
-
-                if codigo not in {
-                    "404",
-                    "NoSuchKey",
-                    "NotFound",
-                }:
-                    raise
+        else:
+            # Si no hay versiones listadas, intentamos eliminar
+            # el objeto directamente.
+            s3_client.delete_object(
+                Bucket=storage_settings.B2_BUCKET_NAME,
+                Key=clave_archivo,
+            )
 
     except (ClientError, BotoCoreError):
         raise HTTPException(

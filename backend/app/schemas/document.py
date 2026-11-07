@@ -7,7 +7,7 @@ class DocumentBase(BaseModel):
     asignacion_id: int
     plantilla_id: int
     nombre_archivo: str
-    archivo_url: str
+    archivo_url: str | None = None
     version: int = 1
     estado: str = "en_proceso"
     usuario_id: int
@@ -29,5 +29,9 @@ class DocumentUpdate(BaseModel):
 class DocumentResponse(DocumentBase):
     id: int
     fecha_carga: datetime
+    eliminado: bool
+    fecha_eliminacion: datetime | None = None
+    eliminado_por_id: int | None = None
+    archivo_disponible: bool = False
 
     model_config = ConfigDict(from_attributes=True)
