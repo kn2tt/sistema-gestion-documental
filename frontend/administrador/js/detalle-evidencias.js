@@ -312,7 +312,20 @@ async function confirmarArchivadoEvidencias() {
         return;
     }
 
+    const contenidoOriginal = boton.innerHTML;
+    const estadoDeshabilitadoOriginal = boton.disabled;
+
     boton.disabled = true;
+    boton.setAttribute("aria-busy", "true");
+
+    boton.innerHTML = `
+        <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+        ></span>
+        Archivando en Google Drive...
+    `;
 
     try {
         const respuesta = await apiFetch(
@@ -363,7 +376,9 @@ async function confirmarArchivadoEvidencias() {
         mostrarNotificacion(error.message, "error");
 
     } finally {
-        boton.disabled = false;
+        boton.innerHTML = contenidoOriginal;
+        boton.disabled = estadoDeshabilitadoOriginal;
+        boton.removeAttribute("aria-busy");
     }
 }
 
@@ -600,10 +615,29 @@ async function obtenerUrlEvidencia(evidencia) {
 }
 
 
-async function eliminarFotografiaAdmin(evidenciaId, itemId) {
+async function eliminarFotografiaAdmin(
+    evidenciaId,
+    itemId,
+    boton
+) {
     const confirmar = await confirmarEliminacionFotografia();
 
     if (!confirmar) return;
+
+    const contenidoOriginal = boton.innerHTML;
+    const estadoDeshabilitadoOriginal = boton.disabled;
+
+    boton.disabled = true;
+    boton.setAttribute("aria-busy", "true");
+
+    boton.innerHTML = `
+        <span
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+            aria-hidden="true"
+        ></span>
+        Eliminando...
+    `;
 
     try {
         const respuesta = await apiFetch(
@@ -639,6 +673,11 @@ async function eliminarFotografiaAdmin(evidenciaId, itemId) {
     } catch (error) {
         console.error("Error al eliminar fotografía:", error);
         mostrarNotificacion(error.message, "error");
+
+    } finally {
+        boton.innerHTML = contenidoOriginal;
+        boton.disabled = estadoDeshabilitadoOriginal;
+        boton.removeAttribute("aria-busy");
     }
 }
 
@@ -955,7 +994,8 @@ checklistContainer.addEventListener("click", async function (event) {
     if (botonEliminar) {
         await eliminarFotografiaAdmin(
             Number(botonEliminar.dataset.evidenceId),
-            Number(botonEliminar.dataset.itemId)
+            Number(botonEliminar.dataset.itemId),
+            botonEliminar
         );
 
         return;

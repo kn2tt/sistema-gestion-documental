@@ -770,12 +770,24 @@ async function subirEvidenciaItem(itemId, archivo, boton) {
         return;
     }
 
+    const contenidoOriginal = boton.innerHTML;
+    const estadoDeshabilitadoOriginal = boton.disabled;
+
     const formulario = new FormData();
     formulario.append("archivo", archivo);
 
-    try {
-        boton.disabled = true;
+    boton.disabled = true;
+    boton.setAttribute("aria-busy", "true");
 
+    boton.innerHTML = `
+        <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+        ></span>
+    `;
+
+    try {
         const respuesta = await apiFetch(
             `${API_URL}/evidencias/tecnico/asignaciones/${assignmentId}/items/${itemId}`,
             {
@@ -817,7 +829,9 @@ async function subirEvidenciaItem(itemId, archivo, boton) {
         );
 
     } finally {
-        boton.disabled = false;
+        boton.innerHTML = contenidoOriginal;
+        boton.disabled = estadoDeshabilitadoOriginal;
+        boton.removeAttribute("aria-busy");
     }
 }
 
@@ -1093,7 +1107,26 @@ function renderizarChecklist(items) {
                     listaEvidencias.hidden = !listaEvidencias.hidden;
 
                     if (!listaEvidencias.hidden) {
-                        await cargarEvidenciasItem(itemId);
+                        const contenidoOriginal = botonConsultar.innerHTML;
+
+                        botonConsultar.disabled = true;
+                        botonConsultar.setAttribute("aria-busy", "true");
+
+                        botonConsultar.innerHTML = `
+                            <span
+                                class="spinner-border spinner-border-sm"
+                                role="status"
+                                aria-hidden="true"
+                            ></span>
+                        `;
+
+                        try {
+                            await cargarEvidenciasItem(itemId);
+                        } finally {
+                            botonConsultar.innerHTML = contenidoOriginal;
+                            botonConsultar.disabled = false;
+                            botonConsultar.removeAttribute("aria-busy");
+                        }
                     }
                 });
 

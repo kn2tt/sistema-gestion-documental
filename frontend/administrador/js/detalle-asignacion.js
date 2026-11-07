@@ -3844,7 +3844,16 @@ document.getElementById("trackingBtnBottom")?.addEventListener("click", function
 });
 
 document.getElementById("evidencesBtn")?.addEventListener("click", function () {
-    window.location.href = "evidencias.html";
+    if (!assignmentId) {
+        mostrarNotificacion(
+            "No se pudo identificar la asignación.",
+            "error"
+        );
+        return;
+    }
+
+    window.location.href =
+        `detalle-evidencias.html?id=${encodeURIComponent(assignmentId)}`;
 });
 
 
