@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mis asignaciones | Gestión Documental</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="../administrador/css/dashboard.css">
+    <link rel="stylesheet" href="../administrador/css/asignaciones.css">
+    <link rel="stylesheet" href="css/asignaciones.css">
+    <link rel="stylesheet" href="../shared/css/notificaciones.css">
+    <link rel="stylesheet" href="../shared/css/logout.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div>
+                <strong>Gestión Documental</strong>
+                <span>Plataforma empresarial</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">PRINCIPAL</div>
+
+            <a href="asignaciones.html" class="nav-item active">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Mis asignaciones</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+
+                <div class="user-avatar" id="sidebarUserAvatar">D</div>
+
+                <div class="user-info">
+                    <strong id="sidebarUserName">Documentador</strong>
+                    <span id="sidebarUserEmail">Usuario del sistema</span>
+                </div>
+
+                <button
+                    type="button"
+                    class="sidebar-logout-button"
+                    id="logoutButton"
+                    title="Cerrar sesión"
+                    aria-label="Cerrar sesión"
+                    data-api-url="http://127.0.0.1:8000"
+                    data-login-url="../index.html"
+                >
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+
+            </div>
+        </div>
+
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="Abrir menú"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="breadcrumb-area">
+                    <span class="breadcrumb-section">Principal</span>
+                    <i class="bi bi-chevron-right"></i>
+                    <strong>Mis asignaciones</strong>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-user">
+                    <div class="topbar-avatar" id="topbarUserAvatar">D</div>
+
+                    <div class="topbar-user-info">
+                        <strong id="topbarUserName">Documentador</strong>
+                        <span>Documentador</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <section class="assignments-page documentador-page">
+
+            <div class="page-header">
+                <div>
+                    <h1>Mis asignaciones</h1>
+                    <p>
+                        Consulta las asignaciones que tienes a cargo y gestiona
+                        la documentación correspondiente.
+                    </p>
+                </div>
+            </div>
+
+            <!-- RESUMEN -->
+            <div class="assignment-summary">
+
+                <div class="summary-card">
+                    <div class="summary-icon total">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+
+                    <div>
+                        <span>Total asignaciones</span>
+                        <strong id="totalAsignaciones">0</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon pending">
+                        <i class="bi bi-clock"></i>
+                    </div>
+
+                    <div>
+                        <span>Pendientes</span>
+                        <strong id="asignacionesPendientes">0</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon process">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+
+                    <div>
+                        <span>En documentación</span>
+                        <strong id="asignacionesEnDocumentacion">0</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon complete">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+
+                    <div>
+                        <span>Completadas</span>
+                        <strong id="asignacionesCompletadas">0</strong>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CLIENTE SELECCIONADO -->
+            <div class="assignment-client-card" id="assignmentClientCard">
+
+                <div class="assignment-client-icon">
+                    <i class="bi bi-building"></i>
+                </div>
+
+                <div class="assignment-client-info">
+                    <h2 id="clienteAsignacionesNombre">Seleccionar cliente</h2>
+                    <p id="clienteAsignacionesEstado">Cliente actual</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="assignment-client-toggle"
+                    id="btnCambiarCliente"
+                    aria-label="Mostrar clientes"
+                    aria-expanded="false"
+                    aria-controls="selectorClientesPanel"
+                >
+                    <i class="bi bi-chevron-down" id="iconoCambiarCliente"></i>
+                </button>
+
+            </div>
+
+            <!-- SELECTOR DE CLIENTES -->
+            <div
+                class="assignment-client-dropdown"
+                id="selectorClientesPanel"
+                hidden
+            >
+                <div class="assignment-client-dropdown-header">
+                    <div>
+                        <h3>Selecciona un cliente</h3>
+                        <p>
+                            Elige el cliente cuyas asignaciones deseas consultar.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="assignment-client-options"
+                    id="listaClientesAsignaciones"
+                ></div>
+
+                <p
+                    class="assignment-client-empty"
+                    id="mensajeClientesVacios"
+                    hidden
+                >
+                    No hay clientes disponibles.
+                </p>
+            </div>
+
+            <select
+                id="clienteAsignacionesSelect"
+                class="visually-hidden"
+                tabindex="-1"
+                aria-hidden="true"
+            >
+                <option value="">Todos los clientes</option>
+            </select>
+
+            <!-- VISTAS POR ESTADO -->
+            <div class="assignment-status-views">
+
+                <button
+                    type="button"
+                    class="assignment-view-card active"
+                    data-assignment-view="activas"
+                    aria-pressed="true"
+                >
+                    <span class="assignment-view-icon active-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </span>
+
+                    <span class="assignment-view-content">
+                        <strong>Activas</strong>
+                        <small>Pendientes y en proceso</small>
+                    </span>
+
+                    <i class="bi bi-chevron-right assignment-view-arrow"></i>
+                </button>
+
+                <button
+                    type="button"
+                    class="assignment-view-card"
+                    data-assignment-view="observadas"
+                    aria-pressed="false"
+                >
+                    <span class="assignment-view-icon observed-icon">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </span>
+
+                    <span class="assignment-view-content">
+                        <strong>Observadas</strong>
+                        <small>Requieren atención</small>
+                    </span>
+
+                    <i class="bi bi-chevron-right assignment-view-arrow"></i>
+                </button>
+
+                <button
+                    type="button"
+                    class="assignment-view-card"
+                    data-assignment-view="completadas"
+                    aria-pressed="false"
+                >
+                    <span class="assignment-view-icon completed-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </span>
+
+                    <span class="assignment-view-content">
+                        <strong>Completadas</strong>
+                        <small>Trabajo finalizado</small>
+                    </span>
+
+                    <i class="bi bi-chevron-right assignment-view-arrow"></i>
+                </button>
+
+            </div>
+
+            <!-- BÚSQUEDA -->
+            <div class="assignment-list-toolbar">
+
+                <div class="assignment-search">
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="searchInput"
+                        placeholder="Buscar por proyecto, site o documento..."
+                        aria-label="Buscar asignaciones"
+                    >
+                </div>
+
+            </div>
+
+            <!-- TABLA -->
+            <div class="assignments-card">
+
+                <div class="table-header">
+                    <div>
+                        <h2>Asignaciones registradas</h2>
+                        <span id="totalResultados">Cargando asignaciones...</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="assignments-table documentador-table">
+                        <thead>
+                            <tr>
+                                <th>Asignación</th>
+                                <th>Site</th>
+                                <th>Subproyecto</th>
+                                <th>Documento</th>
+                                <th>Fecha límite</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="assignmentTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    Cargando asignaciones...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="table-footer">
+                    <span id="contadorAsignaciones">
+                        Cargando asignaciones...
+                    </span>
+
+                    <div
+                        class="pagination"
+                        id="paginacionAsignaciones"
+                        aria-label="Paginación de asignaciones"
+                    ></div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../shared/js/notificaciones.js"></script>
+<script src="js/asignaciones.js"></script>
+<script src="../shared/js/logout.js"></script>
+
+</body>
+</html>

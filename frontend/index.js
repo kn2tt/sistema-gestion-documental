@@ -61,6 +61,11 @@ async function comprobarSesion() {
             return;
         }
 
+        if (rol === "documentador") {
+            window.location.href = "documentador/asignaciones.html";
+            return;
+        }
+
     } catch (error) {
         console.error("No se pudo comprobar la sesión:", error);
     }
@@ -127,6 +132,11 @@ loginForm.addEventListener("submit", async function (event) {
 
         if (rol === "tecnico") {
             window.location.href = "tecnico/asignaciones.html";
+            return;
+        }
+
+        if (rol === "documentador") {
+            window.location.href = "documentador/asignaciones.html";
             return;
         }
 

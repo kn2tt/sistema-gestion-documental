@@ -739,11 +739,11 @@ function renderizarAsignaciones() {
                 <td>
                     <a
                         href="detalle-asignacion.html?id=${encodeURIComponent(id)}"
-                        class="technician-checklist-button"
-                        title="Ver detalles de la asignación"
+                        class="table-action"
+                        title="Ver detalle"
+                        aria-label="Ver detalle de asignación ${id}"
                     >
                         <i class="bi bi-eye"></i>
-                        Ver detalles
                     </a>
                 </td>
             </tr>

@@ -1,0 +1,63 @@
+/* =========================================
+   PANEL DEL DOCUMENTADOR
+   ========================================= */
+
+.documentador-page {
+    min-height: calc(100vh - 72px);
+}
+
+.documentador-table {
+    min-width: 1050px;
+}
+
+.documentador-table td {
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   ESTADOS VACÍOS
+   ========================================= */
+
+.documentador-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55px;
+    height: 55px;
+    margin: 0 auto 14px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 24px;
+}
+
+.documentador-empty strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 13px;
+}
+
+.documentador-empty span {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 800px) {
+    .documentador-page {
+        padding: 24px 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .documentador-page {
+        padding: 20px 15px;
+    }
+}
