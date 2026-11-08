@@ -14,6 +14,10 @@ from app.services.assignment_scheduler import (
     actualizar_asignaciones_por_fecha,
 )
 
+from app.services.assignment_state_service import (
+    sincronizar_estados_documentacion_existentes,
+)
+
 from app.core.storage import verificar_conexion_storage
 
 from app.core.database import engine, settings
@@ -63,6 +67,10 @@ scheduler = BackgroundScheduler(
 async def lifespan(app: FastAPI):
     # Procesar las asignaciones pendientes al iniciar el backend.
     actualizar_asignaciones_por_fecha()
+
+    # Sincronizar asignaciones que ya cumplen las condiciones
+    # para pasar al estado En Documentación.
+    sincronizar_estados_documentacion_existentes()
 
     # Revisar periódicamente si hay asignaciones que deban comenzar.
     scheduler.add_job(

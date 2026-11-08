@@ -799,6 +799,9 @@ async function renderizarEvidenciasItem(itemId) {
 
             contenedor.appendChild(botonEliminar);
         }
+
+        galeria.appendChild(contenedor);
+
     });
 
     lista.appendChild(galeria);

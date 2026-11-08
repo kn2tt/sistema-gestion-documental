@@ -486,6 +486,7 @@ function actualizarFechas(asignacion) {
 
 function renderizarAsignacion(asignacion) {
     actualizarEncabezado(asignacion);
+    actualizarEstado(asignacion.estado);
     actualizarInformacionGeneral(asignacion);
     actualizarFechas(asignacion);
 }

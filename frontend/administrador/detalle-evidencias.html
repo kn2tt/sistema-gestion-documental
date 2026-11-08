@@ -275,65 +275,58 @@
             <!-- CHECKLIST PUBLICADO -->
             <section class="panel-card checklist-panel" id="checklistPanel">
 
-                <div class="panel-header checklist-header technician-checklist-header">
+                <div class="panel-header document-checklist-header">
 
-                    <div class="technician-checklist-heading">
+                    <div>
                         <h2>Checklist de evidencias</h2>
                         <p id="checklistSubtitle">
                             Requisitos e ítems definidos para esta asignación
                         </p>
                     </div>
 
-                    <!-- PROGRESO DEL CHECKLIST -->
-                    <div class="technician-checklist-progress" id="checklistProgress">
-
-                        <div class="technician-checklist-progress-header">
-                            <span>Progreso de evidencias</span>
-                            <strong id="checklistProgressPercentage">0%</strong>
-                        </div>
-
-                        <div
-                            class="technician-checklist-progress-track"
-                            role="progressbar"
-                            aria-label="Progreso de evidencias"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                            aria-valuenow="0"
-                            id="checklistProgressBarContainer"
-                        >
-                            <div
-                                class="technician-checklist-progress-bar"
-                                id="checklistProgressBar"
-                            ></div>
-                        </div>
-
-                        <div class="technician-checklist-progress-details">
-                            <span id="checklistCompletedCount">
-                                0 de 0 ítems con evidencia
-                            </span>
-
-                            <span id="checklistPendingCount">
-                                0 pendientes
-                            </span>
-                        </div>
-
+                    <div class="document-checklist-progress">
+                        <strong id="checklistProgressPercentage">0%</strong>
+                        <span>Completado</span>
                     </div>
 
                 </div>
 
-                <div class="checklist-empty-state" id="checklistEmptyState" hidden>
+                <div
+                    class="document-progress-track"
+                    role="progressbar"
+                    aria-label="Progreso de evidencias"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                    id="checklistProgressBarContainer"
+                >
+                    <div
+                        class="document-progress-bar"
+                        id="checklistProgressBar"
+                    ></div>
+                </div>
 
-                    <div class="checklist-empty-icon">
-                        <i class="bi bi-clipboard-check"></i>
-                    </div>
+                <div class="document-checklist-summary">
+                    <span id="checklistCompletedCount">
+                        0 de 0 ítems con evidencia
+                    </span>
 
-                    <h3>Ch<ecklist no disponible</h3>
+                    <span id="checklistPendingCount">
+                        0 pendientes
+                    </span>
+                </div>
 
-                    <p>
+                <div
+                    class="document-checklist-empty"
+                    id="checklistEmptyState"
+                    hidden
+                >
+                    <i class="bi bi-clipboard-check"></i>
+                    <strong>Checklist no disponible</strong>
+                    <span>
                         El administrador todavía no ha publicado el checklist
                         de esta asignación.
-                    </p>
-
+                    </span>
                 </div>
 
                 <div id="checklistContent" hidden>
@@ -344,7 +337,10 @@
                         </span>
                     </div>
 
-                    <div class="checklist" id="checklistItems"></div>
+                    <div
+                        class="checklist document-checklist-groups"
+                        id="checklistItems"
+                    ></div>
 
                     <div class="checklist-footer-actions" id="checklistExportActions">
                         <button
