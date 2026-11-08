@@ -876,15 +876,11 @@ class DocumentService:
             assignment.plantilla_id,
         )
 
-        if template is None or not template.archivo_url:
+        if template is None:
             raise HTTPException(
                 status_code=404,
                 detail="No se encontró la plantilla asignada.",
             )
-
-        nombre_archivo = Path(
-            template.archivo_url
-        ).name
 
         version_actual = next(
             (
@@ -896,10 +892,18 @@ class DocumentService:
         )
 
         if version_actual:
+            clave_archivo = version_actual.clave_archivo
             nombre_archivo = version_actual.nombre_archivo
+        else:
+            clave_archivo = template.archivo_url
+            nombre_archivo = Path(clave_archivo).name
 
-        contenido = obtener_archivo(
-            template.archivo_url
-        )
+        if not clave_archivo:
+            raise HTTPException(
+                status_code=404,
+                detail="La plantilla no tiene un archivo asociado.",
+            )
+
+        contenido = obtener_archivo(clave_archivo)
 
         return contenido, nombre_archivo

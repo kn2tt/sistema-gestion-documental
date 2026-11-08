@@ -9,7 +9,7 @@ from fastapi import (
     File,
     status,
 )
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -185,8 +185,8 @@ def descargar_plantilla_asignada(
         safe="",
     )
 
-    return StreamingResponse(
-        BytesIO(contenido),
+    return Response(
+        content=contenido,
         media_type="application/octet-stream",
         headers={
             "Content-Disposition": (
