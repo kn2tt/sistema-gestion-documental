@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Detalle de asignación | Gestión Documental</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="../administrador/css/dashboard.css">
+    <link rel="stylesheet" href="../administrador/css/asignaciones.css">
+    <link rel="stylesheet" href="../administrador/css/detalle-asignacion.css">
+    <link rel="stylesheet" href="css/detalle-asignacion.css">
+    <link rel="stylesheet" href="../shared/css/notificaciones.css">
+    <link rel="stylesheet" href="../shared/css/logout.css">
+</head>
+
+<body>
+
+<div
+    id="notificationContainer"
+    class="notification-container"
+    aria-live="polite"
+    aria-relevant="additions"
+></div>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div>
+                <strong>Gestión Documental</strong>
+                <span>Plataforma empresarial</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">PRINCIPAL</div>
+
+            <a href="asignaciones.html" class="nav-item active">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Mis asignaciones</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+
+                <div class="user-avatar" id="sidebarUserAvatar">D</div>
+
+                <div class="user-info">
+                    <strong id="sidebarUserName">Documentador</strong>
+                    <span id="sidebarUserEmail">Usuario del sistema</span>
+                </div>
+
+                <button
+                    type="button"
+                    class="sidebar-logout-button"
+                    id="logoutButton"
+                    title="Cerrar sesión"
+                    aria-label="Cerrar sesión"
+                    data-api-url="http://127.0.0.1:8000"
+                    data-login-url="../index.html"
+                >
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="Abrir menú"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="breadcrumb-area">
+                    <span class="breadcrumb-section">Mis asignaciones</span>
+                    <i class="bi bi-chevron-right"></i>
+                    <strong>Detalle de asignación</strong>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-user">
+
+                    <div class="topbar-avatar" id="topbarUserAvatar">D</div>
+
+                    <div class="topbar-user-info">
+                        <strong id="topbarUserName">Documentador</strong>
+                        <span>Documentador</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <div class="page-content documentador-detail-page">
+
+            <!-- ENCABEZADO -->
+            <div class="page-header">
+
+                <div>
+
+                    <a href="asignaciones.html" class="back-link">
+                        <i class="bi bi-arrow-left"></i>
+                        Volver a mis asignaciones
+                    </a>
+
+                    <div class="title-row">
+
+                        <div>
+                            <h1 id="tituloAsignacion">
+                                Cargando asignación...
+                            </h1>
+
+                            <p id="subtituloAsignacion"></p>
+                        </div>
+
+                        <span
+                            class="status-badge"
+                            id="estadoAsignacion"
+                            hidden
+                        >
+                            <span></span>
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div id="detalleError" class="detail-error" hidden>
+                <i class="bi bi-exclamation-circle"></i>
+
+                <div>
+                    <strong>No se pudo cargar la asignación</strong>
+                    <p id="detalleErrorMensaje">
+                        Comprueba tu conexión e inténtalo nuevamente.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-sm"
+                        id="btnReintentarDetalle"
+                    >
+                        <i class="bi bi-arrow-clockwise me-1"></i>
+                        Reintentar
+                    </button>
+                </div>
+            </div>
+
+            <div id="detalleContenido" hidden>
+
+                <!-- INFORMACIÓN GENERAL -->
+                <section class="info-grid">
+
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="bi bi-building"></i>
+                        </div>
+
+                        <div>
+                            <span class="info-label">Cliente</span>
+                            <strong id="clienteAsignacion"></strong>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+
+                        <div>
+                            <span class="info-label">Site</span>
+                            <strong id="siteAsignacion"></strong>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+
+                        <div>
+                            <span class="info-label">Tipo de documento</span>
+                            <strong id="tipoDocumentoAsignacion"></strong>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="bi bi-list-check"></i>
+                        </div>
+
+                        <div class="info-card-content">
+                            <span class="info-label">Alcances</span>
+                            <div id="alcanceAsignacion" class="scope-list"></div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- INFORMACIÓN COMPLEMENTARIA -->
+                <section class="content-grid documentador-detail-grid">
+
+                    <div class="panel-card">
+
+                        <div class="panel-header">
+                            <div>
+                                <h2>Responsable técnico</h2>
+                                <p>Personal asignado a la ejecución</p>
+                            </div>
+                        </div>
+
+                        <div class="responsible-list" id="tecnicosAsignacion"></div>
+
+                    </div>
+
+                    <div class="panel-card">
+
+                        <div class="panel-header">
+                            <div>
+                                <h2>Información de la asignación</h2>
+                                <p>Fechas y plazo de ejecución</p>
+                            </div>
+                        </div>
+
+                        <div class="date-list">
+
+                            <div class="date-row">
+                                <div class="date-icon">
+                                    <i class="bi bi-calendar-plus"></i>
+                                </div>
+
+                                <div>
+                                    <span>Fecha de asignación</span>
+                                    <strong id="fechaAsignacion"></strong>
+                                </div>
+                            </div>
+
+                            <div class="date-row">
+                                <div class="date-icon">
+                                    <i class="bi bi-calendar-event"></i>
+                                </div>
+
+                                <div>
+                                    <span>Fecha límite</span>
+                                    <strong id="fechaLimiteAsignacion"></strong>
+                                </div>
+                            </div>
+
+                            <div class="date-row">
+                                <div class="date-icon">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+
+                                <div>
+                                    <span>Días restantes</span>
+                                    <strong id="diasRestantesAsignacion"></strong>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="panel-card workflow-card">
+
+                        <div class="panel-header">
+                            <div>
+                                <h2>Estado de la asignación</h2>
+                                <p>Etapa actual del proceso</p>
+                            </div>
+
+                            <i class="bi bi-diagram-3 workflow-header-icon"></i>
+                        </div>
+
+                        <div class="workflow-timeline">
+
+                            <div class="workflow-step" data-status="pendiente">
+                                <div class="workflow-marker">
+                                    <i class="bi bi-clipboard-check"></i>
+                                </div>
+                                <div class="workflow-content">
+                                    <strong>Pendiente</strong>
+                                    <span>Asignación registrada</span>
+                                </div>
+                            </div>
+
+                            <div class="workflow-step" data-status="en_proceso">
+                                <div class="workflow-marker">
+                                    <i class="bi bi-tools"></i>
+                                </div>
+                                <div class="workflow-content">
+                                    <strong>En proceso</strong>
+                                    <span>Ejecución técnica y evidencias</span>
+                                </div>
+                            </div>
+
+                            <div class="workflow-step" data-status="pendiente_documentacion">
+                                <div class="workflow-marker">
+                                    <i class="bi bi-file-earmark"></i>
+                                </div>
+                                <div class="workflow-content">
+                                    <strong>Pendiente de documentación</strong>
+                                    <span>Preparación del documento</span>
+                                </div>
+                            </div>
+
+                            <div class="workflow-step" data-status="en_documentacion">
+                                <div class="workflow-marker">
+                                    <i class="bi bi-pencil-square"></i>
+                                </div>
+                                <div class="workflow-content">
+                                    <strong>En documentación</strong>
+                                    <span>Elaboración del documento</span>
+                                </div>
+                            </div>
+
+                            <div class="workflow-step" data-status="en_revision">
+                                <div class="workflow-marker">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                                <div class="workflow-content">
+                                    <strong>En revisión</strong>
+                                    <span>Revisión del documento</span>
+                                </div>
+                            </div>
+
+                            <div class="workflow-step" data-status="observado">
+                                <div class="workflow-marker">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div class="workflow-content">
+                                    <strong>Observado</strong>
+                                    <span>Requiere atención</span>
+                                </div>
+                            </div>
+
+                            <div class="workflow-step" data-status="completado">
+                                <div class="workflow-marker">
+                                    <i class="bi bi-flag"></i>
+                                </div>
+                                <div class="workflow-content">
+                                    <strong>Completado</strong>
+                                    <span>Asignación finalizada</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- RECURSOS PARA DOCUMENTACIÓN -->
+                <section class="document-resources-grid">
+
+                    <div class="panel-card document-resource-card">
+
+                        <div class="panel-header">
+                            <div>
+                                <h2>Plantilla asignada</h2>
+                                <p id="plantillaNombre">
+                                    Plantilla correspondiente a la asignación
+                                </p>
+                            </div>
+
+                            <i class="bi bi-file-earmark-arrow-down resource-header-icon"></i>
+                        </div>
+
+                        <div class="resource-content">
+                            <div class="resource-icon template-icon">
+                                <i class="bi bi-file-earmark-spreadsheet"></i>
+                            </div>
+
+                            <div class="resource-description">
+                                <strong>Descargar plantilla</strong>
+                                <span>
+                                    Utiliza el formato establecido para elaborar
+                                    el documento.
+                                </span>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary"
+                                id="btnDescargarPlantilla"
+                            >
+                                <i class="bi bi-download me-1"></i>
+                                Descargar
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="panel-card document-resource-card">
+
+                        <div class="panel-header">
+                            <div>
+                                <h2>Carpeta de evidencias</h2>
+                                <p>Archivos proporcionados para elaborar el documento</p>
+                            </div>
+
+                            <i class="bi bi-google resource-header-icon"></i>
+                        </div>
+
+                        <div class="resource-content">
+                            <div class="resource-icon drive-icon">
+                                <i class="bi bi-folder2-open"></i>
+                            </div>
+
+                            <div class="resource-description">
+                                <strong>Google Drive</strong>
+                                <span id="driveEstado">
+                                    Consultando carpeta de evidencias...
+                                </span>
+                            </div>
+
+                            <a
+                                href="#"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn btn-outline-primary disabled"
+                                id="btnAbrirDrive"
+                                aria-disabled="true"
+                            >
+                                <i class="bi bi-box-arrow-up-right me-1"></i>
+                                Abrir carpeta
+                            </a>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- CHECKLIST DOCUMENTAL -->
+                <section class="panel-card document-checklist-panel">
+
+                    <div class="panel-header document-checklist-header">
+
+                        <div>
+                            <h2>Checklist documental</h2>
+                            <p>
+                                Marca los ítems que hayas atendido durante la
+                                elaboración del documento.
+                            </p>
+                        </div>
+
+                        <div class="document-checklist-progress">
+                            <strong id="checklistProgressPercentage">0%</strong>
+                            <span>Completado</span>
+                        </div>
+
+                    </div>
+
+                    <div class="document-progress-track">
+                        <div
+                            class="document-progress-bar"
+                            id="checklistProgressBar"
+                        ></div>
+                    </div>
+
+                    <div class="document-checklist-summary">
+                        <span id="checklistCompletedCount">0 de 0 ítems atendidos</span>
+                        <span id="checklistPendingCount">0 pendientes</span>
+                    </div>
+
+                    <div
+                        class="document-checklist-empty"
+                        id="checklistEmptyState"
+                        hidden
+                    >
+                        <i class="bi bi-clipboard-check"></i>
+                        <strong>Checklist no disponible</strong>
+                        <span>
+                            El administrador todavía no ha publicado el checklist
+                            de esta asignación.
+                        </span>
+                    </div>
+
+                    <div id="checklistItems" class="document-checklist-groups"></div>
+
+                </section>
+
+                <!-- DOCUMENTO ELABORADO -->
+                <section class="panel-card document-file-panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2>Documento elaborado</h2>
+                            <p>
+                                Carga el documento correspondiente a esta asignación.
+                            </p>
+                        </div>
+
+                        <span class="document-file-status" id="documentFileStatus">
+                            Sin documento
+                        </span>
+                    </div>
+
+                    <div id="documentoActual" class="document-current-file" hidden>
+
+                        <div class="document-current-icon">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+
+                        <div class="document-current-info">
+                            <strong id="documentoNombre"></strong>
+                            <span id="documentoFecha"></span>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary btn-sm"
+                            id="btnDescargarDocumento"
+                        >
+                            <i class="bi bi-download me-1"></i>
+                            Descargar
+                        </button>
+
+                    </div>
+
+                    <div class="document-upload-area">
+
+                        <div class="document-upload-description">
+                            <i class="bi bi-cloud-arrow-up"></i>
+
+                            <div>
+                                <strong id="documentUploadTitle">
+                                    Cargar documento
+                                </strong>
+
+                                <span id="documentUploadDescription">
+                                    Selecciona el archivo elaborado para esta asignación.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="document-upload-controls">
+
+                            <input
+                                type="file"
+                                class="form-control"
+                                id="documentFileInput"
+                                accept=".xlsx,.xls,.docx,.doc,.pdf,.pptx,.ppt,.odt,.ods"
+                            >
+
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                id="btnCargarDocumento"
+                                disabled
+                            >
+                                <i class="bi bi-upload me-1"></i>
+                                Cargar documento
+                            </button>
+
+                        </div>
+
+                        <small class="document-upload-help">
+                            Formatos permitidos: XLSX, XLS, DOCX, DOC, PDF,
+                            PPTX, PPT, ODT y ODS.
+                        </small>
+
+                    </div>
+
+                </section>
+
+                <!-- HISTORIAL DE OPERACIONES -->
+                <section class="panel-card document-history-panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2>Historial de operaciones</h2>
+                            <p>
+                                Registro de las operaciones realizadas sobre el documento.
+                            </p>
+                        </div>
+
+                        <i class="bi bi-clock-history history-header-icon"></i>
+                    </div>
+
+                    <div id="documentHistory" class="document-history-list">
+
+                        <div class="document-history-empty">
+                            <i class="bi bi-clock"></i>
+                            <span>No hay operaciones registradas.</span>
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- MODAL CONFIRMAR REEMPLAZO -->
+<div
+    class="modal fade"
+    id="confirmarReemplazoModal"
+    tabindex="-1"
+    aria-labelledby="confirmarReemplazoModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarReemplazoModalLabel">
+                    Reemplazar documento
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="text-center">
+
+                    <div class="mb-3">
+                        <i
+                            class="bi bi-arrow-repeat"
+                            style="font-size: 34px; color: #2563eb;"
+                        ></i>
+                    </div>
+
+                    <p class="mb-2 fw-semibold">
+                        ¿Deseas reemplazar el documento actual?
+                    </p>
+
+                    <p class="text-muted mb-0 small">
+                        El archivo nuevo sustituirá al documento vigente
+                        de esta asignación.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnConfirmarReemplazo"
+                >
+                    <i class="bi bi-check-lg me-1"></i>
+                    Confirmar reemplazo
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../shared/js/notificaciones.js"></script>
+<script src="js/detalle-asignacion.js"></script>
+<script src="../shared/js/logout.js"></script>
+
+</body>
+</html>
