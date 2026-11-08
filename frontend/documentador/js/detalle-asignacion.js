@@ -1050,6 +1050,12 @@ async function ejecutarCargaDocumento(botonAccion = btnCargarDocumento) {
 
         actualizarVistaDocumento(documento);
 
+        if (asignacionActual && documento.estado_asignacion) {
+            asignacionActual.estado = documento.estado_asignacion;
+
+            renderizarAsignacion(asignacionActual);
+        }
+
         await cargarHistorialDocumento(documento.id);
 
         mostrarNotificacion(

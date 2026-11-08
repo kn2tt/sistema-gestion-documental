@@ -3826,14 +3826,283 @@ startChecklistUpdateBtn?.addEventListener(
     iniciarActualizacionChecklist
 );
 
+/* =====================================================
+   DOCUMENTO ENTREGADO Y CHECKLIST DOCUMENTAL
+   ===================================================== */
+
+let documentoRevisionActual = null;
+
+function renderizarChecklistEntregado(checklist) {
+    const contenedor = document.getElementById(
+        "documentReviewChecklist"
+    );
+
+    const items = Array.isArray(checklist?.items)
+        ? checklist.items
+        : [];
+
+    const completados = items.filter(
+        item => Boolean(item.completado)
+    ).length;
+
+    const pendientes = items.length - completados;
+
+    document.getElementById("documentReviewTotal").textContent =
+        items.length;
+
+    document.getElementById("documentReviewCompleted").textContent =
+        completados;
+
+    document.getElementById("documentReviewPending").textContent =
+        pendientes;
+
+    contenedor.replaceChildren();
+
+    if (items.length === 0) {
+        contenedor.innerHTML = `
+            <p class="text-muted small mb-0">
+                No hay ítems registrados en el checklist documental.
+            </p>
+        `;
+        return;
+    }
+
+    const grupos = new Map();
+
+    items.forEach(item => {
+        const encabezado = item.encabezado || "Otros requerimientos";
+
+        if (!grupos.has(encabezado)) {
+            grupos.set(encabezado, []);
+        }
+
+        grupos.get(encabezado).push(item);
+    });
+
+    grupos.forEach((itemsGrupo, encabezado) => {
+        const grupo = document.createElement("div");
+
+        grupo.className = "document-review-group";
+
+        const titulo = document.createElement("h6");
+        titulo.textContent = encabezado;
+
+        grupo.appendChild(titulo);
+
+        itemsGrupo.forEach(item => {
+            const fila = document.createElement("div");
+
+            fila.className = "document-review-item";
+
+            const contenido = document.createElement("div");
+
+            contenido.className = "document-review-item-content";
+
+            const nombre = document.createElement("strong");
+            nombre.textContent = item.titulo || "Ítem sin título";
+
+            contenido.appendChild(nombre);
+
+            if (item.descripcion) {
+                const descripcion = document.createElement("span");
+
+                descripcion.textContent = item.descripcion;
+
+                contenido.appendChild(descripcion);
+            }
+
+            const estado = document.createElement("span");
+
+            estado.className = item.completado
+                ? "document-review-status completed"
+                : "document-review-status pending";
+
+            estado.innerHTML = item.completado
+                ? '<i class="bi bi-check-circle-fill"></i> Completado'
+                : '<i class="bi bi-clock"></i> Pendiente';
+
+            fila.append(contenido, estado);
+
+            grupo.appendChild(fila);
+        });
+
+        contenedor.appendChild(grupo);
+    });
+}
+
+
+async function abrirDocumentoAsignacion() {
+    if (!assignmentId) {
+        mostrarNotificacion(
+            "No se pudo identificar la asignación.",
+            "error"
+        );
+        return;
+    }
+
+    const modalElemento = document.getElementById(
+        "documentReviewModal"
+    );
+
+    const modal = bootstrap.Modal.getOrCreateInstance(
+        modalElemento
+    );
+
+    const loading = document.getElementById(
+        "documentReviewLoading"
+    );
+
+    const contenido = document.getElementById(
+        "documentReviewContent"
+    );
+
+    const vacio = document.getElementById(
+        "documentReviewEmpty"
+    );
+
+    loading.hidden = false;
+    contenido.hidden = true;
+    vacio.hidden = true;
+
+    modal.show();
+
+    try {
+        const documento = await solicitarChecklist(
+            `${API_URL}/documentos/asignacion/${encodeURIComponent(assignmentId)}`
+        );
+
+        if (!documento || !documento.id) {
+            vacio.hidden = false;
+            return;
+        }
+
+        documentoRevisionActual = documento;
+
+        document.getElementById(
+            "documentReviewFileName"
+        ).textContent = documento.nombre_archivo || "Documento sin nombre";
+
+        document.getElementById(
+            "documentReviewFileDate"
+        ).textContent = documento.fecha_carga
+            ? `Última carga: ${new Date(documento.fecha_carga).toLocaleString("es-PE")}`
+            : "Fecha no disponible";
+
+        let checklist = null;
+
+        try {
+            checklist = await solicitarChecklist(
+                `${API_URL}/documentos/asignacion/${encodeURIComponent(assignmentId)}/checklist-documental`
+            );
+        } catch (error) {
+            if (error.status !== 404) {
+                throw error;
+            }
+        }
+
+        renderizarChecklistEntregado(checklist);
+
+        contenido.hidden = false;
+
+    } catch (error) {
+        mostrarNotificacion(
+            error.message || "No se pudo consultar la entrega documental.",
+            "error"
+        );
+
+        modal.hide();
+
+    } finally {
+        loading.hidden = true;
+    }
+}
+
+
+async function descargarDocumentoRevision() {
+    if (!documentoRevisionActual?.id) return;
+
+    const boton = document.getElementById(
+        "btnDownloadReviewDocument"
+    );
+
+    const contenidoOriginal = boton.innerHTML;
+
+    boton.disabled = true;
+
+    boton.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Descargando...
+    `;
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/documentos/${documentoRevisionActual.id}/descargar`
+        );
+
+        if (!respuesta.ok) {
+            const error = await respuesta.json().catch(() => ({}));
+
+            throw new Error(
+                error.detail || "No se pudo descargar el documento."
+            );
+        }
+
+        const blob = await respuesta.blob();
+
+        const disposicion = respuesta.headers.get(
+            "Content-Disposition"
+        );
+
+        const nombreCodificado = disposicion?.match(
+            /filename\*=UTF-8''([^;]+)/i
+        );
+
+        const nombreArchivo = nombreCodificado
+            ? decodeURIComponent(nombreCodificado[1])
+            : documentoRevisionActual.nombre_archivo;
+
+        const url = URL.createObjectURL(blob);
+
+        const enlace = document.createElement("a");
+
+        enlace.href = url;
+        enlace.download = nombreArchivo || "documento";
+
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+
+        URL.revokeObjectURL(url);
+
+        mostrarNotificacion(
+            "El documento se descargó correctamente.",
+            "success"
+        );
+
+    } catch (error) {
+        mostrarNotificacion(
+            error.message || "No se pudo descargar el documento.",
+            "error"
+        );
+
+    } finally {
+        boton.disabled = false;
+        boton.innerHTML = contenidoOriginal;
+    }
+}
+
+
+document.getElementById("btnDownloadReviewDocument")
+    ?.addEventListener("click", descargarDocumentoRevision);
 
 /* =====================================================
    NAVEGACIÓN
    ===================================================== */
 
-document.getElementById("documentBtn")?.addEventListener("click", function () {
-    window.location.href = "documentos.html";
-});
+document.getElementById("documentBtn")?.addEventListener(
+    "click",
+    abrirDocumentoAsignacion
+);
 
 document.getElementById("trackingBtn")?.addEventListener("click", function () {
     window.location.href = "seguimiento.html";

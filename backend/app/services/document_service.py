@@ -345,7 +345,7 @@ class DocumentService:
                     storage_key=nueva_clave,
                     storage_key_pendiente_eliminacion=None,
                     version=1,
-                    estado="en_proceso",
+                    estado="en_revision",
                     usuario_id=user.id,
                     fecha_carga=datetime.utcnow(),
                     eliminado=False,
@@ -367,7 +367,7 @@ class DocumentService:
                     clave_anterior
                 )
                 document.version = 1
-                document.estado = "en_proceso"
+                document.estado = "en_revision"
                 document.usuario_id = user.id
                 document.fecha_carga = datetime.utcnow()
                 document.eliminado = False
@@ -389,6 +389,10 @@ class DocumentService:
                     else "Se cargó el documento de la asignación."
                 ),
             )
+
+            # El documento fue registrado correctamente.
+            # La asignación pasa automáticamente a revisión.
+            assignment.estado = "en_revision"
 
             self.db.commit()
             self.db.refresh(document)

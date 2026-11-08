@@ -4661,3 +4661,192 @@
         margin: 14px 16px;
     }
 }
+
+/* =========================================
+   DOCUMENTO ENTREGADO Y CHECKLIST
+   ========================================= */
+
+.document-review-file {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid #e7ebf0;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.document-review-file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 21px;
+}
+
+.document-review-file-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.document-review-file-info strong {
+    color: #334155;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.document-review-file-info span {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.document-review-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.document-review-summary > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 15px;
+    border: 1px solid #e7ebf0;
+    border-radius: 9px;
+}
+
+.document-review-summary strong {
+    color: #334155;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.document-review-summary span {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.document-review-heading {
+    margin-bottom: 14px;
+}
+
+.document-review-heading h6 {
+    margin-bottom: 4px;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.document-review-heading span {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.document-review-group {
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid #e7ebf0;
+    border-radius: 9px;
+}
+
+.document-review-group > h6 {
+    margin: 0;
+    padding: 13px 15px;
+    border-bottom: 1px solid #e7ebf0;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.document-review-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.document-review-item:last-child {
+    border-bottom: 0;
+}
+
+.document-review-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.document-review-item-content strong {
+    color: #334155;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.document-review-item-content span {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.document-review-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.document-review-status.completed {
+    color: #15803d;
+}
+
+.document-review-status.pending {
+    color: #b45309;
+}
+
+@media (max-width: 576px) {
+    .document-review-file {
+        flex-wrap: wrap;
+    }
+
+    .document-review-file-info {
+        width: calc(100% - 60px);
+    }
+
+    .document-review-file > button {
+        width: 100%;
+    }
+
+    .document-review-summary {
+        gap: 7px;
+    }
+
+    .document-review-summary > div {
+        padding: 10px;
+    }
+
+    .document-review-summary strong {
+        font-size: 18px;
+    }
+
+    .document-review-summary span {
+        font-size: 10px;
+    }
+
+    .document-review-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

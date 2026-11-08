@@ -1566,6 +1566,123 @@
     </div>
 </div>
 
+<!-- MODAL DOCUMENTO ENTREGADO -->
+<div
+    class="modal fade"
+    id="documentReviewModal"
+    tabindex="-1"
+    aria-labelledby="documentReviewModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="documentReviewModalLabel">
+                        Documento entregado
+                    </h5>
+                    <small class="text-muted">
+                        Consulta del documento y checklist documental
+                    </small>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                ></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div id="documentReviewLoading" class="text-center py-4">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Consultando entrega...
+                </div>
+
+                <div id="documentReviewContent" hidden>
+
+                    <div class="document-review-file">
+
+                        <div class="document-review-file-icon">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+
+                        <div class="document-review-file-info">
+                            <strong id="documentReviewFileName"></strong>
+                            <span id="documentReviewFileDate"></span>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary btn-sm"
+                            id="btnDownloadReviewDocument"
+                        >
+                            <i class="bi bi-download me-1"></i>
+                            Descargar
+                        </button>
+
+                    </div>
+
+                    <div class="document-review-summary">
+                        <div>
+                            <strong id="documentReviewTotal">0</strong>
+                            <span>Total de ítems</span>
+                        </div>
+
+                        <div>
+                            <strong id="documentReviewCompleted">0</strong>
+                            <span>Completados</span>
+                        </div>
+
+                        <div>
+                            <strong id="documentReviewPending">0</strong>
+                            <span>Pendientes</span>
+                        </div>
+                    </div>
+
+                    <div class="document-review-checklist">
+
+                        <div class="document-review-heading">
+                            <h6>Checklist documental</h6>
+                            <span>Estado reportado por el documentador</span>
+                        </div>
+
+                        <div id="documentReviewChecklist"></div>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="documentReviewEmpty"
+                    class="text-center py-4"
+                    hidden
+                >
+                    <i class="bi bi-file-earmark-x fs-2 text-muted"></i>
+                    <p class="mt-2 mb-0">
+                        Todavía no se ha cargado un documento para esta asignación.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../shared/js/notificaciones.js"></script>
 <script src="js/detalle-asignacion.js"></script>
