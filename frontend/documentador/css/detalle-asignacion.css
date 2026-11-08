@@ -668,3 +668,74 @@
         padding: 20px 15px;
     }
 }
+
+/* =========================================
+   AJUSTES DE LA VISTA DEL DOCUMENTADOR
+   ========================================= */
+
+.documentador-detail-grid {
+    grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.4fr);
+    align-items: stretch;
+}
+
+.document-dates-card,
+.document-history-panel {
+    min-width: 0;
+    margin-top: 0;
+}
+
+.document-history-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* Fecha próxima a vencer */
+.days-warning {
+    color: #d97706 !important;
+}
+
+/* Fecha vencida */
+.days-overdue {
+    color: #dc2626 !important;
+    font-weight: 700;
+}
+
+/* Carga de documentos */
+.document-upload-area.upload-area {
+    margin: 18px 0 0;
+    padding: 24px 20px;
+}
+
+.document-upload-area .upload-icon {
+    margin: 0 auto 12px;
+}
+
+.document-upload-area > strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.document-upload-area > span {
+    display: block;
+    margin-bottom: 15px;
+}
+
+.document-upload-area input[type="file"] {
+    display: none;
+}
+
+.document-upload-area .btn-primary-custom {
+    border: 0;
+    cursor: pointer;
+}
+
+.document-upload-area .btn-primary-custom:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.document-upload-area .document-upload-help {
+    display: block;
+    margin-top: 12px;
+}

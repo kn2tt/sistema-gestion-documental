@@ -152,14 +152,6 @@
                             <p id="subtituloAsignacion"></p>
                         </div>
 
-                        <span
-                            class="status-badge"
-                            id="estadoAsignacion"
-                            hidden
-                        >
-                            <span></span>
-                        </span>
-
                     </div>
 
                 </div>
@@ -237,28 +229,16 @@
 
                 </section>
 
-                <!-- INFORMACIÓN COMPLEMENTARIA -->
+                <!-- FECHAS E HISTORIAL -->
                 <section class="content-grid documentador-detail-grid">
 
-                    <div class="panel-card">
+                    <!-- FECHAS DE LA ASIGNACIÓN -->
+                    <div class="panel-card document-dates-card">
 
                         <div class="panel-header">
                             <div>
-                                <h2>Responsable técnico</h2>
-                                <p>Personal asignado a la ejecución</p>
-                            </div>
-                        </div>
-
-                        <div class="responsible-list" id="tecnicosAsignacion"></div>
-
-                    </div>
-
-                    <div class="panel-card">
-
-                        <div class="panel-header">
-                            <div>
-                                <h2>Información de la asignación</h2>
-                                <p>Fechas y plazo de ejecución</p>
+                                <h2>Fechas de la asignación</h2>
+                                <p>Plazo establecido para la elaboración</p>
                             </div>
                         </div>
 
@@ -268,7 +248,6 @@
                                 <div class="date-icon">
                                     <i class="bi bi-calendar-plus"></i>
                                 </div>
-
                                 <div>
                                     <span>Fecha de asignación</span>
                                     <strong id="fechaAsignacion"></strong>
@@ -279,7 +258,6 @@
                                 <div class="date-icon">
                                     <i class="bi bi-calendar-event"></i>
                                 </div>
-
                                 <div>
                                     <span>Fecha límite</span>
                                     <strong id="fechaLimiteAsignacion"></strong>
@@ -290,7 +268,6 @@
                                 <div class="date-icon">
                                     <i class="bi bi-hourglass-split"></i>
                                 </div>
-
                                 <div>
                                     <span>Días restantes</span>
                                     <strong id="diasRestantesAsignacion"></strong>
@@ -301,87 +278,23 @@
 
                     </div>
 
-                    <div class="panel-card workflow-card">
+                    <!-- HISTORIAL DE OPERACIONES -->
+                    <div class="panel-card document-history-panel">
 
                         <div class="panel-header">
                             <div>
-                                <h2>Estado de la asignación</h2>
-                                <p>Etapa actual del proceso</p>
+                                <h2>Historial de operaciones</h2>
+                                <p>Registro de las operaciones realizadas sobre el documento</p>
                             </div>
 
-                            <i class="bi bi-diagram-3 workflow-header-icon"></i>
+                            <i class="bi bi-clock-history history-header-icon"></i>
                         </div>
 
-                        <div class="workflow-timeline">
+                        <div id="documentHistory" class="document-history-list">
 
-                            <div class="workflow-step" data-status="pendiente">
-                                <div class="workflow-marker">
-                                    <i class="bi bi-clipboard-check"></i>
-                                </div>
-                                <div class="workflow-content">
-                                    <strong>Pendiente</strong>
-                                    <span>Asignación registrada</span>
-                                </div>
-                            </div>
-
-                            <div class="workflow-step" data-status="en_proceso">
-                                <div class="workflow-marker">
-                                    <i class="bi bi-tools"></i>
-                                </div>
-                                <div class="workflow-content">
-                                    <strong>En proceso</strong>
-                                    <span>Ejecución técnica y evidencias</span>
-                                </div>
-                            </div>
-
-                            <div class="workflow-step" data-status="pendiente_documentacion">
-                                <div class="workflow-marker">
-                                    <i class="bi bi-file-earmark"></i>
-                                </div>
-                                <div class="workflow-content">
-                                    <strong>Pendiente de documentación</strong>
-                                    <span>Preparación del documento</span>
-                                </div>
-                            </div>
-
-                            <div class="workflow-step" data-status="en_documentacion">
-                                <div class="workflow-marker">
-                                    <i class="bi bi-pencil-square"></i>
-                                </div>
-                                <div class="workflow-content">
-                                    <strong>En documentación</strong>
-                                    <span>Elaboración del documento</span>
-                                </div>
-                            </div>
-
-                            <div class="workflow-step" data-status="en_revision">
-                                <div class="workflow-marker">
-                                    <i class="bi bi-search"></i>
-                                </div>
-                                <div class="workflow-content">
-                                    <strong>En revisión</strong>
-                                    <span>Revisión del documento</span>
-                                </div>
-                            </div>
-
-                            <div class="workflow-step" data-status="observado">
-                                <div class="workflow-marker">
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                </div>
-                                <div class="workflow-content">
-                                    <strong>Observado</strong>
-                                    <span>Requiere atención</span>
-                                </div>
-                            </div>
-
-                            <div class="workflow-step" data-status="completado">
-                                <div class="workflow-marker">
-                                    <i class="bi bi-flag"></i>
-                                </div>
-                                <div class="workflow-content">
-                                    <strong>Completado</strong>
-                                    <span>Asignación finalizada</span>
-                                </div>
+                            <div class="document-history-empty">
+                                <i class="bi bi-clock"></i>
+                                <span>No hay operaciones registradas.</span>
                             </div>
 
                         </div>
@@ -558,72 +471,45 @@
 
                     </div>
 
-                    <div class="document-upload-area">
+                    <div class="document-upload-area upload-area">
 
-                        <div class="document-upload-description">
+                        <div class="upload-icon">
                             <i class="bi bi-cloud-arrow-up"></i>
-
-                            <div>
-                                <strong id="documentUploadTitle">
-                                    Cargar documento
-                                </strong>
-
-                                <span id="documentUploadDescription">
-                                    Selecciona el archivo elaborado para esta asignación.
-                                </span>
-                            </div>
                         </div>
 
-                        <div class="document-upload-controls">
+                        <strong id="documentUploadTitle">Cargar documento</strong>
 
-                            <input
-                                type="file"
-                                class="form-control"
-                                id="documentFileInput"
-                                accept=".xlsx,.xls,.docx,.doc,.pdf,.pptx,.ppt,.odt,.ods"
-                            >
+                        <span id="documentUploadDescription">
+                            Selecciona el archivo elaborado para esta asignación.
+                        </span>
 
-                            <button
-                                type="button"
-                                class="btn btn-primary"
-                                id="btnCargarDocumento"
-                                disabled
-                            >
-                                <i class="bi bi-upload me-1"></i>
-                                Cargar documento
-                            </button>
+                        <input
+                            type="file"
+                            id="documentFileInput"
+                            accept=".xlsx,.xls,.docx,.doc,.pdf,.pptx,.ppt,.odt,.ods"
+                        >
 
-                        </div>
+                        <label for="documentFileInput" class="file-label">
+                            <i class="bi bi-folder2-open me-1"></i>
+                            Seleccionar archivo
+                        </label>
+
+                        <p id="documentSelectedFile">Ningún archivo seleccionado</p>
+
+                        <button
+                            type="button"
+                            class="btn-primary-custom mt-3"
+                            id="btnCargarDocumento"
+                            disabled
+                        >
+                            <i class="bi bi-upload me-1"></i>
+                            Cargar documento
+                        </button>
 
                         <small class="document-upload-help">
                             Formatos permitidos: XLSX, XLS, DOCX, DOC, PDF,
                             PPTX, PPT, ODT y ODS.
                         </small>
-
-                    </div>
-
-                </section>
-
-                <!-- HISTORIAL DE OPERACIONES -->
-                <section class="panel-card document-history-panel">
-
-                    <div class="panel-header">
-                        <div>
-                            <h2>Historial de operaciones</h2>
-                            <p>
-                                Registro de las operaciones realizadas sobre el documento.
-                            </p>
-                        </div>
-
-                        <i class="bi bi-clock-history history-header-icon"></i>
-                    </div>
-
-                    <div id="documentHistory" class="document-history-list">
-
-                        <div class="document-history-empty">
-                            <i class="bi bi-clock"></i>
-                            <span>No hay operaciones registradas.</span>
-                        </div>
 
                     </div>
 

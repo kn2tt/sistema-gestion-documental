@@ -325,7 +325,6 @@ function actualizarEncabezado(asignacion) {
     document.title =
         `${asignacionLabel(asignacion.id)} | Gestión Documental`;
 
-    actualizarEstado(asignacion.estado);
 }
 
 function actualizarInformacionGeneral(asignacion) {
@@ -431,36 +430,63 @@ function actualizarFechas(asignacion) {
         "diasRestantesAsignacion"
     );
 
+    elementoDias.classList.remove("days-warning", "days-overdue");
+
     if (!asignacion.fecha_limite) {
         elementoDias.textContent = "Sin fecha límite";
         return;
     }
 
-    const fechaLimite = new Date(
-        `${String(asignacion.fecha_limite).substring(0, 10)}T00:00:00`
+    const fechaTexto = String(asignacion.fecha_limite).substring(0, 10);
+    const partes = fechaTexto.split("-").map(Number);
+
+    if (
+        partes.length !== 3 ||
+        partes.some(Number.isNaN)
+    ) {
+        elementoDias.textContent = "Fecha límite inválida";
+        return;
+    }
+
+    const [anio, mes, dia] = partes;
+
+    const fechaLimiteUTC = Date.UTC(
+        anio,
+        mes - 1,
+        dia
     );
 
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+    const ahora = new Date();
 
-    const diferencia = Math.ceil(
-        (fechaLimite - hoy) / (1000 * 60 * 60 * 24)
+    const hoyUTC = Date.UTC(
+        ahora.getFullYear(),
+        ahora.getMonth(),
+        ahora.getDate()
+    );
+
+    const diferencia = Math.round(
+        (fechaLimiteUTC - hoyUTC) / 86400000
     );
 
     if (diferencia < 0) {
         elementoDias.textContent =
-            `Vencida hace ${Math.abs(diferencia)} días`;
+            `Vencida hace ${Math.abs(diferencia)} día(s)`;
+
+        elementoDias.classList.add("days-overdue");
+
     } else if (diferencia === 0) {
         elementoDias.textContent = "Vence hoy";
+        elementoDias.classList.add("days-warning");
+
     } else {
-        elementoDias.textContent = `${diferencia} días`;
+        elementoDias.textContent =
+            `${diferencia} ${diferencia === 1 ? "día" : "días"}`;
     }
 }
 
 function renderizarAsignacion(asignacion) {
     actualizarEncabezado(asignacion);
     actualizarInformacionGeneral(asignacion);
-    actualizarTecnicos(asignacion);
     actualizarFechas(asignacion);
 }
 
@@ -568,7 +594,9 @@ function obtenerNombreArchivoRespuesta(respuesta) {
         }
     }
 
-    const nombreNormal = disposicion.match(/filename="?([^"]+)"?/i);
+    const nombreNormal = disposicion.match(
+        /filename="?([^"]+)"?/i
+    );
 
     return nombreNormal ? nombreNormal[1] : null;
 }
@@ -584,9 +612,10 @@ function descargarBlob(blob, nombreArchivo) {
     enlace.click();
     enlace.remove();
 
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
 }
-
 
 /* =========================================
    CHECKLIST DOCUMENTAL
@@ -882,7 +911,7 @@ function actualizarVistaDocumento(documento) {
         "Si seleccionas un nuevo archivo, sustituirá al documento vigente.";
 
     btnCargarDocumento.innerHTML = `
-        <i class="bi bi-arrow-repeat me-1"></i>
+        <i class="bi bi-upload me-1"></i>
         Reemplazar documento
     `;
 
@@ -943,8 +972,17 @@ function validarArchivo(archivo) {
 function seleccionarArchivo() {
     const archivo = documentFileInput.files[0] || null;
 
+    const nombreArchivo = document.getElementById(
+        "documentSelectedFile"
+    );
+
     if (!archivo) {
         archivoSeleccionado = null;
+
+        if (nombreArchivo) {
+            nombreArchivo.textContent = "Ningún archivo seleccionado";
+        }
+
         actualizarBotonCarga();
         return;
     }
@@ -952,11 +990,21 @@ function seleccionarArchivo() {
     if (!validarArchivo(archivo)) {
         documentFileInput.value = "";
         archivoSeleccionado = null;
+
+        if (nombreArchivo) {
+            nombreArchivo.textContent = "Ningún archivo seleccionado";
+        }
+
         actualizarBotonCarga();
         return;
     }
 
     archivoSeleccionado = archivo;
+
+    if (nombreArchivo) {
+        nombreArchivo.textContent = archivo.name;
+    }
+
     actualizarBotonCarga();
 }
 
@@ -990,6 +1038,14 @@ async function ejecutarCargaDocumento(botonAccion = btnCargarDocumento) {
 
         documentFileInput.value = "";
         archivoSeleccionado = null;
+
+        const nombreArchivoSeleccionado = document.getElementById(
+            "documentSelectedFile"
+        );
+
+        if (nombreArchivoSeleccionado) {
+            nombreArchivoSeleccionado.textContent = "Ningún archivo seleccionado";
+        }
 
         actualizarVistaDocumento(documento);
 
