@@ -142,6 +142,84 @@ function actualizarEstadoAsignacion(estado) {
 }
 
 /* =========================================
+   ACCIONES DE REVISIÓN DE LA ASIGNACIÓN
+   ========================================= */
+
+async function cambiarEstadoAsignacion(estado) {
+    const botonAprobar = document.getElementById("btnAprobarAsignacion");
+    const botonObservar = document.getElementById("btnObservarAsignacion");
+
+    const botones = [botonAprobar, botonObservar];
+
+    const botonActivo = estado === "completado"
+        ? botonAprobar
+        : botonObservar;
+
+    const textoOriginal = botonActivo.innerHTML;
+
+    botones.forEach(boton => {
+        if (boton) boton.disabled = true;
+    });
+
+    botonActivo.setAttribute("aria-busy", "true");
+
+    botonActivo.innerHTML = `
+        <span
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+            aria-hidden="true"
+        ></span>
+        ${estado === "completado" ? "Aprobando..." : "Observando..."}
+    `;
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/asignaciones/${encodeURIComponent(assignmentId)}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    estado: estado
+                })
+            }
+        );
+
+        const data = await respuesta.json().catch(() => ({}));
+
+        if (!respuesta.ok) {
+            throw new Error(
+                data.detail || "No se pudo actualizar el estado de la asignación."
+            );
+        }
+
+        actualizarEstadoAsignacion(data.estado);
+
+        mostrarNotificacion(
+            estado === "completado"
+                ? "La asignación fue aprobada correctamente."
+                : "La asignación fue observada correctamente.",
+            "success"
+        );
+
+    } catch (error) {
+        mostrarNotificacion(
+            error.message || "No se pudo actualizar la asignación.",
+            "error"
+        );
+
+    } finally {
+        botonActivo.innerHTML = textoOriginal;
+        botonActivo.removeAttribute("aria-busy");
+
+        botones.forEach(boton => {
+            if (boton) boton.disabled = false;
+        });
+    }
+}
+
+/* =========================================
    INFORMACIÓN DE LA ASIGNACIÓN
    ========================================= */
 
@@ -593,6 +671,16 @@ async function cargarDetalleDocumento() {
 
 document.getElementById("btnDescargarDocumento")
     ?.addEventListener("click", descargarDocumento);
+
+document.getElementById("btnAprobarAsignacion")
+    ?.addEventListener("click", () => {
+        cambiarEstadoAsignacion("completado");
+    });
+
+document.getElementById("btnObservarAsignacion")
+    ?.addEventListener("click", () => {
+        cambiarEstadoAsignacion("observado");
+    });
 
 /* =========================================
    SIDEBAR MOBILE

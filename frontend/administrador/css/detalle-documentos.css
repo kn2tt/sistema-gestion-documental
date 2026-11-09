@@ -647,3 +647,42 @@
         margin-left: 46px;
     }
 }
+
+/* =========================================
+   ACCIONES DEL DOCUMENTO
+   ========================================= */
+
+.document-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 650px) {
+    .document-actions {
+        width: 100%;
+    }
+}
+
+/* =========================================
+   COLORES DE LAS ACCIONES
+   ========================================= */
+
+.btn-approve-document {
+    background: #198754;
+}
+
+.btn-approve-document:hover {
+    background: #157347;
+}
+
+.btn-observe-document {
+    background: #dc3545;
+}
+
+.btn-observe-document:hover {
+    background: #bb2d3b;
+}
