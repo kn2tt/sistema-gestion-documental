@@ -401,57 +401,50 @@ function actualizarResumenChecklist(items) {
    ========================================= */
 
 
-function descargarDocumento() {
-    if (
-        !documentoActual?.id ||
-        !documentoActual.archivo_disponible
-    ) {
+async function descargarDocumento() {
+    if (!documentoActual?.id || !documentoActual.archivo_disponible) {
         return;
     }
 
-    const boton = document.getElementById(
-        "btnDescargarDocumento"
-    );
+    const boton = document.getElementById("btnDescargarDocumento");
+    const contenidoOriginal = boton.innerHTML;
+
+    if (boton.disabled) return;
 
     boton.disabled = true;
-
     boton.innerHTML = `
-        <span
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-        ></span>
-        Abriendo descarga...
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Descargando...
     `;
 
     try {
-        const url =
-            `${API_URL}/documentos/${encodeURIComponent(documentoActual.id)}/descargar`;
+        const respuesta = await apiFetch(
+            `${API_URL}/documentos/${encodeURIComponent(documentoActual.id)}/descargar`
+        );
 
-        window.location.href = url;
+        const blob = await obtenerArchivoRespuesta(respuesta);
+
+        descargarBlob(
+            blob,
+            obtenerNombreArchivoRespuesta(respuesta) ||
+            documentoActual.nombre_archivo ||
+            "documento"
+        );
 
         mostrarNotificacion(
-            "Se solicitó la descarga del documento.",
+            "El documento se descargó correctamente.",
             "success"
         );
 
     } catch (error) {
-        console.error("Error al descargar documento:", error);
-
         mostrarNotificacion(
-            "No se pudo iniciar la descarga del documento.",
+            error.message || "No se pudo descargar el documento.",
             "error"
         );
 
     } finally {
-        window.setTimeout(() => {
-            boton.disabled = false;
-
-            boton.innerHTML = `
-                <i class="bi bi-download"></i>
-                Descargar documento
-            `;
-        }, 1500);
+        boton.disabled = false;
+        boton.innerHTML = contenidoOriginal;
     }
 }
 
