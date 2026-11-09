@@ -510,6 +510,46 @@
 
                     </div>
 
+                    <!-- ACCIONES DE REVISIÓN DE LA ASIGNACIÓN -->
+                    <div
+                        class="d-flex flex-wrap align-items-center gap-2 mt-4"
+                        id="accionesRevisionAsignacion"
+                    >
+                        <span class="text-muted small fw-semibold w-100">
+                            Resultado de la revisión:
+                        </span>
+
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            data-estado="en_revision"
+                            disabled
+                        >
+                            <i class="bi bi-search"></i>
+                            Mantener en revisión
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-warning"
+                            data-estado="observado"
+                            disabled
+                        >
+                            <i class="bi bi-exclamation-circle"></i>
+                            Observado
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-success"
+                            data-estado="completado"
+                            disabled
+                        >
+                            <i class="bi bi-check-circle"></i>
+                            Completado
+                        </button>
+                    </div>
+
                 </div>
 
             </section>

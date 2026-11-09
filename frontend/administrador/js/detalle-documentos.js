@@ -492,6 +492,11 @@ async function descargarDocumento() {
             "documento"
         );
 
+        sessionStorage.setItem(
+            `documentoDescargadoAsignacion_${assignmentId}`,
+            `${documentoActual.id}:${documentoActual.version}`
+        );
+
         mostrarNotificacion(
             "El documento se descargó correctamente.",
             "success"

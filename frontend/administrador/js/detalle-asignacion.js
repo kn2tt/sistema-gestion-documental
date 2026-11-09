@@ -189,6 +189,135 @@ function actualizarEstado(estado) {
     });
 }
 
+/* =====================================================
+   REVISIÓN DEL ESTADO DE LA ASIGNACIÓN
+   ===================================================== */
+
+async function actualizarDisponibilidadRevision() {
+    const botones = document.querySelectorAll(
+        "#accionesRevisionAsignacion button[data-estado]"
+    );
+
+    if (!botones.length || !assignmentId) return;
+
+    botones.forEach(boton => {
+        boton.disabled = true;
+    });
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/documentos/asignacion/${encodeURIComponent(assignmentId)}`
+        );
+
+        if (!respuesta.ok) return;
+
+        const documento = await respuesta.json();
+
+        if (!documento?.archivo_disponible) return;
+
+        const descargaRegistrada = sessionStorage.getItem(
+            `documentoDescargadoAsignacion_${assignmentId}`
+        );
+
+        const versionDescargada =
+            `${documento.id}:${documento.version}`;
+
+        const descargaValida =
+            descargaRegistrada === versionDescargada;
+
+        botones.forEach(boton => {
+            boton.disabled = !descargaValida;
+        });
+
+    } catch (error) {
+        console.error(
+            "No se pudo comprobar la descarga del documento:",
+            error
+        );
+    }
+}
+
+
+async function cambiarEstadoAsignacion(nuevoEstado) {
+    const asignacion = window.asignacionDetalleActual;
+
+    if (!asignacion || !assignmentId) return;
+
+    const estadosPermitidos = [
+        "en_revision",
+        "observado",
+        "completado"
+    ];
+
+    if (!estadosPermitidos.includes(nuevoEstado)) return;
+
+    if (nuevoEstado === asignacion.estado) {
+        mostrarNotificacion(
+            "La asignación se mantiene en revisión.",
+            "info"
+        );
+        return;
+    }
+
+    const botones = document.querySelectorAll(
+        "#accionesRevisionAsignacion button[data-estado]"
+    );
+
+    botones.forEach(boton => {
+        boton.disabled = true;
+    });
+
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/asignaciones/${encodeURIComponent(assignmentId)}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    estado: nuevoEstado
+                })
+            }
+        );
+
+        const resultado = await respuesta.json().catch(() => ({}));
+
+        if (!respuesta.ok) {
+            throw new Error(
+                resultado.detail ||
+                "No se pudo actualizar el estado de la asignación."
+            );
+        }
+
+        window.asignacionDetalleActual = resultado;
+
+        actualizarEstado(resultado.estado);
+
+        sessionStorage.removeItem(
+            `documentoDescargadoAsignacion_${assignmentId}`
+        );
+
+        const nombresEstados = {
+            observado: "Observado",
+            completado: "Completado"
+        };
+
+        mostrarNotificacion(
+            `La asignación ahora se encuentra en estado: ${nombresEstados[nuevoEstado]}.`,
+            "success"
+        );
+
+    } catch (error) {
+        mostrarNotificacion(
+            error.message || "No se pudo actualizar la asignación.",
+            "error"
+        );
+
+    } finally {
+        await actualizarDisponibilidadRevision();
+    }
+}
 
 /* =====================================================
    INFORMACIÓN GENERAL
@@ -717,6 +846,7 @@ async function cargarAsignacion() {
 
         const asignacion = await respuesta.json();
         window.asignacionDetalleActual = asignacion;
+        await actualizarDisponibilidadRevision();
         actualizarBotonEdicionEvidencias(asignacion);
 
         console.log("Datos recibidos de la asignación:", asignacion);
@@ -3883,6 +4013,24 @@ document.addEventListener("keydown", function (event) {
         closeSidebar();
     }
 });
+
+/* =====================================================
+   EVENTOS DE REVISIÓN DE LA ASIGNACIÓN
+   ===================================================== */
+
+document.querySelectorAll(
+    "#accionesRevisionAsignacion button[data-estado]"
+).forEach(boton => {
+    boton.addEventListener("click", function () {
+        cambiarEstadoAsignacion(this.dataset.estado);
+    });
+});
+
+window.addEventListener(
+    "pageshow",
+    actualizarDisponibilidadRevision
+);
+
 
 /* =====================================================
    INICIALIZACIÓN
