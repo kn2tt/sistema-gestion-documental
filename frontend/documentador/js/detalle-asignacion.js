@@ -194,12 +194,6 @@ function asignacionLabel(id) {
     return `ASG-${String(id).padStart(4, "0")}`;
 }
 
-function mostrarNotificacion(mensaje, tipo = "info") {
-    if (typeof window.mostrarNotificacion === "function") {
-        window.mostrarNotificacion(mensaje, tipo);
-    }
-}
-
 function mostrarErrorDetalle(mensaje) {
     detalleError.hidden = false;
     detalleErrorMensaje.textContent = mensaje;

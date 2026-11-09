@@ -1,4 +1,3 @@
-from io import BytesIO
 from urllib.parse import quote
 
 from fastapi import (
@@ -9,7 +8,7 @@ from fastapi import (
     File,
     status,
 )
-from fastapi.responses import Response
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -221,8 +220,8 @@ def descargar_documento(
         safe="",
     )
 
-    return StreamingResponse(
-        BytesIO(contenido),
+    return Response(
+        content=contenido,
         media_type="application/octet-stream",
         headers={
             "Content-Disposition": (

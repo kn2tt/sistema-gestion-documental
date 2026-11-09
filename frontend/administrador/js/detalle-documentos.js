@@ -67,6 +67,27 @@ async function obtenerJSON(url, mensaje) {
     return data;
 }
 
+async function obtenerArchivoRespuesta(respuesta) {
+    if (respuesta.status === 401 || respuesta.status === 403) {
+        window.location.replace("../index.html");
+        throw new Error(
+            "Tu sesión no está autorizada para descargar este archivo."
+        );
+    }
+
+    if (!respuesta.ok) {
+        const datos = await respuesta.json().catch(() => ({}));
+
+        throw new Error(
+            datos.detail ||
+            datos.message ||
+            `No se pudo descargar el archivo (HTTP ${respuesta.status}).`
+        );
+    }
+
+    return respuesta.blob();
+}
+
 /* =========================================
    ESTADO DE LA ASIGNACIÓN
    ========================================= */
@@ -396,11 +417,51 @@ function actualizarResumenChecklist(items) {
     contenedor.setAttribute("aria-valuenow", progreso);
 }
 
+
+function obtenerNombreArchivoRespuesta(respuesta) {
+    const disposicion = respuesta.headers.get("Content-Disposition");
+
+    if (!disposicion) return null;
+
+    const nombreCodificado = disposicion.match(
+        /filename\*=UTF-8''([^;]+)/i
+    );
+
+    if (nombreCodificado) {
+        try {
+            return decodeURIComponent(nombreCodificado[1]);
+        } catch {
+            return nombreCodificado[1];
+        }
+    }
+
+    const nombreNormal = disposicion.match(
+        /filename="?([^"]+)"?/i
+    );
+
+    return nombreNormal ? nombreNormal[1] : null;
+}
+
+function descargarBlob(blob, nombreArchivo) {
+    const url = URL.createObjectURL(blob);
+
+    const enlace = document.createElement("a");
+    enlace.href = url;
+    enlace.download = nombreArchivo || "documento";
+
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+
+    window.setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
+}
+
+
 /* =========================================
    DESCARGAR DOCUMENTO
    ========================================= */
-
-
 async function descargarDocumento() {
     if (!documentoActual?.id || !documentoActual.archivo_disponible) {
         return;
