@@ -8,7 +8,7 @@ from fastapi import (
     File,
     status,
 )
-from fastapi.responses import Response, StreamingResponse
+from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
