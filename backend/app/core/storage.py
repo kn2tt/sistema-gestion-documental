@@ -32,8 +32,22 @@ class EvidenceStorageSettings(BaseSettings):
     )
 
 
+class DocumentStorageSettings(BaseSettings):
+    # Cuenta independiente: almacenamiento de documentos.
+    B2_DOCUMENT_ENDPOINT_URL: str | None = None
+    B2_DOCUMENT_BUCKET_NAME: str | None = None
+    B2_DOCUMENT_KEY_ID: str | None = None
+    B2_DOCUMENT_APPLICATION_KEY: str | None = None
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore",
+    )
+
+
 storage_settings = StorageSettings()
 evidence_storage_settings = EvidenceStorageSettings()
+document_storage_settings = DocumentStorageSettings()
 
 
 # =========================================================
@@ -105,6 +119,53 @@ def obtener_cliente_evidencias():
     )
 
     return _evidence_s3_client
+
+
+# =========================================================
+# CLIENTE INDEPENDIENTE (DOCUMENTOS)
+# =========================================================
+
+_document_s3_client = None
+
+
+def obtener_cliente_documentos():
+    global _document_s3_client
+
+    if _document_s3_client is not None:
+        return _document_s3_client
+
+    configuracion = document_storage_settings
+
+    if not all([
+        configuracion.B2_DOCUMENT_ENDPOINT_URL,
+        configuracion.B2_DOCUMENT_BUCKET_NAME,
+        configuracion.B2_DOCUMENT_KEY_ID,
+        configuracion.B2_DOCUMENT_APPLICATION_KEY,
+    ]):
+        raise RuntimeError(
+            "El almacenamiento de documentos no está configurado. "
+            "Revisa las variables B2_DOCUMENT en el archivo .env."
+        )
+
+    _document_s3_client = boto3.client(
+        "s3",
+        endpoint_url=configuracion.B2_DOCUMENT_ENDPOINT_URL,
+        aws_access_key_id=configuracion.B2_DOCUMENT_KEY_ID,
+        aws_secret_access_key=configuracion.B2_DOCUMENT_APPLICATION_KEY,
+        region_name=None,
+        config=Config(
+            signature_version="s3v4",
+            retries={
+                "max_attempts": 3,
+                "mode": "standard",
+            },
+            s3={
+                "addressing_style": "path",
+            },
+        ),
+    )
+
+    return _document_s3_client
 
 
 # =========================================================

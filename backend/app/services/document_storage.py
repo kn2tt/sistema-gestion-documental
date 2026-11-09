@@ -4,7 +4,10 @@ from uuid import uuid4
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import HTTPException, UploadFile
 
-from app.core.storage import s3_client, storage_settings
+from app.core.storage import (
+    obtener_cliente_documentos,
+    document_storage_settings,
+)
 
 
 EXTENSIONES_DOCUMENTOS = {
@@ -66,8 +69,10 @@ async def guardar_documento(
     )
 
     try:
-        s3_client.put_object(
-            Bucket=storage_settings.B2_BUCKET_NAME,
+        cliente = obtener_cliente_documentos()
+
+        cliente.put_object(
+            Bucket=document_storage_settings.B2_DOCUMENT_BUCKET_NAME,
             Key=clave_archivo,
             Body=contenido,
             ContentType=(
@@ -96,8 +101,10 @@ def obtener_documento(clave_archivo: str) -> bytes:
         )
 
     try:
-        respuesta = s3_client.get_object(
-            Bucket=storage_settings.B2_BUCKET_NAME,
+        cliente = obtener_cliente_documentos()
+
+        respuesta = cliente.get_object(
+            Bucket=document_storage_settings.B2_DOCUMENT_BUCKET_NAME,
             Key=clave_archivo,
         )
 
@@ -125,14 +132,16 @@ def eliminar_documento(clave_archivo: str) -> None:
         )
 
     try:
-        paginador = s3_client.get_paginator(
+        cliente = obtener_cliente_documentos()
+
+        paginador = cliente.get_paginator(
             "list_object_versions"
         )
 
         versiones_a_eliminar = []
 
         for pagina in paginador.paginate(
-            Bucket=storage_settings.B2_BUCKET_NAME,
+            Bucket=document_storage_settings.B2_DOCUMENT_BUCKET_NAME,
             Prefix=clave_archivo,
         ):
             for version in pagina.get("Versions", []):
@@ -151,8 +160,8 @@ def eliminar_documento(clave_archivo: str) -> None:
 
         # Eliminar todas las versiones y marcadores encontrados.
         for objeto in versiones_a_eliminar:
-            s3_client.delete_object(
-                Bucket=storage_settings.B2_BUCKET_NAME,
+            cliente.delete_object(
+                Bucket=document_storage_settings.B2_DOCUMENT_BUCKET_NAME,
                 Key=objeto["Key"],
                 VersionId=objeto["VersionId"],
             )
