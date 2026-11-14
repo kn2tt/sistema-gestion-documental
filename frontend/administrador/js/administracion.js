@@ -3032,6 +3032,21 @@ document.getElementById(
     }
 );
 
+/* DEVOLVER EL FOCO AL CERRAR EL MODAL */
+
+document.getElementById(
+    "nuevoClienteModal"
+)?.addEventListener(
+    "hidden.bs.modal",
+    function () {
+
+        document.getElementById(
+            "btnNuevoCliente"
+        )?.focus();
+
+    }
+);
+
 /* =========================================================
    PROYECTOS - SITES - SUBPROYECTOS
    ========================================================= */
@@ -3512,12 +3527,6 @@ document.addEventListener(
             "";
 
 
-        document.getElementById(
-            "proyectoEstado"
-        ).value =
-            "activo";
-
-
         nuevoProyectoModal.show();
 
     }
@@ -3655,12 +3664,6 @@ document.getElementById(
                 "proyectoCliente"
             ).value =
                 "";
-
-
-            document.getElementById(
-                "proyectoEstado"
-            ).value =
-                "activo";
 
 
             nuevoProyectoModal.hide();
