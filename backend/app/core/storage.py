@@ -5,12 +5,17 @@ from botocore.exceptions import BotoCoreError, ClientError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+# =========================================================
+# CONFIGURACIÓN DE ALMACENAMIENTO
+# =========================================================
+
 class StorageSettings(BaseSettings):
-    # Cuenta actual: almacenamiento de plantillas.
-    B2_ENDPOINT_URL: str
-    B2_BUCKET_NAME: str
-    B2_KEY_ID: str
-    B2_APPLICATION_KEY: str
+    # Cloudflare R2: plantillas.
+    R2_ENDPOINT_URL: str
+    R2_BUCKET_NAME: str
+    R2_KEY_ID: str
+    R2_APPLICATION_KEY: str
+    R2_REGION: str = "auto"
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -19,12 +24,12 @@ class StorageSettings(BaseSettings):
 
 
 class EvidenceStorageSettings(BaseSettings):
-    # Cuenta independiente: almacenamiento de fotografías.
-    B2_EVIDENCE_ENDPOINT_URL: str | None = None
-    B2_EVIDENCE_BUCKET_NAME: str | None = None
-    B2_EVIDENCE_KEY_ID: str | None = None
-    B2_EVIDENCE_APPLICATION_KEY: str | None = None
-    B2_EVIDENCE_REGION: str | None = None
+    # Cloudflare R2: evidencias.
+    R2_EVIDENCE_ENDPOINT_URL: str | None = None
+    R2_EVIDENCE_BUCKET_NAME: str | None = None
+    R2_EVIDENCE_KEY_ID: str | None = None
+    R2_EVIDENCE_APPLICATION_KEY: str | None = None
+    R2_EVIDENCE_REGION: str = "auto"
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -33,11 +38,12 @@ class EvidenceStorageSettings(BaseSettings):
 
 
 class DocumentStorageSettings(BaseSettings):
-    # Cuenta independiente: almacenamiento de documentos.
-    B2_DOCUMENT_ENDPOINT_URL: str | None = None
-    B2_DOCUMENT_BUCKET_NAME: str | None = None
-    B2_DOCUMENT_KEY_ID: str | None = None
-    B2_DOCUMENT_APPLICATION_KEY: str | None = None
+    # Cloudflare R2: documentos.
+    R2_DOCUMENT_ENDPOINT_URL: str | None = None
+    R2_DOCUMENT_BUCKET_NAME: str | None = None
+    R2_DOCUMENT_KEY_ID: str | None = None
+    R2_DOCUMENT_APPLICATION_KEY: str | None = None
+    R2_DOCUMENT_REGION: str = "auto"
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -51,30 +57,48 @@ document_storage_settings = DocumentStorageSettings()
 
 
 # =========================================================
-# CLIENTE DE LA CUENTA ACTUAL (PLANTILLAS)
+# CONFIGURACIÓN COMÚN DE LOS CLIENTES S3
 # =========================================================
 
-s3_client = boto3.client(
-    "s3",
-    endpoint_url=storage_settings.B2_ENDPOINT_URL,
-    aws_access_key_id=storage_settings.B2_KEY_ID,
-    aws_secret_access_key=storage_settings.B2_APPLICATION_KEY,
-    region_name="us-east-005",
-    config=Config(
-        signature_version="s3v4",
-        retries={
-            "max_attempts": 3,
-            "mode": "standard",
-        },
-        s3={
-            "addressing_style": "path",
-        },
-    ),
+def _crear_cliente_r2(
+    endpoint_url: str,
+    key_id: str,
+    application_key: str,
+    region: str = "auto",
+):
+    return boto3.client(
+        "s3",
+        endpoint_url=endpoint_url,
+        aws_access_key_id=key_id,
+        aws_secret_access_key=application_key,
+        region_name=region,
+        config=Config(
+            signature_version="s3v4",
+            retries={
+                "max_attempts": 3,
+                "mode": "standard",
+            },
+            s3={
+                "addressing_style": "path",
+            },
+        ),
+    )
+
+
+# =========================================================
+# CLIENTE R2 (PLANTILLAS)
+# =========================================================
+
+s3_client = _crear_cliente_r2(
+    endpoint_url=storage_settings.R2_ENDPOINT_URL,
+    key_id=storage_settings.R2_KEY_ID,
+    application_key=storage_settings.R2_APPLICATION_KEY,
+    region=storage_settings.R2_REGION,
 )
 
 
 # =========================================================
-# CLIENTE INDEPENDIENTE (EVIDENCIAS)
+# CLIENTE R2 (EVIDENCIAS)
 # Se crea únicamente cuando se utiliza.
 # =========================================================
 
@@ -90,39 +114,29 @@ def obtener_cliente_evidencias():
     configuracion = evidence_storage_settings
 
     if not all([
-        configuracion.B2_EVIDENCE_ENDPOINT_URL,
-        configuracion.B2_EVIDENCE_BUCKET_NAME,
-        configuracion.B2_EVIDENCE_KEY_ID,
-        configuracion.B2_EVIDENCE_APPLICATION_KEY,
+        configuracion.R2_EVIDENCE_ENDPOINT_URL,
+        configuracion.R2_EVIDENCE_BUCKET_NAME,
+        configuracion.R2_EVIDENCE_KEY_ID,
+        configuracion.R2_EVIDENCE_APPLICATION_KEY,
     ]):
         raise RuntimeError(
             "El almacenamiento de evidencias no está configurado. "
-            "Revisa las variables B2_EVIDENCE en el archivo .env."
+            "Revisa las variables R2_EVIDENCE en el archivo .env."
         )
 
-    _evidence_s3_client = boto3.client(
-        "s3",
-        endpoint_url=configuracion.B2_EVIDENCE_ENDPOINT_URL,
-        aws_access_key_id=configuracion.B2_EVIDENCE_KEY_ID,
-        aws_secret_access_key=configuracion.B2_EVIDENCE_APPLICATION_KEY,
-        region_name=configuracion.B2_EVIDENCE_REGION or None,
-        config=Config(
-            signature_version="s3v4",
-            retries={
-                "max_attempts": 3,
-                "mode": "standard",
-            },
-            s3={
-                "addressing_style": "path",
-            },
-        ),
+    _evidence_s3_client = _crear_cliente_r2(
+        endpoint_url=configuracion.R2_EVIDENCE_ENDPOINT_URL,
+        key_id=configuracion.R2_EVIDENCE_KEY_ID,
+        application_key=configuracion.R2_EVIDENCE_APPLICATION_KEY,
+        region=configuracion.R2_EVIDENCE_REGION,
     )
 
     return _evidence_s3_client
 
 
 # =========================================================
-# CLIENTE INDEPENDIENTE (DOCUMENTOS)
+# CLIENTE R2 (DOCUMENTOS)
+# Se crea únicamente cuando se utiliza.
 # =========================================================
 
 _document_s3_client = None
@@ -137,51 +151,40 @@ def obtener_cliente_documentos():
     configuracion = document_storage_settings
 
     if not all([
-        configuracion.B2_DOCUMENT_ENDPOINT_URL,
-        configuracion.B2_DOCUMENT_BUCKET_NAME,
-        configuracion.B2_DOCUMENT_KEY_ID,
-        configuracion.B2_DOCUMENT_APPLICATION_KEY,
+        configuracion.R2_DOCUMENT_ENDPOINT_URL,
+        configuracion.R2_DOCUMENT_BUCKET_NAME,
+        configuracion.R2_DOCUMENT_KEY_ID,
+        configuracion.R2_DOCUMENT_APPLICATION_KEY,
     ]):
         raise RuntimeError(
             "El almacenamiento de documentos no está configurado. "
-            "Revisa las variables B2_DOCUMENT en el archivo .env."
+            "Revisa las variables R2_DOCUMENT en el archivo .env."
         )
 
-    _document_s3_client = boto3.client(
-        "s3",
-        endpoint_url=configuracion.B2_DOCUMENT_ENDPOINT_URL,
-        aws_access_key_id=configuracion.B2_DOCUMENT_KEY_ID,
-        aws_secret_access_key=configuracion.B2_DOCUMENT_APPLICATION_KEY,
-        region_name=None,
-        config=Config(
-            signature_version="s3v4",
-            retries={
-                "max_attempts": 3,
-                "mode": "standard",
-            },
-            s3={
-                "addressing_style": "path",
-            },
-        ),
+    _document_s3_client = _crear_cliente_r2(
+        endpoint_url=configuracion.R2_DOCUMENT_ENDPOINT_URL,
+        key_id=configuracion.R2_DOCUMENT_KEY_ID,
+        application_key=configuracion.R2_DOCUMENT_APPLICATION_KEY,
+        region=configuracion.R2_DOCUMENT_REGION,
     )
 
     return _document_s3_client
 
 
 # =========================================================
-# ALMACENAMIENTO ACTUAL (PLANTILLAS)
+# ALMACENAMIENTO DE PLANTILLAS
 # =========================================================
 
 def verificar_conexion_storage():
     try:
         s3_client.head_bucket(
-            Bucket=storage_settings.B2_BUCKET_NAME
+            Bucket=storage_settings.R2_BUCKET_NAME
         )
 
         return {
             "conexion": "exitosa",
-            "servicio": "Backblaze B2",
-            "bucket": storage_settings.B2_BUCKET_NAME,
+            "servicio": "Cloudflare R2",
+            "bucket": storage_settings.R2_BUCKET_NAME,
         }
 
     except ClientError as error:
@@ -195,7 +198,7 @@ def verificar_conexion_storage():
 
     except BotoCoreError:
         raise RuntimeError(
-            "No se pudo establecer conexión con Backblaze B2."
+            "No se pudo establecer conexión con Cloudflare R2."
         ) from None
 
 
@@ -207,7 +210,7 @@ def subir_archivo(
     try:
         s3_client.upload_file(
             ruta_local,
-            storage_settings.B2_BUCKET_NAME,
+            storage_settings.R2_BUCKET_NAME,
             clave_archivo,
             ExtraArgs={
                 "ContentType": tipo_contenido,
@@ -216,13 +219,13 @@ def subir_archivo(
 
         return {
             "estado": "subido",
-            "bucket": storage_settings.B2_BUCKET_NAME,
+            "bucket": storage_settings.R2_BUCKET_NAME,
             "clave_archivo": clave_archivo,
         }
 
     except (ClientError, BotoCoreError, OSError):
         raise RuntimeError(
-            "No se pudo subir el archivo a Backblaze B2."
+            "No se pudo subir el archivo a Cloudflare R2."
         ) from None
 
 
@@ -232,26 +235,26 @@ def descargar_archivo(
 ):
     try:
         s3_client.download_file(
-            storage_settings.B2_BUCKET_NAME,
+            storage_settings.R2_BUCKET_NAME,
             clave_archivo,
             ruta_destino,
         )
 
         return {
             "estado": "descargado",
-            "bucket": storage_settings.B2_BUCKET_NAME,
+            "bucket": storage_settings.R2_BUCKET_NAME,
             "clave_archivo": clave_archivo,
             "ruta_destino": ruta_destino,
         }
 
     except (ClientError, BotoCoreError, OSError):
         raise RuntimeError(
-            "No se pudo descargar el archivo desde Backblaze B2."
+            "No se pudo descargar el archivo desde Cloudflare R2."
         ) from None
 
 
 # =========================================================
-# ALMACENAMIENTO DE EVIDENCIAS (CUENTA NUEVA)
+# ALMACENAMIENTO DE EVIDENCIAS
 # =========================================================
 
 def subir_evidencia(
@@ -264,7 +267,7 @@ def subir_evidencia(
 
         cliente.upload_fileobj(
             archivo,
-            evidence_storage_settings.B2_EVIDENCE_BUCKET_NAME,
+            evidence_storage_settings.R2_EVIDENCE_BUCKET_NAME,
             clave_archivo,
             ExtraArgs={
                 "ContentType": tipo_contenido,
@@ -273,7 +276,7 @@ def subir_evidencia(
 
         return {
             "estado": "subido",
-            "bucket": evidence_storage_settings.B2_EVIDENCE_BUCKET_NAME,
+            "bucket": evidence_storage_settings.R2_EVIDENCE_BUCKET_NAME,
             "clave_archivo": clave_archivo,
         }
 
@@ -282,7 +285,7 @@ def subir_evidencia(
 
     except (ClientError, BotoCoreError, OSError):
         raise RuntimeError(
-            "No se pudo subir la fotografía a Backblaze B2."
+            "No se pudo subir la fotografía a Cloudflare R2."
         ) from None
 
 
@@ -293,7 +296,7 @@ def eliminar_evidencia(
         cliente = obtener_cliente_evidencias()
 
         cliente.delete_object(
-            Bucket=evidence_storage_settings.B2_EVIDENCE_BUCKET_NAME,
+            Bucket=evidence_storage_settings.R2_EVIDENCE_BUCKET_NAME,
             Key=clave_archivo,
         )
 
@@ -307,7 +310,7 @@ def eliminar_evidencia(
 
     except (ClientError, BotoCoreError):
         raise RuntimeError(
-            "No se pudo eliminar la fotografía de Backblaze B2."
+            "No se pudo eliminar la fotografía de Cloudflare R2."
         ) from None
 
 
@@ -316,7 +319,7 @@ def descargar_evidencia_contenido(clave_archivo: str) -> bytes:
         cliente = obtener_cliente_evidencias()
 
         respuesta = cliente.get_object(
-            Bucket=evidence_storage_settings.B2_EVIDENCE_BUCKET_NAME,
+            Bucket=evidence_storage_settings.R2_EVIDENCE_BUCKET_NAME,
             Key=clave_archivo,
         )
 
@@ -327,7 +330,7 @@ def descargar_evidencia_contenido(clave_archivo: str) -> bytes:
 
     except (ClientError, BotoCoreError, OSError):
         raise RuntimeError(
-            "No se pudo descargar la fotografía desde Backblaze B2."
+            "No se pudo descargar la fotografía desde Cloudflare R2."
         ) from None
 
 
@@ -341,7 +344,7 @@ def generar_url_evidencia(
         return cliente.generate_presigned_url(
             "get_object",
             Params={
-                "Bucket": evidence_storage_settings.B2_EVIDENCE_BUCKET_NAME,
+                "Bucket": evidence_storage_settings.R2_EVIDENCE_BUCKET_NAME,
                 "Key": clave_archivo,
             },
             ExpiresIn=expiracion,
@@ -361,13 +364,13 @@ def verificar_conexion_storage_evidencias():
         cliente = obtener_cliente_evidencias()
 
         cliente.head_bucket(
-            Bucket=evidence_storage_settings.B2_EVIDENCE_BUCKET_NAME
+            Bucket=evidence_storage_settings.R2_EVIDENCE_BUCKET_NAME
         )
 
         return {
             "conexion": "exitosa",
-            "servicio": "Backblaze B2",
-            "bucket": evidence_storage_settings.B2_EVIDENCE_BUCKET_NAME,
+            "servicio": "Cloudflare R2",
+            "bucket": evidence_storage_settings.R2_EVIDENCE_BUCKET_NAME,
         }
 
     except RuntimeError:
@@ -384,5 +387,5 @@ def verificar_conexion_storage_evidencias():
 
     except BotoCoreError:
         raise RuntimeError(
-            "No se pudo establecer conexión con el almacenamiento de evidencias."
+            "No se pudo establecer conexión con Cloudflare R2."
         ) from None

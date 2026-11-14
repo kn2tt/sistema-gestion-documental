@@ -1,3 +1,4 @@
+
 from pathlib import Path
 from uuid import uuid4
 
@@ -60,7 +61,7 @@ async def guardar_archivo(archivo: UploadFile) -> tuple[str, str]:
 
     try:
         s3_client.put_object(
-            Bucket=storage_settings.B2_BUCKET_NAME,
+            Bucket=storage_settings.R2_BUCKET_NAME,
             Key=clave_archivo,
             Body=contenido,
             ContentType=archivo.content_type or "application/octet-stream",
@@ -68,7 +69,7 @@ async def guardar_archivo(archivo: UploadFile) -> tuple[str, str]:
     except (ClientError, BotoCoreError):
         raise HTTPException(
             status_code=502,
-            detail="No se pudo guardar la plantilla en Backblaze B2.",
+            detail="No se pudo guardar la plantilla en Cloudflare R2.",
         ) from None
 
     return nombre_original, clave_archivo
@@ -77,7 +78,7 @@ async def guardar_archivo(archivo: UploadFile) -> tuple[str, str]:
 def obtener_archivo(clave_archivo: str) -> bytes:
     try:
         respuesta = s3_client.get_object(
-            Bucket=storage_settings.B2_BUCKET_NAME,
+            Bucket=storage_settings.R2_BUCKET_NAME,
             Key=clave_archivo,
         )
         return respuesta["Body"].read()
@@ -85,48 +86,21 @@ def obtener_archivo(clave_archivo: str) -> bytes:
     except (ClientError, BotoCoreError):
         raise HTTPException(
             status_code=404,
-            detail="No se pudo recuperar la plantilla de Backblaze B2.",
+            detail="No se pudo recuperar la plantilla de Cloudflare R2.",
         ) from None
 
 
 def eliminar_archivo(clave_archivo: str) -> None:
     try:
-        paginador = s3_client.get_paginator("list_object_versions")
-
-        versiones_a_eliminar = []
-
-        for pagina in paginador.paginate(
-            Bucket=storage_settings.B2_BUCKET_NAME,
-            Prefix=clave_archivo,
-        ):
-            for version in pagina.get("Versions", []):
-                if version.get("Key") == clave_archivo:
-                    versiones_a_eliminar.append({
-                        "Key": clave_archivo,
-                        "VersionId": version["VersionId"],
-                    })
-
-            for marcador in pagina.get("DeleteMarkers", []):
-                if marcador.get("Key") == clave_archivo:
-                    versiones_a_eliminar.append({
-                        "Key": clave_archivo,
-                        "VersionId": marcador["VersionId"],
-                    })
-
-        for objeto in versiones_a_eliminar:
-            s3_client.delete_object(
-                Bucket=storage_settings.B2_BUCKET_NAME,
-                Key=objeto["Key"],
-                VersionId=objeto["VersionId"],
-            )
+        s3_client.delete_object(
+            Bucket=storage_settings.R2_BUCKET_NAME,
+            Key=clave_archivo,
+        )
 
     except (ClientError, BotoCoreError):
         raise HTTPException(
             status_code=502,
-            detail=(
-                "No se pudieron eliminar todas las versiones del archivo "
-                "en Backblaze B2."
-            ),
+            detail="No se pudo eliminar la plantilla de Cloudflare R2.",
         ) from None
 
 
@@ -143,9 +117,9 @@ def duplicar_archivo(clave_origen: str) -> str:
 
     try:
         s3_client.copy_object(
-            Bucket=storage_settings.B2_BUCKET_NAME,
+            Bucket=storage_settings.R2_BUCKET_NAME,
             CopySource={
-                "Bucket": storage_settings.B2_BUCKET_NAME,
+                "Bucket": storage_settings.R2_BUCKET_NAME,
                 "Key": clave_origen,
             },
             Key=clave_destino,
@@ -156,6 +130,5 @@ def duplicar_archivo(clave_origen: str) -> str:
     except (ClientError, BotoCoreError):
         raise HTTPException(
             status_code=502,
-            detail="No se pudo copiar la versión en Backblaze B2.",
+            detail="No se pudo copiar la versión en Cloudflare R2.",
         ) from None
-

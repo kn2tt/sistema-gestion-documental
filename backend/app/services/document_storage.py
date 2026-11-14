@@ -1,3 +1,4 @@
+
 from pathlib import Path
 from uuid import uuid4
 
@@ -72,7 +73,7 @@ async def guardar_documento(
         cliente = obtener_cliente_documentos()
 
         cliente.put_object(
-            Bucket=document_storage_settings.B2_DOCUMENT_BUCKET_NAME,
+            Bucket=document_storage_settings.R2_DOCUMENT_BUCKET_NAME,
             Key=clave_archivo,
             Body=contenido,
             ContentType=(
@@ -81,12 +82,15 @@ async def guardar_documento(
             ),
         )
 
+    except RuntimeError:
+        raise
+
     except (ClientError, BotoCoreError):
         raise HTTPException(
             status_code=502,
             detail=(
                 "No se pudo guardar el documento "
-                "en Backblaze B2."
+                "en Cloudflare R2."
             ),
         ) from None
 
@@ -104,21 +108,23 @@ def obtener_documento(clave_archivo: str) -> bytes:
         cliente = obtener_cliente_documentos()
 
         respuesta = cliente.get_object(
-            Bucket=document_storage_settings.B2_DOCUMENT_BUCKET_NAME,
+            Bucket=document_storage_settings.R2_DOCUMENT_BUCKET_NAME,
             Key=clave_archivo,
         )
 
         return respuesta["Body"].read()
+
+    except RuntimeError:
+        raise
 
     except (ClientError, BotoCoreError):
         raise HTTPException(
             status_code=404,
             detail=(
                 "No se pudo recuperar el documento "
-                "desde Backblaze B2."
+                "desde Cloudflare R2."
             ),
         ) from None
-
 
 
 def eliminar_documento(clave_archivo: str) -> None:
@@ -134,47 +140,19 @@ def eliminar_documento(clave_archivo: str) -> None:
     try:
         cliente = obtener_cliente_documentos()
 
-        paginador = cliente.get_paginator(
-            "list_object_versions"
+        cliente.delete_object(
+            Bucket=document_storage_settings.R2_DOCUMENT_BUCKET_NAME,
+            Key=clave_archivo,
         )
 
-        versiones_a_eliminar = []
-
-        for pagina in paginador.paginate(
-            Bucket=document_storage_settings.B2_DOCUMENT_BUCKET_NAME,
-            Prefix=clave_archivo,
-        ):
-            for version in pagina.get("Versions", []):
-                if version.get("Key") == clave_archivo:
-                    versiones_a_eliminar.append({
-                        "Key": clave_archivo,
-                        "VersionId": version["VersionId"],
-                    })
-
-            for marcador in pagina.get("DeleteMarkers", []):
-                if marcador.get("Key") == clave_archivo:
-                    versiones_a_eliminar.append({
-                        "Key": clave_archivo,
-                        "VersionId": marcador["VersionId"],
-                    })
-
-        # Eliminar todas las versiones y marcadores encontrados.
-        for objeto in versiones_a_eliminar:
-            cliente.delete_object(
-                Bucket=document_storage_settings.B2_DOCUMENT_BUCKET_NAME,
-                Key=objeto["Key"],
-                VersionId=objeto["VersionId"],
-            )
-
-        # Si no hay versiones ni marcadores, no se ejecuta
-        # un borrado normal que pueda crear otro marcador.
+    except RuntimeError:
+        raise
 
     except (ClientError, BotoCoreError):
         raise HTTPException(
             status_code=502,
             detail=(
-                "No se pudieron eliminar todas las versiones "
-                "del documento en Backblaze B2."
+                "No se pudo eliminar el documento "
+                "de Cloudflare R2."
             ),
         ) from None
-
