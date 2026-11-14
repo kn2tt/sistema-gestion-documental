@@ -12,10 +12,12 @@ from app.models.user import User
 from app.models.user_session import UserSession
 from app.repositories.user_repository import UserRepository
 from app.services.user_service import password_hash
+from app.services.auth_protection_service import (
+    AuthProtectionService,
+    AuthenticationLockedError,
+)
 
 
-# Hash ficticio para realizar una verificación cuando el correo no existe.
-# Evita que el flujo de autenticación dependa únicamente de encontrar al usuario.
 DUMMY_PASSWORD_HASH = password_hash.hash(
     "clave-ficticia-para-verificacion"
 )
@@ -32,6 +34,7 @@ class AuthService:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
+        self.protection_service = AuthProtectionService(db)
 
     @staticmethod
     def hash_token(token: str) -> str:
@@ -43,62 +46,120 @@ class AuthService:
         self,
         correo: str,
         password: str,
+        client_ip: str,
         previous_token: str | None = None,
     ) -> tuple[User, str, str]:
 
-        user = self.user_repository.get_by_email(correo)
-
-        stored_hash = (
-            user.password_hash
-            if user
-            else DUMMY_PASSWORD_HASH
-        )
-
-        try:
-            password_valid = password_hash.verify(
-                password,
-                stored_hash,
-            )
-        except Exception:
-            password_valid = False
-
-        if not user or not password_valid or not user.activo:
-            raise ValueError("Credenciales incorrectas.")
-
-        # Revocar la sesión anterior si existe.
-        if previous_token:
-            previous_hash = self.hash_token(previous_token)
-
-            previous_session = self.db.execute(
-                select(UserSession).where(
-                    UserSession.token_hash == previous_hash,
-                    UserSession.revoked_at.is_(None),
-                )
-            ).scalar_one_or_none()
-
-            if previous_session:
-                previous_session.revoked_at = datetime.utcnow()
-
-        session_token = secrets.token_urlsafe(32)
-        csrf_token = secrets.token_urlsafe(32)
-
+        correo = correo.strip().lower()
         now = datetime.utcnow()
 
-        user_session = UserSession(
-            user_id=user.id,
-            token_hash=self.hash_token(session_token),
-            csrf_token_hash=self.hash_token(csrf_token),
-            created_at=now,
-            expires_at=now + timedelta(
-                hours=settings.SESSION_TTL_HOURS
-            ),
-            last_activity_at=now,
-        )
+        try:
+            (
+                account_state,
+                ip_state,
+                remaining_lock,
+            ) = self.protection_service.obtener_estados(
+                correo,
+                client_ip,
+            )
 
-        self.db.add(user_session)
-        self.db.commit()
+            if remaining_lock > 0:
+                self.db.commit()
 
-        return user, session_token, csrf_token
+                raise AuthenticationLockedError(
+                    remaining_lock
+                )
+
+            user = self.user_repository.get_by_email(correo)
+
+            stored_hash = (
+                user.password_hash
+                if user
+                else DUMMY_PASSWORD_HASH
+            )
+
+            try:
+                password_valid = password_hash.verify(
+                    password,
+                    stored_hash,
+                )
+            except Exception:
+                password_valid = False
+
+            if not user or not password_valid or not user.activo:
+
+                account_lock = (
+                    self.protection_service.registrar_fallo_cuenta(
+                        account_state,
+                        now,
+                    )
+                )
+
+                ip_lock = (
+                    self.protection_service.registrar_fallo_ip(
+                        ip_state,
+                        now,
+                    )
+                )
+
+                self.db.commit()
+
+                retry_after = max(
+                    account_lock,
+                    ip_lock,
+                )
+
+                if retry_after > 0:
+                    raise AuthenticationLockedError(
+                        retry_after
+                    )
+
+                raise ValueError(
+                    "Credenciales incorrectas."
+                )
+
+            self.protection_service.resetear_cuenta(
+                account_state,
+                now,
+            )
+
+            if previous_token:
+                previous_hash = self.hash_token(
+                    previous_token
+                )
+
+                previous_session = self.db.execute(
+                    select(UserSession).where(
+                        UserSession.token_hash == previous_hash,
+                        UserSession.revoked_at.is_(None),
+                    )
+                ).scalar_one_or_none()
+
+                if previous_session:
+                    previous_session.revoked_at = now
+
+            session_token = secrets.token_urlsafe(32)
+            csrf_token = secrets.token_urlsafe(32)
+
+            user_session = UserSession(
+                user_id=user.id,
+                token_hash=self.hash_token(session_token),
+                csrf_token_hash=self.hash_token(csrf_token),
+                created_at=now,
+                expires_at=now + timedelta(
+                    hours=settings.SESSION_TTL_HOURS
+                ),
+                last_activity_at=now,
+            )
+
+            self.db.add(user_session)
+            self.db.commit()
+
+            return user, session_token, csrf_token
+
+        except Exception:
+            self.db.rollback()
+            raise
 
     def get_session(
         self,

@@ -25,6 +25,9 @@ from app.services.auth_service import (
     AuthService,
     AuthenticatedSession,
 )
+from app.services.auth_protection_service import (
+    AuthenticationLockedError,
+)
 
 
 router = APIRouter(
@@ -76,13 +79,30 @@ def iniciar_sesion(
         settings.SESSION_COOKIE_NAME
     )
 
+    client_ip = (
+        request.client.host
+        if request.client
+        else "unknown"
+    )
+
     service = AuthService(db)
 
     try:
         user, session_token, csrf_token = service.login(
             correo=str(data.correo).lower(),
             password=data.password,
+            client_ip=client_ip,
             previous_token=previous_token,
+        )
+
+    except AuthenticationLockedError as error:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail={
+                "message": str(error),
+                "retry_after": error.retry_after,
+            },
+            headers={"Retry-After": str(error.retry_after)},
         )
 
     except ValueError as error:
