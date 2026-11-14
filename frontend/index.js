@@ -1,11 +1,16 @@
+
 const API_URL = "http://127.0.0.1:8000";
 
 // Elementos del formulario
 const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("password");
+const correoInput = document.getElementById("correo");
 const loginForm = document.getElementById("loginForm");
 const loginMessage = document.getElementById("loginMessage");
 const loginButton = document.getElementById("loginButton");
+
+let temporizadorBloqueo = null;
+let bloqueoActivo = false;
 
 // Mostrar / ocultar contraseña
 togglePassword.addEventListener("click", function () {
@@ -33,6 +38,83 @@ function restaurarBoton() {
         <span>Ingresar al sistema</span>
         <i class="bi bi-arrow-right"></i>
     `;
+}
+
+// Habilitar o deshabilitar formulario
+function cambiarEstadoFormulario(deshabilitado) {
+    correoInput.disabled = deshabilitado;
+    passwordInput.disabled = deshabilitado;
+    togglePassword.disabled = deshabilitado;
+    loginButton.disabled = deshabilitado;
+}
+
+// Formatear tiempo restante
+function formatearTiempo(segundos) {
+    const horas = Math.floor(segundos / 3600);
+    const minutos = Math.floor((segundos % 3600) / 60);
+    const segundosRestantes = segundos % 60;
+
+    if (horas > 0) {
+        return `${horas}h ${minutos}m ${segundosRestantes}s`;
+    }
+
+    if (minutos > 0) {
+        return `${minutos}m ${segundosRestantes}s`;
+    }
+
+    return `${segundosRestantes}s`;
+}
+
+// Iniciar contador de bloqueo
+function iniciarBloqueo(segundos) {
+    if (temporizadorBloqueo) {
+        clearInterval(temporizadorBloqueo);
+    }
+
+    const duracion = Math.max(1, Number(segundos) || 1);
+    const fechaDesbloqueo = Date.now() + duracion * 1000;
+
+    bloqueoActivo = true;
+
+    cambiarEstadoFormulario(true);
+
+    loginButton.innerHTML = `
+        <span>Acceso bloqueado</span>
+        <i class="bi bi-lock"></i>
+    `;
+
+    function actualizarContador() {
+        const restante = Math.max(
+            0,
+            Math.ceil((fechaDesbloqueo - Date.now()) / 1000)
+        );
+
+        if (restante <= 0) {
+            clearInterval(temporizadorBloqueo);
+            temporizadorBloqueo = null;
+            bloqueoActivo = false;
+
+            cambiarEstadoFormulario(false);
+            restaurarBoton();
+
+            loginMessage.className = "login-message";
+            loginMessage.textContent = "";
+
+            return;
+        }
+
+        mostrarMensaje(
+            `Por seguridad, el acceso está temporalmente bloqueado. Podrás intentarlo nuevamente en ${formatearTiempo(restante)}.`,
+            "error"
+        );
+    }
+
+    actualizarContador();
+
+    temporizadorBloqueo = setInterval(
+        actualizarContador,
+        1000
+    );
 }
 
 // Comprobar si ya existe una sesión
@@ -75,7 +157,11 @@ async function comprobarSesion() {
 loginForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const correo = document.getElementById("correo").value.trim();
+    if (bloqueoActivo) {
+        return;
+    }
+
+    const correo = correoInput.value.trim();
     const passwordValue = passwordInput.value;
 
     loginMessage.className = "login-message";
@@ -107,19 +193,38 @@ loginForm.addEventListener("submit", async function (event) {
 
         const data = await response.json();
 
+        if (response.status === 429) {
+            const retryAfter = Number(
+                data.detail?.retry_after
+            );
+
+            if (Number.isFinite(retryAfter) && retryAfter > 0) {
+                iniciarBloqueo(retryAfter);
+            } else {
+                mostrarMensaje(
+                    "Tu acceso está temporalmente bloqueado. Inténtalo nuevamente más tarde."
+                );
+            }
+
+            return;
+        }
+
         if (!response.ok) {
             mostrarMensaje(
                 typeof data.detail === "string"
                     ? data.detail
                     : "No se pudo iniciar sesión. Verifica tus credenciales."
             );
+
             return;
         }
 
         const usuario = data.usuario;
 
         if (!usuario) {
-            mostrarMensaje("El servidor no devolvió los datos del usuario.");
+            mostrarMensaje(
+                "El servidor no devolvió los datos del usuario."
+            );
             return;
         }
 
@@ -153,7 +258,9 @@ loginForm.addEventListener("submit", async function (event) {
         );
 
     } finally {
-        restaurarBoton();
+        if (!bloqueoActivo) {
+            restaurarBoton();
+        }
     }
 });
 
