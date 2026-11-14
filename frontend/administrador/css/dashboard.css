@@ -1808,3 +1808,124 @@ body {
     }
 
 }
+
+
+/* =========================================================
+   ALERTAS Y PRIORIDADES DEL DASHBOARD
+   ========================================================= */
+
+.alerts-card {
+    min-width: 0;
+}
+
+.priority-list {
+    padding: 12px 21px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.priority-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    padding: 11px 10px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    text-decoration: none;
+    transition: background .2s ease, border-color .2s ease;
+}
+
+.priority-item:hover {
+    background: var(--background);
+    border-color: #cbd5e1;
+}
+
+.priority-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.priority-danger .priority-icon {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.priority-warning .priority-icon {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.priority-info .priority-icon {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.priority-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.priority-content strong {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--text);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.priority-content span {
+    display: block;
+    color: var(--text-light);
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.priority-count {
+    min-width: 27px;
+    text-align: center;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.priority-arrow {
+    flex-shrink: 0;
+    color: var(--text-light);
+    font-size: 11px;
+}
+
+.priority-loading,
+.priority-empty {
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    color: var(--text-light);
+    font-size: 10px;
+}
+
+.priority-empty {
+    flex-direction: column;
+    text-align: center;
+}
+
+.priority-empty i {
+    font-size: 20px;
+}
+
+@media (max-width: 576px) {
+    .priority-list {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
