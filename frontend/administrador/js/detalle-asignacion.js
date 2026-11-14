@@ -2324,8 +2324,7 @@ saveChecklistTemplateBtn?.addEventListener("click", async function () {
                     },
                     body: JSON.stringify({
                         nombre,
-                        descripcion: descripcion || null,
-                        activo
+                        descripcion: descripcion || null
                     })
                 }
             );
@@ -2363,7 +2362,7 @@ saveChecklistTemplateBtn?.addEventListener("click", async function () {
 
         mostrarMensajeAdministracionChecklist(
             "La plantilla y sus ítems se guardaron correctamente.",
-            "info"
+            "success"
         );
 
     } catch (error) {

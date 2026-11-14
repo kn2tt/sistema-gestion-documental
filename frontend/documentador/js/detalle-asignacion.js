@@ -1003,9 +1003,11 @@ function seleccionarArchivo() {
     actualizarBotonCarga();
 }
 
-async function ejecutarCargaDocumento(botonAccion = btnCargarDocumento) {
+
+async function ejecutarCargaDocumento(evento = null) {
     if (!archivoSeleccionado || cargandoDocumento) return;
 
+    const botonAccion = evento?.currentTarget || btnCargarDocumento;
     const contenidoOriginal = botonAccion.innerHTML;
 
     cargandoDocumento = true;
@@ -1039,14 +1041,14 @@ async function ejecutarCargaDocumento(botonAccion = btnCargarDocumento) {
         );
 
         if (nombreArchivoSeleccionado) {
-            nombreArchivoSeleccionado.textContent = "Ningún archivo seleccionado";
+            nombreArchivoSeleccionado.textContent =
+                "Ningún archivo seleccionado";
         }
 
         actualizarVistaDocumento(documento);
 
         if (asignacionActual && documento.estado_asignacion) {
             asignacionActual.estado = documento.estado_asignacion;
-
             renderizarAsignacion(asignacionActual);
         }
 
@@ -1094,6 +1096,9 @@ async function descargarDocumentoActual() {
     if (!documentoActual?.id) return;
 
     const boton = document.getElementById("btnDescargarDocumento");
+
+    if (boton.disabled) return;
+
     const contenidoOriginal = boton.innerHTML;
 
     boton.disabled = true;
@@ -1285,6 +1290,29 @@ async function cargarAsignacion() {
 }
 
 
+async function reintentarCargaDetalle(evento) {
+    const boton = evento.currentTarget;
+
+    if (boton.disabled) return;
+
+    const contenidoOriginal = boton.innerHTML;
+
+    boton.disabled = true;
+    boton.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Cargando...
+    `;
+
+    try {
+        await cargarAsignacion();
+
+    } finally {
+        boton.disabled = false;
+        boton.innerHTML = contenidoOriginal;
+    }
+}
+
+
 /* =========================================
    MENÚ RESPONSIVE
    ========================================= */
@@ -1341,7 +1369,7 @@ function configurarEventos() {
         .addEventListener("click", descargarDocumentoActual);
 
     document.getElementById("btnReintentarDetalle")
-        .addEventListener("click", cargarAsignacion);
+        .addEventListener("click", reintentarCargaDetalle);
 }
 
 

@@ -1923,12 +1923,6 @@ document.getElementById(
             ).value.trim();
 
 
-        const estado =
-            document.getElementById(
-                "clienteEstado"
-            ).value;
-
-
         if (!nombre) {
 
             mostrarNotificacion(
@@ -1996,9 +1990,7 @@ document.getElementById(
                                 correo ||
                                 null,
 
-                            activo:
-                                estado ===
-                                "activo"
+                            activo: true
 
                         })
                     }
@@ -2031,12 +2023,6 @@ document.getElementById(
                 "clienteTelefono",
                 "clienteCorreo"
             ]);
-
-
-            document.getElementById(
-                "clienteEstado"
-            ).value =
-                "activo";
 
 
             nuevoClienteModal.hide();
@@ -3041,13 +3027,6 @@ document.getElementById(
             "clienteCorreo"
         ]);
 
-
-        document.getElementById(
-            "clienteEstado"
-        ).value =
-            "activo";
-
-
         nuevoClienteModal.show();
 
     }
@@ -3480,12 +3459,6 @@ document.getElementById(
             "";
 
 
-        document.getElementById(
-            "proyectoEstado"
-        ).value =
-            "activo";
-
-
         nuevoProyectoModal.show();
 
     }
@@ -3577,12 +3550,6 @@ document.getElementById(
             ).value.trim();
 
 
-        const estado =
-            document.getElementById(
-                "proyectoEstado"
-            ).value;
-
-
         if (!clienteId) {
 
             mostrarNotificacion(
@@ -3652,8 +3619,7 @@ document.getElementById(
                             fecha_fin:
                                 null,
 
-                            estado:
-                                estado
+                            estado: "activo"
 
                         })
                     }
@@ -6561,12 +6527,6 @@ document.addEventListener(
         ]);
 
 
-        document.getElementById(
-            "siteEstado"
-        ).value =
-            "activo";
-
-
         nuevoSiteModal.show();
 
     }
@@ -6615,12 +6575,6 @@ document.getElementById(
             document.getElementById(
                 "siteDistrito"
             ).value.trim();
-
-
-        const estado =
-            document.getElementById(
-                "siteEstado"
-            ).value;
 
 
         /*
@@ -6737,9 +6691,7 @@ document.getElementById(
                             distrito:
                                 distrito,
 
-                            estado:
-                                estado ===
-                                "activo"
+                            estado: true
 
                         })
                     }
