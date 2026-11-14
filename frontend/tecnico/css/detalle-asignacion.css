@@ -1047,3 +1047,129 @@
         margin-left: 16px;
     }
 }
+
+/* =========================================
+   SKELETON LOADING - DETALLE DEL TÉCNICO
+   ========================================= */
+
+.detail-skeleton-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.detail-skeleton-stack .skeleton-block {
+    width: 85%;
+    height: 17px;
+}
+
+.detail-skeleton-person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.detail-skeleton-person-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-skeleton-person-info .skeleton-block:first-child {
+    width: 55%;
+    height: 15px;
+}
+
+.detail-skeleton-person-info .skeleton-block:last-child {
+    width: 35%;
+    height: 12px;
+}
+
+/* Checklist */
+
+.detail-checklist-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px 24px 24px;
+}
+
+.detail-checklist-skeleton-group {
+    overflow: hidden;
+    border: 1px solid #e7ebf0;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.detail-checklist-skeleton-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #e7ebf0;
+    background: #f8fafc;
+}
+
+.detail-checklist-skeleton-heading .skeleton-block:first-child {
+    width: 35%;
+    height: 14px;
+}
+
+.detail-checklist-skeleton-heading .skeleton-block:last-child {
+    width: 65%;
+    height: 11px;
+}
+
+.detail-checklist-skeleton-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 17px 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-checklist-skeleton-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-checklist-skeleton-text .skeleton-block:first-child {
+    width: 55%;
+    height: 13px;
+}
+
+.detail-checklist-skeleton-text .skeleton-block:last-child {
+    width: 75%;
+    height: 11px;
+}
+
+.detail-checklist-skeleton-item > .skeleton-block {
+    width: 88px;
+    height: 29px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+    .detail-checklist-skeleton {
+        padding: 14px 16px 18px;
+    }
+
+    .detail-checklist-skeleton-item {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .detail-checklist-skeleton-text .skeleton-block:first-child {
+        width: 75%;
+    }
+
+    .detail-checklist-skeleton-text .skeleton-block:last-child {
+        width: 90%;
+    }
+}

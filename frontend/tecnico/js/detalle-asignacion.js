@@ -84,6 +84,44 @@ function mostrarTexto(elemento, valor, alternativa = "No disponible") {
             : alternativa;
 }
 
+function finalizarSkeletonDetalle() {
+    const selectores = [
+        ".page-header .skeleton-line-text",
+        ".info-grid .skeleton-line-text",
+        ".date-list .skeleton-line-text",
+        "#alcanceAsignacion .skeleton-block",
+        "#tecnicosAsignacion .skeleton-circle",
+        "#tecnicosAsignacion .skeleton-block"
+    ];
+
+    document.querySelectorAll(selectores.join(",")).forEach(elemento => {
+        elemento.classList.remove(
+            "skeleton-line-text",
+            "skeleton-block",
+            "skeleton-circle"
+        );
+    });
+
+    document.querySelectorAll(".detail-skeleton-person").forEach(elemento => {
+        elemento.remove();
+    });
+}
+
+function finalizarSkeletonChecklist() {
+    const skeleton = document.getElementById("checklistSkeleton");
+
+    if (skeleton) {
+        skeleton.hidden = true;
+        skeleton.setAttribute("aria-busy", "false");
+    }
+
+    document.querySelectorAll(
+        "#checklistPanel .skeleton-line-text"
+    ).forEach(elemento => {
+        elemento.classList.remove("skeleton-line-text");
+    });
+}
+
 function obtenerIniciales(nombre, apellido = "") {
     return `${nombre || ""} ${apellido || ""}`
         .trim()
@@ -509,6 +547,8 @@ async function cargarChecklistPublicado() {
             error.message || "No se pudo cargar el checklist.",
             "error"
         );
+    } finally {
+        finalizarSkeletonChecklist();
     }
 }
 
@@ -1357,12 +1397,17 @@ async function cargarAsignacion() {
         actualizarTecnicos(asignacion);
         actualizarFechas(asignacion);
 
+        finalizarSkeletonDetalle();
+
         actualizarEstadoEdicionEvidencias();
 
         await cargarChecklistPublicado();
 
     } catch (error) {
         console.error("Error al cargar el detalle:", error);
+
+        finalizarSkeletonDetalle();
+        finalizarSkeletonChecklist();
 
         mostrarNotificacion(
             error.message ||

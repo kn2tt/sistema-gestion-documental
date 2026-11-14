@@ -739,3 +739,117 @@
     display: block;
     margin-top: 12px;
 }
+
+/* =========================================
+   SKELETON LOADING - DETALLE DOCUMENTADOR
+   ========================================= */
+
+#detalleContenido[aria-busy="true"] {
+    pointer-events: none;
+}
+
+.detail-skeleton-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.detail-skeleton-stack .skeleton-block {
+    width: 85%;
+    height: 16px;
+}
+
+/* Historial */
+
+.detail-history-skeleton {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+}
+
+.detail-history-skeleton-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-history-skeleton-info .skeleton-block:nth-child(1) {
+    width: 55%;
+    height: 14px;
+}
+
+.detail-history-skeleton-info .skeleton-block:nth-child(2) {
+    width: 75%;
+    height: 12px;
+}
+
+.detail-history-skeleton-info .skeleton-block:nth-child(3) {
+    width: 35%;
+    height: 10px;
+}
+
+/* Checklist */
+
+.detail-document-checklist-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.detail-document-skeleton-group {
+    overflow: hidden;
+    border: 1px solid #e7ebf0;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.detail-document-skeleton-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #e7ebf0;
+    background: #f8fafc;
+}
+
+.detail-document-skeleton-heading .skeleton-block:first-child {
+    width: 35%;
+    height: 14px;
+}
+
+.detail-document-skeleton-heading .skeleton-block:last-child {
+    width: 65%;
+    height: 11px;
+}
+
+.detail-document-skeleton-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 17px 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-document-skeleton-item .skeleton-block:first-child {
+    width: 55%;
+    height: 13px;
+}
+
+.detail-document-skeleton-item .skeleton-block:last-child {
+    width: 25%;
+    height: 13px;
+}
+
+@media (max-width: 700px) {
+    .detail-document-skeleton-item {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .detail-document-skeleton-item .skeleton-block:first-child {
+        width: 80%;
+    }
+}

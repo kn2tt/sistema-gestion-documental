@@ -474,14 +474,6 @@ async function comprobarSesionTecnico() {
    ========================================= */
 
 async function cargarAsignaciones() {
-    assignmentTableBody.innerHTML = `
-        <tr>
-            <td colspan="7" class="text-center py-4">
-                Cargando tus asignaciones...
-            </td>
-        </tr>
-    `;
-
     try {
         const response = await apiFetch(
             `${API_URL}/asignaciones/tecnico/mis-asignaciones`
@@ -560,6 +552,25 @@ function actualizarResumenAsignaciones() {
     document.getElementById("asignacionesCompletadas").textContent = completadas;
 }
 
+function finalizarSkeletonAsignaciones() {
+    document.querySelectorAll(".summary-card.is-loading").forEach(card => {
+        card.classList.remove("is-loading");
+        card.setAttribute("aria-busy", "false");
+    });
+
+    const clienteCard = document.getElementById("assignmentClientCard");
+
+    if (clienteCard) {
+        clienteCard.classList.remove("is-loading");
+        clienteCard.setAttribute("aria-busy", "false");
+    }
+
+    document.querySelectorAll(".skeleton-value, .skeleton-line-text").forEach(elemento => {
+        elemento.classList.remove("skeleton-value", "skeleton-line-text");
+    });
+
+    assignmentTableBody?.setAttribute("aria-busy", "false");
+}
 
 /* =========================================
    FILTROS
@@ -877,6 +888,7 @@ async function inicializarPanelTecnico() {
 
     await cargarAsignaciones();
     cargarClientesAsignaciones();
+    finalizarSkeletonAsignaciones();
 }
 
 inicializarPanelTecnico();

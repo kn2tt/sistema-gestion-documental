@@ -16,6 +16,7 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    <link rel="stylesheet" href="../shared/css/skeleton.css">
     <link rel="stylesheet" href="../administrador/css/dashboard.css">
     <link rel="stylesheet" href="../administrador/css/asignaciones.css">
     <link rel="stylesheet" href="../administrador/css/detalle-asignacion.css">
@@ -150,11 +151,11 @@
                     <div class="title-row">
 
                         <div>
-                            <h1 id="tituloAsignacion">
+                            <h1 id="tituloAsignacion" class="skeleton-line-text">
                                 Cargando asignación...
                             </h1>
 
-                            <p id="subtituloAsignacion"></p>
+                            <p id="subtituloAsignacion" class="skeleton-line-text"></p>
                         </div>
 
                         <span
@@ -181,7 +182,7 @@
 
                     <div>
                         <span class="info-label">Cliente</span>
-                        <strong id="clienteAsignacion"></strong>
+                        <strong id="clienteAsignacion" class="skeleton-line-text"></strong>
                     </div>
                 </div>
 
@@ -192,7 +193,7 @@
 
                     <div>
                         <span class="info-label">Site</span>
-                        <strong id="siteAsignacion"></strong>
+                        <strong id="siteAsignacion" class="skeleton-line-text"></strong>
                     </div>
                 </div>
 
@@ -203,7 +204,7 @@
 
                     <div>
                         <span class="info-label">Tipo de documento</span>
-                        <strong id="tipoDocumentoAsignacion"></strong>
+                        <strong id="tipoDocumentoAsignacion" class="skeleton-line-text"></strong>
                     </div>
                 </div>
 
@@ -214,7 +215,11 @@
 
                     <div class="info-card-content">
                         <span class="info-label">Alcances</span>
-                        <div id="alcanceAsignacion" class="scope-list"></div>
+                        <div id="alcanceAsignacion" class="scope-list detail-skeleton-stack">
+                            <div class="skeleton-block"></div>
+                            <div class="skeleton-block"></div>
+                            <div class="skeleton-block"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -232,7 +237,23 @@
                         </div>
                     </div>
 
-                    <div class="responsible-list" id="tecnicosAsignacion"></div>
+                    <div class="responsible-list" id="tecnicosAsignacion">
+                        <div class="detail-skeleton-person">
+                            <div class="skeleton-circle"></div>
+                            <div class="detail-skeleton-person-info">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+                        </div>
+
+                        <div class="detail-skeleton-person">
+                            <div class="skeleton-circle"></div>
+                            <div class="detail-skeleton-person-info">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -254,7 +275,7 @@
 
                             <div>
                                 <span>Fecha de asignación</span>
-                                <strong id="fechaAsignacion"></strong>
+                                <strong id="fechaAsignacion" class="skeleton-line-text"></strong>
                             </div>
                         </div>
 
@@ -265,7 +286,7 @@
 
                             <div>
                                 <span>Fecha límite</span>
-                                <strong id="fechaLimiteAsignacion"></strong>
+                                <strong id="fechaLimiteAsignacion" class="skeleton-line-text"></strong>
                             </div>
                         </div>
 
@@ -276,7 +297,7 @@
 
                             <div>
                                 <span>Días restantes</span>
-                                <strong id="diasRestantesAsignacion"></strong>
+                                <strong id="diasRestantesAsignacion" class="skeleton-line-text"></strong>
                             </div>
                         </div>
 
@@ -386,7 +407,12 @@
                     </div>
 
                     <div class="document-checklist-progress">
-                        <strong id="checklistProgressPercentage">0%</strong>
+                        <strong
+                            id="checklistProgressPercentage"
+                            class="skeleton-line-text"
+                        >
+                            0%
+                        </strong>
                         <span>Completado</span>
                     </div>
 
@@ -408,13 +434,57 @@
                 </div>
 
                 <div class="document-checklist-summary">
-                    <span id="checklistCompletedCount">
+                    <span id="checklistCompletedCount" class="skeleton-line-text">
                         0 de 0 ítems completados
                     </span>
 
-                    <span id="checklistPendingCount">
+                    <span id="checklistPendingCount" class="skeleton-line-text">
                         0 pendientes
                     </span>
+                </div>
+
+                <div
+                    id="checklistSkeleton"
+                    class="detail-checklist-skeleton"
+                    aria-busy="true"
+                >
+                    <div class="detail-checklist-skeleton-group">
+                        <div class="detail-checklist-skeleton-heading">
+                            <div class="skeleton-block"></div>
+                            <div class="skeleton-block"></div>
+                        </div>
+
+                        <div class="detail-checklist-skeleton-item">
+                            <div class="detail-checklist-skeleton-text">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+                            <div class="skeleton-block"></div>
+                        </div>
+
+                        <div class="detail-checklist-skeleton-item">
+                            <div class="detail-checklist-skeleton-text">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+                            <div class="skeleton-block"></div>
+                        </div>
+                    </div>
+
+                    <div class="detail-checklist-skeleton-group">
+                        <div class="detail-checklist-skeleton-heading">
+                            <div class="skeleton-block"></div>
+                            <div class="skeleton-block"></div>
+                        </div>
+
+                        <div class="detail-checklist-skeleton-item">
+                            <div class="detail-checklist-skeleton-text">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+                            <div class="skeleton-block"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div

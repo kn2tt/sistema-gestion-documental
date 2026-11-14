@@ -16,6 +16,7 @@
         rel="stylesheet"
     >
 
+    <link rel="stylesheet" href="../shared/css/skeleton.css">
     <link rel="stylesheet" href="../administrador/css/dashboard.css">
     <link rel="stylesheet" href="../administrador/css/asignaciones.css">
     <link rel="stylesheet" href="../administrador/css/detalle-asignacion.css">
@@ -145,11 +146,11 @@
                     <div class="title-row">
 
                         <div>
-                            <h1 id="tituloAsignacion">
+                            <h1 id="tituloAsignacion" class="skeleton-line-text">
                                 Cargando asignación...
                             </h1>
 
-                            <p id="subtituloAsignacion"></p>
+                            <p id="subtituloAsignacion" class="skeleton-line-text"></p>
                         </div>
 
                         <span
@@ -186,7 +187,7 @@
                 </div>
             </div>
 
-            <div id="detalleContenido" hidden>
+            <div id="detalleContenido" aria-busy="true">
 
                 <!-- INFORMACIÓN GENERAL -->
                 <section class="info-grid">
@@ -198,7 +199,7 @@
 
                         <div>
                             <span class="info-label">Cliente</span>
-                            <strong id="clienteAsignacion"></strong>
+                            <strong id="clienteAsignacion" class="skeleton-line-text"></strong>
                         </div>
                     </div>
 
@@ -209,7 +210,7 @@
 
                         <div>
                             <span class="info-label">Site</span>
-                            <strong id="siteAsignacion"></strong>
+                            <strong id="siteAsignacion" class="skeleton-line-text"></strong>
                         </div>
                     </div>
 
@@ -220,7 +221,7 @@
 
                         <div>
                             <span class="info-label">Tipo de documento</span>
-                            <strong id="tipoDocumentoAsignacion"></strong>
+                            <strong id="tipoDocumentoAsignacion" class="skeleton-line-text"></strong>
                         </div>
                     </div>
 
@@ -231,7 +232,11 @@
 
                         <div class="info-card-content">
                             <span class="info-label">Alcances</span>
-                            <div id="alcanceAsignacion" class="scope-list"></div>
+                            <div id="alcanceAsignacion" class="scope-list detail-skeleton-stack">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -258,7 +263,7 @@
                                 </div>
                                 <div>
                                     <span>Fecha de asignación</span>
-                                    <strong id="fechaAsignacion"></strong>
+                                    <strong id="fechaAsignacion" class="skeleton-line-text"></strong>
                                 </div>
                             </div>
 
@@ -268,7 +273,7 @@
                                 </div>
                                 <div>
                                     <span>Fecha límite</span>
-                                    <strong id="fechaLimiteAsignacion"></strong>
+                                    <strong id="fechaLimiteAsignacion" class="skeleton-line-text"></strong>
                                 </div>
                             </div>
 
@@ -278,7 +283,7 @@
                                 </div>
                                 <div>
                                     <span>Días restantes</span>
-                                    <strong id="diasRestantesAsignacion"></strong>
+                                    <strong id="diasRestantesAsignacion" class="skeleton-line-text"></strong>
                                 </div>
                             </div>
 
@@ -299,12 +304,23 @@
                         </div>
 
                         <div id="documentHistory" class="document-history-list">
-
-                            <div class="document-history-empty">
-                                <i class="bi bi-clock"></i>
-                                <span>No hay operaciones registradas.</span>
+                            <div class="detail-history-skeleton">
+                                <div class="skeleton-circle"></div>
+                                <div class="detail-history-skeleton-info">
+                                    <div class="skeleton-block"></div>
+                                    <div class="skeleton-block"></div>
+                                    <div class="skeleton-block"></div>
+                                </div>
                             </div>
 
+                            <div class="detail-history-skeleton">
+                                <div class="skeleton-circle"></div>
+                                <div class="detail-history-skeleton-info">
+                                    <div class="skeleton-block"></div>
+                                    <div class="skeleton-block"></div>
+                                    <div class="skeleton-block"></div>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -319,7 +335,7 @@
                         <div class="panel-header">
                             <div>
                                 <h2>Plantilla asignada</h2>
-                                <p id="plantillaNombre">
+                                <p id="plantillaNombre" class="skeleton-line-text">
                                     Plantilla correspondiente a la asignación
                                 </p>
                             </div>
@@ -370,7 +386,7 @@
 
                             <div class="resource-description">
                                 <strong>Google Drive</strong>
-                                <span id="driveEstado">
+                                <span id="driveEstado" class="skeleton-line-text">
                                     Consultando carpeta de evidencias...
                                 </span>
                             </div>
@@ -406,7 +422,9 @@
                         </div>
 
                         <div class="document-checklist-progress">
-                            <strong id="checklistProgressPercentage">0%</strong>
+                            <strong id="checklistProgressPercentage" class="skeleton-line-text">
+                                0%
+                            </strong>
                             <span>Completado</span>
                         </div>
 
@@ -420,8 +438,48 @@
                     </div>
 
                     <div class="document-checklist-summary">
-                        <span id="checklistCompletedCount">0 de 0 ítems atendidos</span>
-                        <span id="checklistPendingCount">0 pendientes</span>
+                        <span id="checklistCompletedCount" class="skeleton-line-text">
+                            0 de 0 ítems atendidos
+                        </span>
+
+                        <span id="checklistPendingCount" class="skeleton-line-text">
+                            0 pendientes
+                        </span>
+                    </div>
+
+                    <div
+                        id="checklistSkeleton"
+                        class="detail-document-checklist-skeleton"
+                        aria-busy="true"
+                    >
+                        <div class="detail-document-skeleton-group">
+                            <div class="detail-document-skeleton-heading">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+
+                            <div class="detail-document-skeleton-item">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+
+                            <div class="detail-document-skeleton-item">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+                        </div>
+
+                        <div class="detail-document-skeleton-group">
+                            <div class="detail-document-skeleton-heading">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+
+                            <div class="detail-document-skeleton-item">
+                                <div class="skeleton-block"></div>
+                                <div class="skeleton-block"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div

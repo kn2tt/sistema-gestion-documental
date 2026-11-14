@@ -16,6 +16,7 @@
         rel="stylesheet"
     >
 
+    <link rel="stylesheet" href="../shared/css/skeleton.css">
     <link rel="stylesheet" href="../administrador/css/dashboard.css">
     <link rel="stylesheet" href="../administrador/css/asignaciones.css">
     <link rel="stylesheet" href="css/asignaciones.css">
@@ -133,54 +134,58 @@
             <!-- RESUMEN -->
             <div class="assignment-summary">
 
-                <div class="summary-card">
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon total">
                         <i class="bi bi-clipboard-check"></i>
                     </div>
 
                     <div>
                         <span>Total asignaciones</span>
-                        <strong id="totalAsignaciones">0</strong>
+                        <strong id="totalAsignaciones" class="skeleton-value">0</strong>
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon pending">
                         <i class="bi bi-clock"></i>
                     </div>
 
                     <div>
                         <span>Pendientes</span>
-                        <strong id="asignacionesPendientes">0</strong>
+                        <strong id="asignacionesPendientes" class="skeleton-value">0</strong>
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon process">
                         <i class="bi bi-pencil-square"></i>
                     </div>
 
                     <div>
                         <span>En documentación</span>
-                        <strong id="asignacionesEnDocumentacion">0</strong>
+                        <strong id="asignacionesEnDocumentacion" class="skeleton-value">0</strong>
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon complete">
                         <i class="bi bi-check-circle"></i>
                     </div>
 
                     <div>
                         <span>Completadas</span>
-                        <strong id="asignacionesCompletadas">0</strong>
+                        <strong id="asignacionesCompletadas" class="skeleton-value">0</strong>
                     </div>
                 </div>
 
             </div>
 
             <!-- CLIENTE SELECCIONADO -->
-            <div class="assignment-client-card" id="assignmentClientCard">
+            <div
+                class="assignment-client-card is-loading"
+                id="assignmentClientCard"
+                aria-busy="true"
+            >
 
                 <div class="assignment-client-icon">
                     <i class="bi bi-building"></i>
@@ -324,7 +329,9 @@
                 <div class="table-header">
                     <div>
                         <h2>Asignaciones registradas</h2>
-                        <span id="totalResultados">Cargando asignaciones...</span>
+                        <span id="totalResultados" class="skeleton-line-text">
+                            Cargando asignaciones...
+                        </span>
                     </div>
                 </div>
 
@@ -343,12 +350,33 @@
                             </tr>
                         </thead>
 
-                        <tbody id="assignmentTableBody">
-                            <tr>
-                                <td colspan="7" class="text-center py-4">
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
-                                    Cargando asignaciones...
-                                </td>
+                        <tbody id="assignmentTableBody" aria-busy="true">
+                            <tr class="skeleton-row">
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
+                                <td><div class="skeleton-cell"></div></td>
                             </tr>
                         </tbody>
                     </table>
@@ -356,7 +384,7 @@
                 </div>
 
                 <div class="table-footer">
-                    <span id="contadorAsignaciones">
+                    <span id="contadorAsignaciones" class="skeleton-line-text">
                         Cargando asignaciones...
                     </span>
 

@@ -138,6 +138,45 @@ function mostrarTexto(elemento, valor, alternativa = "No disponible") {
             : alternativa;
 }
 
+function finalizarSkeletonDetalle() {
+    document.querySelectorAll(
+        "#tituloAsignacion.skeleton-line-text, " +
+        "#subtituloAsignacion.skeleton-line-text, " +
+        "#detalleContenido .skeleton-line-text, " +
+        "#detalleContenido .detail-skeleton-stack .skeleton-block"
+    ).forEach(elemento => {
+        elemento.classList.remove(
+            "skeleton-line-text",
+            "skeleton-block"
+        );
+    });
+
+    const historial = document.getElementById("documentHistory");
+
+    if (historial) {
+        historial.querySelectorAll(".detail-history-skeleton").forEach(
+            elemento => elemento.remove()
+        );
+    }
+
+    detalleContenido.setAttribute("aria-busy", "false");
+}
+
+function finalizarSkeletonChecklist() {
+    const skeleton = document.getElementById("checklistSkeleton");
+
+    if (skeleton) {
+        skeleton.hidden = true;
+        skeleton.setAttribute("aria-busy", "false");
+    }
+
+    document.querySelectorAll(
+        ".document-checklist-panel .skeleton-line-text"
+    ).forEach(elemento => {
+        elemento.classList.remove("skeleton-line-text");
+    });
+}
+
 function obtenerIniciales(nombre, apellido = "") {
     return `${nombre || ""} ${apellido || ""}`
         .trim()
@@ -491,36 +530,45 @@ function renderizarAsignacion(asignacion) {
    ========================================= */
 
 async function cargarContextoDocumental() {
-    const respuesta = await apiFetch(
-        `${API_URL}/documentos/asignacion/${assignmentId}/contexto`
-    );
+    try {
+        const respuesta = await apiFetch(
+            `${API_URL}/documentos/asignacion/${assignmentId}/contexto`
+        );
 
-    const contexto = await obtenerRespuesta(respuesta);
+        const contexto = await obtenerRespuesta(respuesta);
 
-    mostrarTexto(
-        document.getElementById("plantillaNombre"),
-        contexto.plantilla_nombre,
-        "Plantilla asignada"
-    );
+        mostrarTexto(
+            document.getElementById("plantillaNombre"),
+            contexto.plantilla_nombre,
+            "Plantilla asignada"
+        );
 
-    const enlaceDrive = contexto.drive_web_view_link;
-    const botonDrive = document.getElementById("btnAbrirDrive");
-    const estadoDrive = document.getElementById("driveEstado");
+        const enlaceDrive = contexto.drive_web_view_link;
+        const botonDrive = document.getElementById("btnAbrirDrive");
+        const estadoDrive = document.getElementById("driveEstado");
 
-    if (enlaceDrive) {
-        botonDrive.href = enlaceDrive;
-        botonDrive.classList.remove("disabled");
-        botonDrive.removeAttribute("aria-disabled");
+        if (enlaceDrive) {
+            botonDrive.href = enlaceDrive;
+            botonDrive.classList.remove("disabled");
+            botonDrive.removeAttribute("aria-disabled");
 
-        estadoDrive.textContent =
-            "Carpeta de evidencias disponible.";
-    } else {
-        botonDrive.href = "#";
-        botonDrive.classList.add("disabled");
-        botonDrive.setAttribute("aria-disabled", "true");
+            estadoDrive.textContent =
+                "Carpeta de evidencias disponible.";
+        } else {
+            botonDrive.href = "#";
+            botonDrive.classList.add("disabled");
+            botonDrive.setAttribute("aria-disabled", "true");
 
-        estadoDrive.textContent =
-            "Todavía no se ha registrado una carpeta de evidencias.";
+            estadoDrive.textContent =
+                "Todavía no se ha registrado una carpeta de evidencias.";
+        }
+
+    } finally {
+        document.getElementById("plantillaNombre")
+            ?.classList.remove("skeleton-line-text");
+
+        document.getElementById("driveEstado")
+            ?.classList.remove("skeleton-line-text");
     }
 }
 
@@ -815,13 +863,6 @@ async function cargarChecklistDocumental() {
     const contenedor = document.getElementById("checklistItems");
     const vacio = document.getElementById("checklistEmptyState");
 
-    contenedor.innerHTML = `
-        <div class="document-loading">
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Cargando checklist documental...
-        </div>
-    `;
-
     vacio.hidden = true;
 
     try {
@@ -853,6 +894,9 @@ async function cargarChecklistDocumental() {
             error.message || "Inténtalo nuevamente.";
 
         actualizarProgresoChecklist([]);
+
+    } finally {
+        finalizarSkeletonChecklist();
     }
 }
 
@@ -1273,6 +1317,8 @@ async function cargarAsignacion() {
         asignacionActual = asignacion;
 
         renderizarAsignacion(asignacion);
+
+        finalizarSkeletonDetalle();
 
         detalleContenido.hidden = false;
 

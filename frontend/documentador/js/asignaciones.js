@@ -246,6 +246,26 @@ function actualizarResumen(asignaciones) {
     document.getElementById("asignacionesCompletadas").textContent = completadas;
 }
 
+function finalizarSkeletonAsignaciones() {
+    document.querySelectorAll(".summary-card.is-loading").forEach(card => {
+        card.classList.remove("is-loading");
+        card.setAttribute("aria-busy", "false");
+    });
+
+    const clienteCard = document.getElementById("assignmentClientCard");
+
+    if (clienteCard) {
+        clienteCard.classList.remove("is-loading");
+        clienteCard.setAttribute("aria-busy", "false");
+    }
+
+    document.querySelectorAll(".skeleton-value, .skeleton-line-text").forEach(elemento => {
+        elemento.classList.remove("skeleton-value", "skeleton-line-text");
+    });
+
+    assignmentTableBody?.setAttribute("aria-busy", "false");
+}
+
 /* =========================================
    SELECTOR DE CLIENTES
    ========================================= */
@@ -708,15 +728,6 @@ function actualizarPaginacion(totalPaginas) {
    ========================================= */
 
 async function cargarAsignaciones() {
-    assignmentTableBody.innerHTML = `
-        <tr>
-            <td colspan="7" class="text-center py-4">
-                <span class="spinner-border spinner-border-sm me-2"></span>
-                Cargando asignaciones...
-            </td>
-        </tr>
-    `;
-
     try {
         const response = await apiFetch(
             `${API_URL}/asignaciones/documentador/mis-asignaciones`
@@ -738,6 +749,8 @@ async function cargarAsignaciones() {
         actualizarResumen(asignacionesData);
         cargarClientesAsignaciones();
         renderizarAsignaciones();
+
+        finalizarSkeletonAsignaciones();
 
     } catch (error) {
         console.error("Error al cargar asignaciones:", error);
@@ -771,6 +784,13 @@ async function cargarAsignaciones() {
             "No se pudieron cargar las asignaciones";
 
         document.getElementById("contadorAsignaciones").textContent = "";
+
+        document.getElementById("totalAsignaciones").textContent = "—";
+        document.getElementById("asignacionesPendientes").textContent = "—";
+        document.getElementById("asignacionesEnDocumentacion").textContent = "—";
+        document.getElementById("asignacionesCompletadas").textContent = "—";
+
+        finalizarSkeletonAsignaciones();
 
         document.getElementById("retryAssignmentsButton")
             ?.addEventListener("click", cargarAsignaciones);
