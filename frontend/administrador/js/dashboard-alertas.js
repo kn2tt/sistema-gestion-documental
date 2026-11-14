@@ -164,6 +164,8 @@ async function consultarEvidenciasIncompletas(asignaciones) {
 function renderizarAlertas(datos) {
     const { vencidas, proximas, evidencias } = datos;
 
+    dashboardAlerts.setAttribute("aria-busy", "false");
+
     dashboardAlerts.innerHTML = `
         <a
             href="asignaciones.html"
@@ -236,11 +238,48 @@ function renderizarAlertas(datos) {
     `;
 }
 
+function mostrarSkeletonAlertas() {
+    if (!dashboardAlerts) return;
+
+    dashboardAlerts.setAttribute("aria-busy", "true");
+
+    dashboardAlerts.innerHTML = `
+        <div class="priority-skeleton">
+            <div class="skeleton-circle"></div>
+            <div class="priority-skeleton-content">
+                <div class="skeleton-block"></div>
+                <div class="skeleton-block"></div>
+            </div>
+            <div class="skeleton-value"></div>
+        </div>
+
+        <div class="priority-skeleton">
+            <div class="skeleton-circle"></div>
+            <div class="priority-skeleton-content">
+                <div class="skeleton-block"></div>
+                <div class="skeleton-block"></div>
+            </div>
+            <div class="skeleton-value"></div>
+        </div>
+
+        <div class="priority-skeleton">
+            <div class="skeleton-circle"></div>
+            <div class="priority-skeleton-content">
+                <div class="skeleton-block"></div>
+                <div class="skeleton-block"></div>
+            </div>
+            <div class="skeleton-value"></div>
+        </div>
+    `;
+}
+
 /* =========================================
    CARGAR DASHBOARD
    ========================================= */
 
 async function cargarAlertasDashboard() {
+    mostrarSkeletonAlertas();
+
     try {
         const asignaciones = await obtenerJSON(
             `${API_URL}/asignaciones/`
@@ -266,6 +305,8 @@ async function cargarAlertasDashboard() {
             "No se pudieron cargar las alertas del dashboard:",
             error
         );
+
+        dashboardAlerts.setAttribute("aria-busy", "false");
 
         dashboardAlerts.innerHTML = `
             <div class="priority-empty">

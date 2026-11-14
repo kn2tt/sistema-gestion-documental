@@ -153,6 +153,7 @@ async function cargarDocumentos() {
             : [];
 
         actualizarResumen();
+        finalizarSkeletonResumen();
         cargarFiltros();
         aplicarFiltros();
 
@@ -168,6 +169,7 @@ async function cargarDocumentos() {
         `;
 
         actualizarResumen([]);
+        finalizarSkeletonResumen();
     }
 }
 
@@ -193,6 +195,17 @@ function actualizarResumen(datos = documentosData) {
         datos.filter(documento =>
             documento.estado === "observado"
         ).length;
+}
+
+function finalizarSkeletonResumen() {
+    document.querySelectorAll(".summary-card.is-loading").forEach(card => {
+        card.classList.remove("is-loading");
+        card.setAttribute("aria-busy", "false");
+    });
+
+    document.querySelectorAll(".summary-card .skeleton-value").forEach(elemento => {
+        elemento.classList.remove("skeleton-value");
+    });
 }
 
 /* =========================================

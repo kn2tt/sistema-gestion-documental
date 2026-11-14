@@ -1929,3 +1929,106 @@ body {
         padding-right: 16px;
     }
 }
+
+
+/* =========================================
+   SKELETON LOADING - DASHBOARD
+   ========================================= */
+
+/* Tarjetas de resumen */
+
+.stat-card.is-loading {
+    background: #ffffff;
+}
+
+.stat-card.is-loading .stat-icon {
+    background: linear-gradient(
+        100deg,
+        #e9edf2 25%,
+        #dfe4ea 45%,
+        #e9edf2 65%
+    ) !important;
+    background-size: 200% 100% !important;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+    color: transparent !important;
+}
+
+.stat-card.is-loading .stat-icon i {
+    visibility: hidden;
+}
+
+.stat-card.is-loading .stat-value {
+    width: 58px;
+    height: 30px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    color: transparent !important;
+}
+
+.stat-card.is-loading .stat-footer {
+    color: transparent !important;
+}
+
+.stat-card.is-loading .stat-footer i {
+    visibility: hidden;
+}
+
+.stat-card.is-loading .stat-footer span {
+    min-width: 115px;
+    min-height: 11px;
+}
+
+/* Tabla de asignaciones recientes */
+
+#dashboardAssignments[aria-busy="true"] .skeleton-cell {
+    width: 85%;
+    height: 15px;
+}
+
+/* Alertas y prioridades */
+
+.priority-skeleton {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    min-height: 54px;
+    padding: 11px 10px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+}
+
+.priority-skeleton .skeleton-circle {
+    width: 32px;
+    height: 32px;
+}
+
+.priority-skeleton-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.priority-skeleton-content .skeleton-block:first-child {
+    width: 65%;
+    height: 11px;
+}
+
+.priority-skeleton-content .skeleton-block:last-child {
+    width: 85%;
+    height: 9px;
+}
+
+.priority-skeleton > .skeleton-value {
+    width: 27px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stat-card.is-loading .stat-icon {
+        animation: none;
+    }
+}

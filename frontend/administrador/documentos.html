@@ -137,43 +137,43 @@
 
             <div class="document-summary">
 
-                <div class="summary-card">
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon blue">
                         <i class="bi bi-file-earmark-text"></i>
                     </div>
                     <div>
                         <span class="summary-label">Documentos recibidos</span>
-                        <strong id="totalDocumentCount">0</strong>
+                        <strong id="totalDocumentCount" class="skeleton-value">0</strong>
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon orange">
                         <i class="bi bi-hourglass-split"></i>
                     </div>
                     <div>
                         <span class="summary-label">En proceso</span>
-                        <strong id="processDocumentCount">0</strong>
+                        <strong id="processDocumentCount" class="skeleton-value">0</strong>
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon green">
                         <i class="bi bi-check-circle"></i>
                     </div>
                     <div>
                         <span class="summary-label">Completados</span>
-                        <strong id="completeDocumentCount">0</strong>
+                        <strong id="completeDocumentCount" class="skeleton-value">0</strong>
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon red">
                         <i class="bi bi-exclamation-circle"></i>
                     </div>
                     <div>
                         <span class="summary-label">Observados</span>
-                        <strong id="observedDocumentCount">0</strong>
+                        <strong id="observedDocumentCount" class="skeleton-value">0</strong>
                     </div>
                 </div>
 
@@ -234,12 +234,123 @@
                 </div>
             </div>
 
-            <div class="document-groups" id="documentTableBody">
-                <div class="content-card document-loading">
-                    <div class="spinner-border spinner-border-sm" role="status"></div>
-                    <span>Cargando documentos...</span>
-                </div>
-            </div>
+            <div class="document-groups" id="documentTableBody" aria-busy="true">
+
+                <article class="content-card document-assignment document-skeleton">
+                    <div class="document-assignment-header">
+                        <div class="document-assignment-main">
+                            <div class="skeleton-placeholder skeleton-icon"></div>
+                            <div class="document-assignment-title skeleton-heading">
+                                <div class="skeleton-placeholder skeleton-short"></div>
+                                <div class="skeleton-placeholder skeleton-title"></div>
+                                <div class="skeleton-placeholder skeleton-medium"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-placeholder skeleton-status"></div>
+                    </div>
+
+                    <div class="document-assignment-meta">
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-file"></div>
+                        </div>
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+                    </div>
+
+                    <div class="document-assignment-footer">
+                        <div class="skeleton-placeholder skeleton-footer-text"></div>
+                        <div class="skeleton-placeholder skeleton-button"></div>
+                    </div>
+                </article>
+
+                <article class="content-card document-assignment document-skeleton">
+                    <div class="document-assignment-header">
+                        <div class="document-assignment-main">
+                            <div class="skeleton-placeholder skeleton-icon"></div>
+                            <div class="document-assignment-title skeleton-heading">
+                                <div class="skeleton-placeholder skeleton-short"></div>
+                                <div class="skeleton-placeholder skeleton-title"></div>
+                                <div class="skeleton-placeholder skeleton-medium"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-placeholder skeleton-status"></div>
+                    </div>
+
+                    <div class="document-assignment-meta">
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-file"></div>
+                        </div>
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+                    </div>
+
+                    <div class="document-assignment-footer">
+                        <div class="skeleton-placeholder skeleton-footer-text"></div>
+                        <div class="skeleton-placeholder skeleton-button"></div>
+                    </div>
+                </article>
+
+                <article class="content-card document-assignment document-skeleton">
+                    <div class="document-assignment-header">
+                        <div class="document-assignment-main">
+                            <div class="skeleton-placeholder skeleton-icon"></div>
+                            <div class="document-assignment-title skeleton-heading">
+                                <div class="skeleton-placeholder skeleton-short"></div>
+                                <div class="skeleton-placeholder skeleton-title"></div>
+                                <div class="skeleton-placeholder skeleton-medium"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-placeholder skeleton-status"></div>
+                    </div>
+
+                    <div class="document-assignment-meta">
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-file"></div>
+                        </div>
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+                        <div class="skeleton-meta">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+                    </div>
+
+                    <div class="document-assignment-footer">
+            <div class="skeleton-placeholder skeleton-footer-text"></div>
+            <div class="skeleton-placeholder skeleton-button"></div>
+        </div>
+    </article>
+
+</div>
 
         </section>
     </main>

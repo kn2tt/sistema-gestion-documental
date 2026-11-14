@@ -229,13 +229,6 @@ async function consultarAsignacion(asignacion) {
    ========================================= */
 
 async function cargarEvidencias() {
-    contenedor.innerHTML = `
-        <div class="content-card evidence-loading">
-            <div class="spinner-border spinner-border-sm" role="status"></div>
-            <span>Cargando asignaciones enviadas...</span>
-        </div>
-    `;
-
     try {
         const asignaciones = await obtenerJSON(
             `${API_URL}/asignaciones/`,
@@ -264,8 +257,12 @@ async function cargarEvidencias() {
         asignacionesData = resultados.filter(Boolean);
 
         actualizarResumen();
+        finalizarSkeletonResumen();
+
         cargarTiposDocumento();
         aplicarFiltros();
+
+        contenedor.setAttribute("aria-busy", "false");
 
     } catch (error) {
         console.error("Error al cargar evidencias:", error);
@@ -278,6 +275,8 @@ async function cargarEvidencias() {
         `;
 
         actualizarResumen([]);
+        finalizarSkeletonResumen();
+        contenedor.setAttribute("aria-busy", "false");
     }
 }
 
@@ -299,6 +298,17 @@ function actualizarResumen(datos = asignacionesData) {
     document.getElementById("totalEvidenceCount").textContent = total;
     document.getElementById("pendingEvidenceCount").textContent = pendientes;
     document.getElementById("completeEvidenceCount").textContent = completas;
+}
+
+function finalizarSkeletonResumen() {
+    document.querySelectorAll(".summary-card.is-loading").forEach(card => {
+        card.classList.remove("is-loading");
+        card.setAttribute("aria-busy", "false");
+    });
+
+    document.querySelectorAll(".summary-card .skeleton-value").forEach(elemento => {
+        elemento.classList.remove("skeleton-value");
+    });
 }
 
 /* =========================================

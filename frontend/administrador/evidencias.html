@@ -196,45 +196,34 @@
             <!-- RESUMEN -->
             <div class="evidence-summary">
 
-                <div class="summary-card">
-
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon blue">
                         <i class="bi bi-images"></i>
                     </div>
-
                     <div>
                         <span class="summary-label">Asignaciones recibidas</span>
-                        <strong id="totalEvidenceCount">0</strong>
+                        <strong id="totalEvidenceCount" class="skeleton-value">0</strong>
                     </div>
-
                 </div>
 
-
-                <div class="summary-card">
-
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon orange">
                         <i class="bi bi-hourglass-split"></i>
                     </div>
-
                     <div>
                         <span class="summary-label">Pendientes de evidencias</span>
-                        <strong id="pendingEvidenceCount">0</strong>
+                        <strong id="pendingEvidenceCount" class="skeleton-value">0</strong>
                     </div>
-
                 </div>
 
-
-                <div class="summary-card">
-
+                <div class="summary-card is-loading" aria-busy="true">
                     <div class="summary-icon green">
                         <i class="bi bi-check-circle"></i>
                     </div>
-
                     <div>
                         <span class="summary-label">Evidencias completas</span>
-                        <strong id="completeEvidenceCount">0</strong>
+                        <strong id="completeEvidenceCount" class="skeleton-value">0</strong>
                     </div>
-
                 </div>
 
             </div>
@@ -343,17 +332,97 @@
             </div>
 
             <!-- EVIDENCIAS AGRUPADAS POR ASIGNACIÓN -->
-            <div class="evidence-groups" id="evidenceTableBody">
+            <div class="evidence-groups" id="evidenceTableBody" aria-busy="true">
 
-                <div class="content-card evidence-loading">
+                <article class="content-card evidence-assignment evidence-skeleton">
+                    <div class="evidence-assignment-header">
+                        <div class="evidence-assignment-main">
+                            <div class="skeleton-placeholder skeleton-icon"></div>
+                            <div class="evidence-assignment-title skeleton-title-group">
+                                <div class="skeleton-placeholder skeleton-code"></div>
+                                <div class="skeleton-placeholder skeleton-title"></div>
+                                <div class="skeleton-placeholder skeleton-subtitle"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-placeholder skeleton-status"></div>
+                    </div>
 
-                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                    <div class="evidence-assignment-meta">
+                        <div class="evidence-meta-item">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-person">
+                                <div class="skeleton-placeholder skeleton-avatar"></div>
+                                <div class="skeleton-placeholder skeleton-person-name"></div>
+                            </div>
+                            <div class="skeleton-person">
+                                <div class="skeleton-placeholder skeleton-avatar"></div>
+                                <div class="skeleton-placeholder skeleton-person-name short"></div>
+                            </div>
+                        </div>
 
-                    <span>
-                        Cargando asignaciones enviadas...
-                    </span>
+                        <div class="evidence-meta-item">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
 
-                </div>
+                        <div class="evidence-meta-item evidence-progress">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-progress-text"></div>
+                            <div class="skeleton-placeholder skeleton-progress-bar"></div>
+                            <div class="skeleton-placeholder skeleton-caption"></div>
+                        </div>
+                    </div>
+
+                    <div class="evidence-assignment-footer">
+                        <div class="skeleton-placeholder skeleton-footer-text"></div>
+                        <div class="skeleton-placeholder skeleton-button"></div>
+                    </div>
+                </article>
+
+                <article class="content-card evidence-assignment evidence-skeleton">
+                    <div class="evidence-assignment-header">
+                        <div class="evidence-assignment-main">
+                            <div class="skeleton-placeholder skeleton-icon"></div>
+                            <div class="evidence-assignment-title skeleton-title-group">
+                                <div class="skeleton-placeholder skeleton-code"></div>
+                                <div class="skeleton-placeholder skeleton-title"></div>
+                                <div class="skeleton-placeholder skeleton-subtitle"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-placeholder skeleton-status"></div>
+                    </div>
+
+                    <div class="evidence-assignment-meta">
+                        <div class="evidence-meta-item">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-person">
+                                <div class="skeleton-placeholder skeleton-avatar"></div>
+                                <div class="skeleton-placeholder skeleton-person-name"></div>
+                            </div>
+                            <div class="skeleton-person">
+                                <div class="skeleton-placeholder skeleton-avatar"></div>
+                                <div class="skeleton-placeholder skeleton-person-name short"></div>
+                            </div>
+                        </div>
+
+                        <div class="evidence-meta-item">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-medium"></div>
+                        </div>
+
+                        <div class="evidence-meta-item evidence-progress">
+                            <div class="skeleton-placeholder skeleton-label"></div>
+                            <div class="skeleton-placeholder skeleton-progress-text"></div>
+                            <div class="skeleton-placeholder skeleton-progress-bar"></div>
+                            <div class="skeleton-placeholder skeleton-caption"></div>
+                        </div>
+                    </div>
+
+                    <div class="evidence-assignment-footer">
+                        <div class="skeleton-placeholder skeleton-footer-text"></div>
+                        <div class="skeleton-placeholder skeleton-button"></div>
+                    </div>
+                </article>
 
             </div>
 

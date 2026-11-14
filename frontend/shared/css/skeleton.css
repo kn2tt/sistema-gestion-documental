@@ -1,0 +1,100 @@
+
+/* =========================================
+   SKELETON LOADING - SISTEMA COMPARTIDO
+   ========================================= */
+
+.skeleton-value,
+.skeleton-line-text,
+.skeleton-cell,
+.skeleton-block,
+.skeleton-circle {
+    background: linear-gradient(
+        100deg,
+        #e9edf2 25%,
+        #dfe4ea 45%,
+        #e9edf2 65%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+/* Valores numéricos */
+
+.skeleton-value {
+    display: block;
+    width: 48px;
+    height: 25px;
+    border-radius: 5px;
+    color: transparent !important;
+}
+
+/* Textos */
+
+.skeleton-line-text {
+    display: inline-block;
+    min-width: 175px;
+    min-height: 15px;
+    border-radius: 5px;
+    color: transparent !important;
+}
+
+/* Celdas de tablas */
+
+.skeleton-cell {
+    position: relative;
+    overflow: hidden;
+    width: 85%;
+    height: 15px;
+    min-width: 55px;
+    border-radius: 5px;
+}
+
+/* Bloques genéricos */
+
+.skeleton-block {
+    display: block;
+    width: 100%;
+    min-height: 16px;
+    border-radius: 5px;
+}
+
+/* Elementos circulares: avatares e iconos */
+
+.skeleton-circle {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+/* Filas de tablas */
+
+.skeleton-row td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+/* Animación */
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+/* Accesibilidad */
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-value,
+    .skeleton-line-text,
+    .skeleton-cell,
+    .skeleton-block,
+    .skeleton-circle {
+        animation: none;
+    }
+}

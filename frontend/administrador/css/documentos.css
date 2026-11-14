@@ -582,3 +582,154 @@
         justify-content: center;
     }
 }
+
+/* =========================================
+   SKELETON LOADING - DOCUMENTOS
+   ========================================= */
+
+.skeleton-placeholder,
+.summary-card.is-loading .summary-icon,
+.summary-card.is-loading strong {
+    background: linear-gradient(
+        100deg,
+        #e9edf2 25%,
+        #dfe4ea 45%,
+        #e9edf2 65%
+    );
+    background-size: 200% 100%;
+    animation: documentos-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes documentos-shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+/* Resumen */
+
+.summary-card.is-loading {
+    min-height: 82px;
+}
+
+.summary-card.is-loading .summary-icon {
+    color: transparent !important;
+}
+
+.summary-card.is-loading .summary-icon i {
+    visibility: hidden;
+}
+
+.summary-card.is-loading strong {
+    display: block;
+    width: 42px;
+    height: 23px;
+    overflow: hidden;
+    border-radius: 5px;
+    color: transparent !important;
+}
+
+/* Tarjetas */
+
+.document-skeleton {
+    pointer-events: none;
+}
+
+.skeleton-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.skeleton-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 10px;
+}
+
+.skeleton-short {
+    width: 95px;
+    height: 13px;
+    border-radius: 4px;
+}
+
+.skeleton-title {
+    width: min(260px, 75%);
+    height: 17px;
+    border-radius: 4px;
+}
+
+.skeleton-medium {
+    width: 145px;
+    max-width: 100%;
+    height: 12px;
+    border-radius: 4px;
+}
+
+.skeleton-status {
+    width: 90px;
+    height: 26px;
+    flex-shrink: 0;
+    border-radius: 20px;
+}
+
+.skeleton-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
+}
+
+.skeleton-label {
+    width: 95px;
+    height: 10px;
+    border-radius: 4px;
+}
+
+.skeleton-file {
+    width: 175px;
+    max-width: 100%;
+    height: 34px;
+    border-radius: 7px;
+}
+
+.skeleton-footer-text {
+    width: 230px;
+    max-width: 55%;
+    height: 12px;
+    border-radius: 4px;
+}
+
+.skeleton-button {
+    width: 105px;
+    height: 32px;
+    border-radius: 7px;
+}
+
+/* Accesibilidad */
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-placeholder,
+    .summary-card.is-loading .summary-icon,
+    .summary-card.is-loading strong {
+        animation: none;
+    }
+}
+
+/* Responsive */
+
+@media (max-width: 650px) {
+    .skeleton-footer-text {
+        width: 180px;
+    }
+
+    .skeleton-button {
+        width: 100%;
+    }
+}

@@ -22,6 +22,30 @@
         "dashboardAssignments"
     );
 
+    function finalizarSkeletonEstadisticas() {
+        document.querySelectorAll(".stat-card").forEach(card => {
+            card.classList.remove("is-loading");
+            card.setAttribute("aria-busy", "false");
+        });
+
+        document.querySelectorAll(
+            ".stat-card .skeleton-value, .stat-card .skeleton-line-text"
+        ).forEach(elemento => {
+            elemento.classList.remove(
+                "skeleton-value",
+                "skeleton-line-text"
+            );
+        });
+    }
+
+    function finalizarSkeletonTabla() {
+        if (window.SkeletonUI) {
+            window.SkeletonUI.finalizarTabla(tablaAsignaciones);
+        } else if (tablaAsignaciones) {
+            tablaAsignaciones.setAttribute("aria-busy", "false");
+        }
+    }
+
     function escaparHTML(valor) {
         return String(valor ?? "").replace(/[&<>"']/g, caracter => {
             const entidades = {
@@ -331,6 +355,13 @@
     }
 
     async function cargarAsignaciones() {
+        if (window.SkeletonUI && tablaAsignaciones) {
+            window.SkeletonUI.mostrarTabla(tablaAsignaciones, {
+                filas: 5,
+                columnas: 5
+            });
+        }
+
         try {
             const asignaciones = await obtenerJSON("/asignaciones/");
 
@@ -340,6 +371,8 @@
 
             actualizarEstadisticas(asignaciones);
             renderizarAsignaciones(asignaciones);
+            finalizarSkeletonEstadisticas();
+            finalizarSkeletonTabla();
 
         } catch (error) {
             console.error(
@@ -371,6 +404,8 @@
                     </tr>
                 `;
             }
+            finalizarSkeletonEstadisticas();
+            finalizarSkeletonTabla();
         }
     }
 
