@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Indicadores de gestión | Gestión Documental</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/indicadores.css">
+    <link rel="stylesheet" href="../shared/css/notificaciones.css">
+    <link rel="stylesheet" href="../shared/css/logout.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+
+            <div>
+                <strong>Gestión Documental</strong>
+                <span>Plataforma empresarial</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">PRINCIPAL</div>
+
+            <a href="dashboard.html" class="nav-item">
+                <i class="bi bi-grid-1x2"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="asignaciones.html" class="nav-item">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Asignaciones</span>
+            </a>
+
+            <a href="documentos.html" class="nav-item">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Documentos</span>
+            </a>
+
+            <a href="evidencias.html" class="nav-item">
+                <i class="bi bi-images"></i>
+                <span>Evidencias</span>
+            </a>
+
+            <a href="indicadores.html" class="nav-item active">
+                <i class="bi bi-graph-up-arrow"></i>
+                <span>Indicadores de gestión</span>
+            </a>
+
+            <div class="nav-section-title nav-section-space">
+                ADMINISTRACIÓN
+            </div>
+
+            <a href="administracion.html" class="nav-item">
+                <i class="bi bi-gear"></i>
+                <span>Configuración</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+
+            <div class="sidebar-user">
+
+                <div class="user-avatar">AS</div>
+
+                <div class="user-info">
+                    <strong>Administrador</strong>
+                    <span> </span>
+                </div>
+
+                <button
+                    type="button"
+                    class="sidebar-logout-button"
+                    id="logoutButton"
+                    title="Cerrar sesión"
+                    aria-label="Cerrar sesión"
+                    data-api-url="http://127.0.0.1:8000"
+                    data-login-url="../index.html"
+                >
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- OVERLAY MOBILE -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="Abrir menú"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="breadcrumb-area">
+                    <span class="breadcrumb-section">Principal</span>
+                    <i class="bi bi-chevron-right"></i>
+                    <strong>Indicadores de gestión</strong>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    class="topbar-button notification-button"
+                    title="Notificaciones"
+                >
+                    <i class="bi bi-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+
+                <div class="topbar-divider"></div>
+
+                <div class="topbar-user">
+
+                    <div class="topbar-avatar">AS</div>
+
+                    <div class="topbar-user-info">
+                        <strong>Administrador</strong>
+                        <span>Administrador del sistema</span>
+                    </div>
+
+                    <i class="bi bi-chevron-down topbar-chevron"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENIDO -->
+        <section class="page-content indicators-page">
+
+            <!-- ENCABEZADO -->
+            <div class="page-header">
+
+                <div>
+                    <h1>Indicadores de gestión</h1>
+
+                    <p>
+                        Consulta el rendimiento de las asignaciones,
+                        documentación y evidencias del sistema.
+                    </p>
+                </div>
+
+                <div class="header-actions">
+
+                    <span class="last-update" id="lastUpdate">
+                        <i class="bi bi-clock"></i>
+                        Esperando información
+                    </span>
+
+                    <button
+                        type="button"
+                        class="btn-refresh"
+                        id="refreshIndicators"
+                    >
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Actualizar
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTROS -->
+            <section class="content-card indicators-filters">
+
+                <div class="filters-heading">
+
+                    <div>
+                        <h2>Filtros de consulta</h2>
+
+                        <span>
+                            Delimita la información que deseas analizar.
+                        </span>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-filter-reset"
+                        id="resetFilters"
+                    >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Limpiar filtros
+                    </button>
+
+                </div>
+
+
+                <div class="indicators-filter-grid">
+
+                    <div class="filter-group">
+                        <label for="dateFrom">Fecha desde</label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="dateFrom"
+                        >
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="dateTo">Fecha hasta</label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="dateTo"
+                        >
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="clientFilter">Cliente</label>
+
+                        <select
+                            class="form-select"
+                            id="clientFilter"
+                        >
+                            <option value="">Todos los clientes</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="projectFilter">Proyecto</label>
+
+                        <select
+                            class="form-select"
+                            id="projectFilter"
+                        >
+                            <option value="">Todos los proyectos</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ESTADO DE CARGA / ERROR -->
+            <div
+                class="indicators-message"
+                id="indicatorsMessage"
+                role="status"
+                aria-live="polite"
+                hidden
+            ></div>
+
+
+            <!-- INDICADORES PRINCIPALES -->
+            <section class="indicator-cards" id="indicatorCards">
+
+                <article class="indicator-card">
+                    <div class="indicator-card-top">
+                        <div class="indicator-icon blue">
+                            <i class="bi bi-clipboard-data"></i>
+                        </div>
+                        <span class="indicator-tag">General</span>
+                    </div>
+
+                    <strong class="indicator-value" id="totalAssignments">—</strong>
+                    <span class="indicator-label">Total de asignaciones</span>
+                    <span class="indicator-description">
+                        Registros considerados en la consulta
+                    </span>
+                </article>
+
+
+                <article class="indicator-card">
+                    <div class="indicator-card-top">
+                        <div class="indicator-icon purple">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <span class="indicator-tag">En curso</span>
+                    </div>
+
+                    <strong class="indicator-value" id="activeAssignments">—</strong>
+                    <span class="indicator-label">Asignaciones activas</span>
+                    <span class="indicator-description">
+                        Procesos aún no completados
+                    </span>
+                </article>
+
+
+                <article class="indicator-card">
+                    <div class="indicator-card-top">
+                        <div class="indicator-icon green">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <span class="indicator-tag">Finalizadas</span>
+                    </div>
+
+                    <strong class="indicator-value" id="completedAssignments">—</strong>
+                    <span class="indicator-label">Asignaciones completadas</span>
+                    <span class="indicator-description">
+                        Procesos con estado completado
+                    </span>
+                </article>
+
+
+                <article class="indicator-card">
+                    <div class="indicator-card-top">
+                        <div class="indicator-icon red">
+                            <i class="bi bi-calendar-x"></i>
+                        </div>
+                        <span class="indicator-tag">Atención</span>
+                    </div>
+
+                    <strong class="indicator-value" id="overdueAssignments">—</strong>
+                    <span class="indicator-label">Asignaciones vencidas</span>
+                    <span class="indicator-description">
+                        Fecha límite superada
+                    </span>
+                </article>
+
+
+                <article class="indicator-card">
+                    <div class="indicator-card-top">
+                        <div class="indicator-icon cyan">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+                        <span class="indicator-tag">Documentación</span>
+                    </div>
+
+                    <strong class="indicator-value" id="uploadedDocuments">—</strong>
+                    <span class="indicator-label">Documentos cargados</span>
+                    <span class="indicator-description">
+                        Documentos registrados en el sistema
+                    </span>
+                </article>
+
+
+                <article class="indicator-card">
+                    <div class="indicator-card-top">
+                        <div class="indicator-icon orange">
+                            <i class="bi bi-file-earmark-excel"></i>
+                        </div>
+                        <span class="indicator-tag">Pendientes</span>
+                    </div>
+
+                    <strong class="indicator-value" id="missingDocuments">—</strong>
+                    <span class="indicator-label">Asignaciones sin documento</span>
+                    <span class="indicator-description">
+                        Asignaciones sin documento cargado
+                    </span>
+                </article>
+
+            </section>
+
+
+            <!-- GRÁFICOS PRINCIPALES -->
+            <section class="charts-grid">
+
+                <article class="content-card chart-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h2>Asignaciones por estado</h2>
+                            <p>Distribución de los procesos registrados</p>
+                        </div>
+
+                        <span class="heading-icon">
+                            <i class="bi bi-pie-chart"></i>
+                        </span>
+                    </div>
+
+                    <div class="chart-container chart-doughnut">
+                        <canvas id="assignmentsChart"></canvas>
+                    </div>
+
+                    <div class="chart-legend" id="assignmentsLegend"></div>
+
+                </article>
+
+
+                <article class="content-card chart-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h2>Documentos por estado</h2>
+                            <p>Situación de los documentos cargados</p>
+                        </div>
+
+                        <span class="heading-icon">
+                            <i class="bi bi-file-earmark-bar-graph"></i>
+                        </span>
+                    </div>
+
+                    <div class="chart-container chart-doughnut">
+                        <canvas id="documentsChart"></canvas>
+                    </div>
+
+                    <div class="chart-legend" id="documentsLegend"></div>
+
+                </article>
+
+            </section>
+
+
+            <!-- CLIENTES Y PROYECTOS -->
+            <section class="charts-grid distribution-grid">
+
+                <article class="content-card chart-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h2>Asignaciones por cliente</h2>
+                            <p>Volumen de trabajo por cliente</p>
+                        </div>
+
+                        <span class="heading-icon">
+                            <i class="bi bi-buildings"></i>
+                        </span>
+                    </div>
+
+                    <div class="chart-container chart-bar">
+                        <canvas id="clientsChart"></canvas>
+                    </div>
+
+                </article>
+
+
+                <article class="content-card chart-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h2>Asignaciones por proyecto</h2>
+                            <p>Distribución de asignaciones por proyecto</p>
+                        </div>
+
+                        <span class="heading-icon">
+                            <i class="bi bi-diagram-3"></i>
+                        </span>
+                    </div>
+
+                    <div class="chart-container chart-bar">
+                        <canvas id="projectsChart"></canvas>
+                    </div>
+
+                </article>
+
+            </section>
+
+
+            <!-- DOCUMENTACIÓN Y EVIDENCIAS -->
+            <section class="analysis-grid">
+
+                <article class="content-card analysis-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h2>Documentación</h2>
+                            <p>Resumen de documentos registrados</p>
+                        </div>
+
+                        <span class="heading-icon">
+                            <i class="bi bi-folder2-open"></i>
+                        </span>
+                    </div>
+
+
+                    <div class="document-summary">
+
+                        <div class="document-summary-main">
+                            <span>Total de documentos</span>
+                            <strong id="documentsTotal">—</strong>
+                        </div>
+
+                        <div class="document-summary-list" id="documentsByType">
+                            <div class="empty-state compact">
+                                No hay información disponible.
+                            </div>
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <article class="content-card analysis-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h2>Cumplimiento de evidencias</h2>
+                            <p>Ítems fotográficos obligatorios de checklists publicados</p>
+                        </div>
+
+                        <span class="heading-icon">
+                            <i class="bi bi-camera"></i>
+                        </span>
+                    </div>
+
+
+                    <div class="evidence-progress-area">
+
+                        <div class="evidence-progress-heading">
+                            <div>
+                                <strong id="evidencePercentage">—%</strong>
+                                <span>de cumplimiento</span>
+                            </div>
+
+                            <span class="evidence-total" id="evidenceTotal">
+                                — ítems
+                            </span>
+                        </div>
+
+                        <div class="evidence-progress-track">
+                            <div
+                                class="evidence-progress-fill"
+                                id="evidenceProgressFill"
+                                style="width: 0%;"
+                            ></div>
+                        </div>
+
+                        <div class="evidence-stats">
+
+                            <div class="evidence-stat completed">
+                                <span class="evidence-stat-dot"></span>
+                                <div>
+                                    <strong id="evidenceCompleted">—</strong>
+                                    <span>Completados</span>
+                                </div>
+                            </div>
+
+                            <div class="evidence-stat pending">
+                                <span class="evidence-stat-dot"></span>
+                                <div>
+                                    <strong id="evidencePending">—</strong>
+                                    <span>Pendientes</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </section>
+
+
+            <!-- RESPONSABLES -->
+            <section class="content-card table-card">
+
+                <div class="card-heading table-card-heading">
+
+                    <div>
+                        <h2>Carga de trabajo por responsable</h2>
+                        <p>Asignaciones activas por técnico y documentador</p>
+                    </div>
+
+                    <span class="heading-icon">
+                        <i class="bi bi-people"></i>
+                    </span>
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table class="indicators-table">
+
+                        <thead>
+                            <tr>
+                                <th>RESPONSABLE</th>
+                                <th>ROL</th>
+                                <th class="text-end">ASIGNACIONES ACTIVAS</th>
+                                <th class="text-end">DISTRIBUCIÓN</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="responsiblesTable">
+                            <tr>
+                                <td colspan="4" class="table-empty">
+                                    Esperando información...
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ALERTAS -->
+            <section class="content-card alerts-card">
+
+                <div class="card-heading table-card-heading">
+
+                    <div>
+                        <h2>Alertas y situaciones pendientes</h2>
+                        <p>Asignaciones que requieren atención</p>
+                    </div>
+
+                    <span class="alerts-count" id="alertsCount">0 alertas</span>
+
+                </div>
+
+
+                <div class="alerts-list" id="alertsList">
+                    <div class="empty-state">
+                        Esperando información...
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- PIE -->
+            <div class="indicators-footer">
+                <span>
+                    <i class="bi bi-info-circle"></i>
+                    Los indicadores se calculan con la información disponible según los filtros aplicados.
+                </span>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<script src="js/indicadores.js"></script>
+<script src="../shared/js/logout.js"></script>
+
+</body>
+</html>

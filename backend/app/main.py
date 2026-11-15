@@ -57,6 +57,9 @@ from app.controllers.document_controller import (
 from app.controllers.subproject_controller import (
     router as subproject_router,
 )
+from app.controllers.indicator_controller import (
+    router as indicator_router,
+)
 
 scheduler = BackgroundScheduler(
     timezone=ZoneInfo("America/Lima")
@@ -196,6 +199,8 @@ app.include_router(
     document_router,
     dependencies=[Depends(get_current_user)],
 )
+
+app.include_router(indicator_router)
 
 @app.get("/")
 def inicio():
