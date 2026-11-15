@@ -3847,14 +3847,6 @@ document.getElementById("documentBtn")?.addEventListener(
     abrirDocumentoAsignacion
 );
 
-document.getElementById("trackingBtn")?.addEventListener("click", function () {
-    window.location.href = "seguimiento.html";
-});
-
-document.getElementById("trackingBtnBottom")?.addEventListener("click", function () {
-    window.location.href = "seguimiento.html";
-});
-
 document.getElementById("evidencesBtn")?.addEventListener("click", function () {
     if (!assignmentId) {
         mostrarNotificacion(
