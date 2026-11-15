@@ -686,6 +686,7 @@ async function eliminarFotografiaAdmin(
    RENDERIZAR GALERÍA DE FOTOGRAFÍAS
    ========================================= */
 
+
 async function renderizarEvidenciasItem(itemId) {
     const lista = document.getElementById(`evidencias-item-${itemId}`);
 
@@ -709,8 +710,20 @@ async function renderizarEvidenciasItem(itemId) {
     const galeria = document.createElement("div");
     galeria.className = "technician-evidence-gallery";
 
+    // Las evidencias archivadas no necesitan consultar el almacenamiento.
     const vistas = await Promise.all(
         evidencias.map(async evidencia => {
+            const estadoAlmacenamiento = normalizarEstado(
+                evidencia.estado_almacenamiento
+            );
+
+            if (estadoAlmacenamiento === "archivada") {
+                return {
+                    evidencia,
+                    url: null
+                };
+            }
+
             try {
                 return {
                     evidencia,
@@ -734,11 +747,15 @@ async function renderizarEvidenciasItem(itemId) {
         const contenedor = document.createElement("div");
         contenedor.className = "technician-evidence-preview";
 
-        if (evidencia.estado_almacenamiento === "archivada") {
+        const estadoAlmacenamiento = normalizarEstado(
+            evidencia.estado_almacenamiento
+        );
+
+        if (estadoAlmacenamiento === "archivada") {
 
             const archivada = document.createElement("div");
-
-            archivada.className = "technician-evidence-no-preview";
+            archivada.className =
+                "technician-evidence-no-preview archived";
 
             const icono = document.createElement("i");
             icono.className = "bi bi-cloud-check";
@@ -762,7 +779,8 @@ async function renderizarEvidenciasItem(itemId) {
             const imagen = document.createElement("img");
 
             imagen.src = url;
-            imagen.alt = evidencia.nombre_archivo || "Fotografía de evidencia";
+            imagen.alt = evidencia.nombre_archivo ||
+                "Fotografía de evidencia";
             imagen.loading = "lazy";
 
             enlace.appendChild(imagen);
@@ -783,7 +801,7 @@ async function renderizarEvidenciasItem(itemId) {
             contenedor.appendChild(sinVista);
         }
 
-        if (evidencia.estado_almacenamiento === "pendiente") {
+        if (estadoAlmacenamiento === "pendiente") {
 
             const botonEliminar = document.createElement("button");
 
@@ -801,11 +819,11 @@ async function renderizarEvidenciasItem(itemId) {
         }
 
         galeria.appendChild(contenedor);
-
     });
 
     lista.appendChild(galeria);
 }
+
 
 
 /* =========================================
