@@ -33,23 +33,15 @@
 
     const topbarRight = document.querySelector(".topbar-right");
 
-    const notificationWrapper = document.createElement("div");
-
-    notificationWrapper.className = "notification-center-wrapper";
-
-    topbarRight.insertBefore(
-        notificationWrapper,
-        botonNotificaciones
-    );
-
-    notificationWrapper.appendChild(botonNotificaciones);
-
+    // Si la página no tiene barra superior, no continuar.
     if (!topbarRight) return;
 
+    // Buscar si ya existe el botón.
     let botonNotificaciones = topbarRight.querySelector(
         ".notification-button"
     );
 
+    // Crear la campana si todavía no existe.
     if (!botonNotificaciones) {
         botonNotificaciones = document.createElement("button");
 
@@ -78,6 +70,21 @@
             divisor || topbarRight.firstChild
         );
     }
+
+    // Crear el contenedor del centro de notificaciones.
+    const notificationWrapper = document.createElement("div");
+
+    notificationWrapper.className = "notification-center-wrapper";
+
+    // Ubicar el contenedor en la posición de la campana.
+    topbarRight.insertBefore(
+        notificationWrapper,
+        botonNotificaciones
+    );
+
+    // Introducir la campana dentro del contenedor.
+    notificationWrapper.appendChild(botonNotificaciones);
+
 
     const puntoRojo = botonNotificaciones.querySelector(
         ".notification-dot"
