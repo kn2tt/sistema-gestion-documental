@@ -724,7 +724,22 @@ function renderizarEvidenciasItem(itemId, evidencias) {
         const contenedor = document.createElement("div");
         contenedor.className = "technician-evidence-preview";
 
-        if (evidencia.archivo_url) {
+        if (evidencia.estado_almacenamiento === "archivada") {
+
+            const archivada = document.createElement("div");
+            archivada.className = "technician-evidence-no-preview archived";
+
+            const icono = document.createElement("i");
+            icono.className = "bi bi-cloud-check";
+
+            const texto = document.createElement("span");
+            texto.textContent = "Archivada en Google Drive";
+
+            archivada.append(icono, texto);
+            contenedor.appendChild(archivada);
+
+        } else if (evidencia.archivo_url) {
+
             const enlace = document.createElement("a");
             enlace.className = "technician-evidence-image-link";
             enlace.href = evidencia.archivo_url;
@@ -734,12 +749,14 @@ function renderizarEvidenciasItem(itemId, evidencias) {
 
             const imagen = document.createElement("img");
             imagen.src = evidencia.archivo_url;
-            imagen.alt = "Fotografía de evidencia";
+            imagen.alt = evidencia.nombre_archivo || "Fotografía de evidencia";
             imagen.loading = "lazy";
 
             enlace.appendChild(imagen);
             contenedor.appendChild(enlace);
+
         } else {
+
             const sinVista = document.createElement("div");
             sinVista.className = "technician-evidence-no-preview";
 

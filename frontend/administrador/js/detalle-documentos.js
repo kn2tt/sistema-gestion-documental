@@ -11,6 +11,7 @@ const params = new URLSearchParams(window.location.search);
 const assignmentId = params.get("id");
 
 let documentoActual = null;
+let estadoAsignacionActual = null;
 
 function escaparHTML(valor) {
     return String(valor ?? "").replace(/[&<>"']/g, caracter => ({
@@ -131,7 +132,26 @@ function obtenerEstadoAsignacion(estado) {
 }
 
 function actualizarEstadoAsignacion(estado) {
+    estadoAsignacionActual = estado;
+
+    const botonAprobar = document.getElementById(
+        "btnAprobarAsignacion"
+    );
+
+    const botonObservar = document.getElementById(
+        "btnObservarAsignacion"
+    );
+
+    if (botonAprobar) {
+        botonAprobar.disabled = estado === "completado";
+    }
+
+    if (botonObservar) {
+        botonObservar.disabled = false;
+    }
+
     const badge = document.getElementById("estadoAsignacion");
+
     if (!badge) return;
 
     const datos = obtenerEstadoAsignacion(estado);
@@ -213,9 +233,14 @@ async function cambiarEstadoAsignacion(estado) {
         botonActivo.innerHTML = textoOriginal;
         botonActivo.removeAttribute("aria-busy");
 
-        botones.forEach(boton => {
-            if (boton) boton.disabled = false;
-        });
+        if (botonAprobar) {
+            botonAprobar.disabled =
+                estadoAsignacionActual === "completado";
+        }
+
+        if (botonObservar) {
+            botonObservar.disabled = false;
+        }
     }
 }
 
