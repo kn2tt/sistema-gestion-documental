@@ -629,10 +629,12 @@ assignmentViewCards.forEach(button => {
 });
 
 
-searchInput.addEventListener("input", function () {
-    paginaActualAsignaciones = 1;
-    renderizarAsignaciones();
-});
+if (searchInput) {
+    searchInput.addEventListener("input", function () {
+        paginaActualAsignaciones = 1;
+        renderizarAsignaciones();
+    });
+}
 
 
 /* =========================================

@@ -71,20 +71,31 @@
         );
     }
 
-    // Crear el contenedor del centro de notificaciones.
-    const notificationWrapper = document.createElement("div");
+    // =========================================
+    // CONTENEDOR DEL CENTRO DE NOTIFICACIONES
+    // =========================================
 
-    notificationWrapper.className = "notification-center-wrapper";
-
-    // Ubicar el contenedor en la posición de la campana.
-    topbarRight.insertBefore(
-        notificationWrapper,
-        botonNotificaciones
+    // Comprobar si la campana ya está dentro de un contenedor.
+    let notificationWrapper = botonNotificaciones.closest(
+        ".notification-center-wrapper"
     );
 
-    // Introducir la campana dentro del contenedor.
-    notificationWrapper.appendChild(botonNotificaciones);
+    // Si todavía no existe, crearlo.
+    if (!notificationWrapper) {
+        notificationWrapper = document.createElement("div");
 
+        notificationWrapper.className = "notification-center-wrapper";
+
+        // Utilizar el padre real de la campana.
+        const padreBoton = botonNotificaciones.parentNode;
+
+        padreBoton.insertBefore(
+            notificationWrapper,
+            botonNotificaciones
+        );
+
+        notificationWrapper.appendChild(botonNotificaciones);
+    }
 
     const puntoRojo = botonNotificaciones.querySelector(
         ".notification-dot"
