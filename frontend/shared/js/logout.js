@@ -264,4 +264,16 @@
         }
     });
 
+    // =========================================
+    // CENTRO DE NOTIFICACIONES
+    // =========================================
+
+    const centroNotificaciones = document.createElement("script");
+
+    centroNotificaciones.src = (
+        "../shared/js/centro-notificaciones.js"
+    );
+
+    document.body.appendChild(centroNotificaciones);
+
 })();

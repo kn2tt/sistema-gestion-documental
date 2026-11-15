@@ -490,11 +490,26 @@ function actualizarFechas(asignacion) {
    CARGAR CHECKLIST PUBLICADO
    ========================================= */
 
+
 async function cargarChecklistPublicado() {
     const contenedor = document.getElementById("checklistItems");
     const contenido = document.getElementById("checklistContent");
     const vacio = document.getElementById("checklistEmptyState");
     const estado = document.getElementById("generatedChecklistStatus");
+
+    function mostrarChecklistVacio() {
+        contenido.hidden = true;
+        vacio.hidden = false;
+
+        if (estado) {
+            estado.textContent = "";
+            estado.classList.remove("is-published");
+        }
+
+        if (contenedor) {
+            contenedor.replaceChildren();
+        }
+    }
 
     try {
         const respuesta = await apiFetch(
@@ -506,27 +521,37 @@ async function cargarChecklistPublicado() {
             return;
         }
 
-        if (respuesta.status === 404) {
-            contenido.hidden = true;
-            vacio.hidden = false;
+        const datos = await respuesta.json().catch(() => ({}));
+
+        const detalle = datos.detail || datos.message || "";
+
+        const checklistNoDisponible =
+            respuesta.status === 404 ||
+            (
+                respuesta.status === 400 &&
+                (
+                    detalle === "Esta asignación todavía no tiene un checklist generado." ||
+                    detalle === "El checklist de esta asignación todavía no ha sido publicado."
+                )
+            );
+
+        if (checklistNoDisponible) {
+            mostrarChecklistVacio();
             return;
         }
 
-        const datos = await respuesta.json().catch(() => ({}));
-
         if (!respuesta.ok) {
-            const detalle = datos.detail || datos.message || "Sin detalle del servidor";
-
             throw new Error(
-                `No se pudo consultar el checklist (HTTP ${respuesta.status}): ${detalle}`
+                `No se pudo consultar el checklist (HTTP ${respuesta.status}): ${
+                    detalle || "Sin detalle del servidor"
+                }`
             );
         }
 
         const checklist = datos;
 
         if (String(checklist.estado).toLowerCase() !== "publicado") {
-            contenido.hidden = true;
-            vacio.hidden = false;
+            mostrarChecklistVacio();
             return;
         }
 
@@ -547,6 +572,7 @@ async function cargarChecklistPublicado() {
             error.message || "No se pudo cargar el checklist.",
             "error"
         );
+
     } finally {
         finalizarSkeletonChecklist();
     }

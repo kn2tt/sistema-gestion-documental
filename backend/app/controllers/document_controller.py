@@ -16,6 +16,8 @@ from app.core.database import get_db
 from app.core.auth import require_roles
 from app.models.user import User
 from app.services.document_service import DocumentService
+from app.services.assignment_service import AssignmentService
+from app.services.notification_service import NotificationService
 
 
 router = APIRouter(
@@ -113,6 +115,7 @@ def actualizar_progreso_checklist(
 # Solo el documentador asignado.
 # =====================================================
 
+
 @router.post(
     "/asignacion/{asignacion_id}/archivo",
     status_code=status.HTTP_201_CREATED,
@@ -128,11 +131,45 @@ async def cargar_documento(
     service = DocumentService(db)
 
     try:
-        return await service.cargar_documento(
+        resultado = await service.cargar_documento(
             asignacion_id=asignacion_id,
             archivo=archivo,
             user=user,
         )
+
+        asignacion = AssignmentService(db).get_by_id(
+            asignacion_id
+        )
+
+        if asignacion:
+            nombre_documentador = (
+                f"{user.nombre} {user.apellido}"
+            ).strip()
+
+            nombre_archivo = resultado.get(
+                "nombre_archivo",
+                "documento",
+            )
+
+            NotificationService.crear_para_rol(
+                db=db,
+                rol="administrador",
+                tipo="documento_cargado",
+                titulo="Documento enviado a revisión",
+                mensaje=(
+                    f"El documentador {nombre_documentador} "
+                    f"cargó o actualizó el archivo "
+                    f"«{nombre_archivo}» de la asignación "
+                    f"#ASG-{asignacion_id:04d}."
+                ),
+                actor_id=user.id,
+                entidad_tipo="asignacion",
+                entidad_id=asignacion_id,
+            )
+
+            NotificationService.persistir(db)
+
+        return resultado
 
     finally:
         await archivo.close()

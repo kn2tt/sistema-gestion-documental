@@ -12,6 +12,7 @@ from app.services.generated_checklist_service import (
 from app.services.generated_checklist_draft_service import (
     GeneratedChecklistDraftService,
 )
+from app.services.notification_service import NotificationService
 
 from app.schemas.generated_checklist import (
     GeneratedChecklistCreate,
@@ -48,6 +49,7 @@ def convertir_error(error: ValueError):
 # CHECKLIST PARA EL TÉCNICO
 # =========================================================
 
+
 @router.get(
     "/tecnico/{assignment_id}/checklist",
     response_model=GeneratedChecklistResponse,
@@ -72,6 +74,52 @@ def obtener_checklist_tecnico(
         )
 
     except ValueError as error:
+
+        mensaje = str(error)
+
+        # El checklist todavía no fue generado.
+        # Se informa al administrador una sola vez.
+        if mensaje == (
+            "Esta asignación todavía no tiene un checklist generado."
+        ):
+
+            nombre_tecnico = (
+                f"{tecnico.nombre} {tecnico.apellido}"
+            ).strip()
+
+            NotificationService.crear_para_rol_una_vez(
+                db=db,
+                rol="administrador",
+                tipo="checklist_no_generado",
+                titulo="Checklist pendiente de generación",
+                mensaje=(
+                    f"El técnico {nombre_tecnico} ingresó a la "
+                    f"asignación #ASG-{assignment_id:04d}, "
+                    "pero todavía no tiene un checklist generado. "
+                    "Se requiere preparar y publicar el checklist."
+                ),
+                actor_id=tecnico.id,
+                entidad_tipo="asignacion",
+                entidad_id=assignment_id,
+            )
+
+            NotificationService.persistir(db)
+
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=mensaje,
+            )
+
+        # Un checklist generado pero todavía no publicado
+        # tampoco debe mostrarse como un error al técnico.
+        if mensaje == (
+            "El checklist de esta asignación todavía no ha sido publicado."
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=mensaje,
+            )
+
         convertir_error(error)
 
 # =========================================================

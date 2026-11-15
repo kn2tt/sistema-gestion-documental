@@ -60,6 +60,9 @@ from app.controllers.subproject_controller import (
 from app.controllers.indicator_controller import (
     router as indicator_router,
 )
+from app.controllers.notification_controller import (
+    router as notification_router,
+)
 
 scheduler = BackgroundScheduler(
     timezone=ZoneInfo("America/Lima")
@@ -117,6 +120,11 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+
+app.include_router(
+    notification_router,
+    dependencies=[Depends(get_current_user)],
+)
 
 # =========================================================
 # MÓDULOS DE ADMINISTRACIÓN

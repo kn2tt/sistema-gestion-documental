@@ -23,7 +23,8 @@ from app.schemas.evidence import (
 )
 
 from app.services.evidence_service import EvidenceService
-
+from app.services.assignment_service import AssignmentService
+from app.services.notification_service import NotificationService
 
 router = APIRouter(
     prefix="/evidencias",
@@ -64,6 +65,7 @@ def convertir_error(error: Exception):
 # OPERACIONES DEL TÉCNICO
 # =========================================================
 
+
 @router.post(
     "/tecnico/asignaciones/{asignacion_id}/enviar",
 )
@@ -75,13 +77,43 @@ def enviar_checklist_tecnico(
     service = EvidenceService(db)
 
     try:
-        return service.enviar_checklist_tecnico(
+        resultado = service.enviar_checklist_tecnico(
             assignment_id=asignacion_id,
             tecnico_id=tecnico.id,
         )
 
+        asignacion = AssignmentService(db).get_by_id(
+            asignacion_id
+        )
+
+        if asignacion:
+            nombre_tecnico = (
+                f"{tecnico.nombre} {tecnico.apellido}"
+            ).strip()
+
+            NotificationService.crear_para_rol(
+                db=db,
+                rol="administrador",
+                tipo="checklist_enviado",
+                titulo="Checklist enviado",
+                mensaje=(
+                    f"El técnico {nombre_tecnico} envió el "
+                    f"checklist de la asignación "
+                    f"#ASG-{asignacion_id:04d} "
+                    "para su revisión."
+                ),
+                actor_id=tecnico.id,
+                entidad_tipo="asignacion",
+                entidad_id=asignacion_id,
+            )
+
+            NotificationService.persistir(db)
+
+        return resultado
+
     except (ValueError, PermissionError, RuntimeError) as error:
         convertir_error(error)
+
 
 @router.post(
     "/tecnico/asignaciones/{asignacion_id}/items/{item_id}",
@@ -227,6 +259,7 @@ def exportar_evidencias_asignacion(
         convertir_error(error)
 
 
+
 @router.post(
     "/asignacion/{asignacion_id}/archivar",
     dependencies=[Depends(require_roles("administrador"))],
@@ -238,13 +271,51 @@ def archivar_evidencias_asignacion(
     administrador: User = Depends(require_roles("administrador")),
 ):
     service = EvidenceService(db)
+    assignment_service = AssignmentService(db)
 
     try:
-        return service.archivar_evidencias_asignacion(
+        anterior = assignment_service.get_by_id(
+            asignacion_id
+        )
+
+        resultado = service.archivar_evidencias_asignacion(
             assignment_id=asignacion_id,
             drive_web_view_link=drive_web_view_link,
             usuario_id=administrador.id,
         )
+
+        # Consultar nuevamente el estado después del archivado.
+        db.expire_all()
+
+        actualizada = assignment_service.get_by_id(
+            asignacion_id
+        )
+
+        if (
+            anterior
+            and actualizada
+            and anterior["estado"] != "en_documentacion"
+            and actualizada["estado"] == "en_documentacion"
+            and actualizada["documentador_id"]
+        ):
+            NotificationService.crear_para_usuario(
+                db=db,
+                usuario_id=actualizada["documentador_id"],
+                tipo="lista_documentacion",
+                titulo="Asignación lista para documentación",
+                mensaje=(
+                    f"La asignación #ASG-{asignacion_id:04d} "
+                    "ya cuenta con las evidencias archivadas "
+                    "y está lista para iniciar la documentación."
+                ),
+                actor_id=administrador.id,
+                entidad_tipo="asignacion",
+                entidad_id=asignacion_id,
+            )
+
+            NotificationService.persistir(db)
+
+        return resultado
 
     except (ValueError, PermissionError, RuntimeError) as error:
         convertir_error(error)

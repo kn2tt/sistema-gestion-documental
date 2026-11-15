@@ -1,0 +1,324 @@
+
+/* =========================================
+   CONTENEDOR DE LA CAMPANA
+   ========================================= */
+
+.notification-center-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* =========================================
+   INDICADOR
+   ========================================= */
+
+.notification-button.has-unread .notification-dot {
+    display: block;
+}
+
+.notification-button .notification-dot {
+    display: none;
+}
+
+/* =========================================
+   PANEL DESPLEGABLE
+   ========================================= */
+
+.notification-center-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+
+    width: 390px;
+    max-width: calc(100vw - 28px);
+    max-height: min(540px, calc(100vh - 100px));
+
+    display: flex;
+    flex-direction: column;
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+    border-radius: 12px;
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.10),
+        0 2px 6px rgba(15, 23, 42, 0.04);
+
+    overflow: hidden;
+    z-index: 1050;
+
+    transform-origin: top right;
+    animation: notificationPanelIn 0.16s ease-out;
+}
+
+.notification-center-panel[hidden] {
+    display: none !important;
+}
+
+@keyframes notificationPanelIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px) scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =========================================
+   ENCABEZADO
+   ========================================= */
+
+.notification-center-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 18px 19px 15px;
+
+    background: #ffffff;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.notification-center-header > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.notification-center-header strong {
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.notification-center-header span {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* =========================================
+   MARCAR COMO LEÍDAS
+   ========================================= */
+
+.notification-center-read-all {
+    padding: 5px 0;
+
+    border: none;
+    background: transparent;
+
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.notification-center-read-all:hover {
+    color: #1d4ed8;
+}
+
+.notification-center-read-all:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =========================================
+   LISTADO
+   ========================================= */
+
+.notification-center-list {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    max-height: 430px;
+}
+
+.notification-center-list[hidden] {
+    display: none !important;
+}
+
+/* =========================================
+   ELEMENTO
+   ========================================= */
+
+.notification-center-item {
+    position: relative;
+
+    width: 100%;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    padding: 15px 18px;
+
+    border: none;
+    border-bottom: 1px solid #f0f2f5;
+
+    background: #ffffff;
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: background 0.15s ease;
+}
+
+.notification-center-item:hover {
+    background: #f8fafc;
+}
+
+.notification-center-item.unread {
+    background: #f5f8ff;
+}
+
+.notification-center-item.unread:hover {
+    background: #eff5ff;
+}
+
+/* =========================================
+   ICONO
+   ========================================= */
+
+.notification-center-icon {
+    flex: 0 0 36px;
+
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 15px;
+}
+
+/* =========================================
+   INFORMACIÓN
+   ========================================= */
+
+.notification-center-content {
+    min-width: 0;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.notification-center-content strong {
+    color: #1e293b;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.notification-center-content > span {
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.notification-center-content small {
+    margin-top: 3px;
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+/* =========================================
+   PUNTO DE NO LEÍDA
+   ========================================= */
+
+.notification-center-unread-dot {
+    flex: 0 0 7px;
+
+    width: 7px;
+    height: 7px;
+
+    margin-top: 5px;
+
+    border-radius: 50%;
+    background: #2563eb;
+
+    visibility: hidden;
+}
+
+.notification-center-item.unread
+.notification-center-unread-dot {
+    visibility: visible;
+}
+
+/* =========================================
+   ESTADO VACÍO
+   ========================================= */
+
+.notification-center-empty {
+    min-height: 190px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+    padding: 25px;
+
+    text-align: center;
+}
+
+.notification-center-empty[hidden] {
+    display: none !important;
+}
+
+.notification-center-empty > i {
+    color: #cbd5e1;
+    font-size: 27px;
+}
+
+.notification-center-empty strong {
+    color: #334155;
+    font-size: 13px;
+}
+
+.notification-center-empty span {
+    max-width: 250px;
+    color: #94a3b8;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 576px) {
+    .notification-center-panel {
+        right: -8px;
+        width: min(370px, calc(100vw - 24px));
+        max-height: calc(100vh - 90px);
+    }
+
+    .notification-center-header {
+        padding: 15px;
+    }
+
+    .notification-center-item {
+        padding: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .notification-center-panel {
+        animation: none;
+    }
+}
